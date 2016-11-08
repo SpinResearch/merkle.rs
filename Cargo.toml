@@ -1,0 +1,13 @@
+
+[package]
+name = "merkle"
+version = "0.1.0"
+authors = [
+  "Frederic Jacobs <me@fredericjacobs.com>",
+  "Dylan Bourgeois <dtsbourg@gmail.com>",
+  "Romain Ruetschi <romain.ruetschi@gmail.com>"
+]
+
+[dependencies]
+rust-crypto = "^0.2.36"
+
