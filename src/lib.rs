@@ -36,8 +36,8 @@ enum Tree<T> where T: Hashable + Clone {
 impl <T> Tree<T> where T: Hashable + Clone {
     fn get_hash<'a>(&'a self) -> &'a Vec<u8> {
         match *self {
-            Tree::Leaf { hash: ref hash, value: _ }          => hash,
-            Tree::Node { hash: ref hash, left: _, right: _ } => hash
+            Tree::Leaf { ref hash, value: _ }          => hash,
+            Tree::Node { ref hash, left: _, right: _ } => hash
         }
     }
 }
@@ -85,27 +85,41 @@ impl <D, T> MerkleTree<D, T> where D: Digest + Clone, T: Hashable + Clone {
 
     // TODO: Don't clone all the things
     pub fn from_vec(digest: D, values: Vec<T>) -> MerkleTree<D, T> {
-        let leafs: Vec<Tree<T>> = values.iter().map(|v| make_leaf::<D, T>(digest.clone(), v.clone())).collect();
+        if values.is_empty() {
+            panic!("Cannot build a Merkle tree from an empty vector.");
+        }
 
-        for chunk in leafs.chunks(2) {
-            if chunk.len() == 1 {
+        let mut cur: Vec<_> =
+            values.iter()
+                  .map(|v| make_leaf::<D, T>(digest.clone(), v.clone()))
+                  .collect();
 
-            } else {
-                let left  = chunk[0].clone();
-                let right = chunk[1].clone();
+        while cur.len() > 1 {
+            cur = cur.chunks(2).map(|chunk|
+                if chunk.len() == 1 {
+                    chunk[0].clone()
+                } else {
+                    let left:  Tree<T> = chunk[0].clone();
+                    let right: Tree<T> = chunk[1].clone();
 
-                let combined_hash = combine_hashes::<D>(digest.clone(), left.get_hash().as_slice(), right.get_hash().as_slice());
-                let node = Tree::Node {
-                   hash: combined_hash,
-                   left: Box::new(left),
-                   right: Box::new(right)
-                };
-            }
+                    let combined_hash = combine_hashes::<D>(
+                        digest.clone(),
+                        left.get_hash().as_slice(),
+                        right.get_hash().as_slice()
+                    );
+
+                    Tree::Node {
+                       hash: combined_hash,
+                       left: Box::new(left),
+                       right: Box::new(right)
+                    }
+                }
+            ).collect();
         }
 
         return MerkleTree {
             digest: digest.clone(),
-            tree: make_leaf::<D, T>(digest, values[0].clone())
+            tree: cur[0].clone()
         };
 
     }
