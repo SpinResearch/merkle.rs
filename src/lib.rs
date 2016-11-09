@@ -91,8 +91,8 @@ impl <D, T> MerkleTree<D, T> where D: Digest + Clone, T: Hashable + Clone {
             if chunk.len() == 1 {
 
             } else {
-                let left: Tree<T>  = chunk[0].clone();
-                let right: Tree<T> = chunk[1].clone();
+                let left  = chunk[0].clone();
+                let right = chunk[1].clone();
 
                 let combined_hash = combine_hashes::<D>(digest.clone(), left.get_hash().as_slice(), right.get_hash().as_slice());
                 let node = Tree::Node {
