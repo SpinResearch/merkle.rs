@@ -19,6 +19,7 @@ impl Hashable for str {
     }
 }
 
+#[derive(Clone)]
 enum Tree<T> where T: Hashable + Clone {
     Leaf {
         hash: Vec<u8>,
@@ -49,7 +50,7 @@ pub struct MerkleTree<D, T> where D: Digest + Clone, T: Hashable + Clone {
 impl <T> Tree<T> where T: Hashable + Clone {
 
     // fn from_chunks<D>(digest: D, iter: Chunks<Tree<T>>) -> Tree<T> where D: Digest {
-    
+
     // }
 
 }
@@ -84,20 +85,20 @@ impl <D, T> MerkleTree<D, T> where D: Digest + Clone, T: Hashable + Clone {
 
     // TODO: Don't clone all the things
     pub fn from_vec(digest: D, values: Vec<T>) -> MerkleTree<D, T> {
-        let leafs: Vec<Box<Tree<T>>> = values.iter().map(|v| Box::new(make_leaf::<D, T>(digest.clone(), v.clone()))).collect();
+        let leafs: Vec<Tree<T>> = values.iter().map(|v| make_leaf::<D, T>(digest.clone(), v.clone())).collect();
 
         for chunk in leafs.chunks(2) {
             if chunk.len() == 1 {
 
             } else {
-                let left  = chunk[0].clone();
-                let right = chunk[1].clone();
+                let left: Tree<T>  = chunk[0].clone();
+                let right: Tree<T> = chunk[1].clone();
 
                 let combined_hash = combine_hashes::<D>(digest.clone(), left.get_hash().as_slice(), right.get_hash().as_slice());
                 let node = Tree::Node {
                    hash: combined_hash,
-                   left: left,
-                   right: right
+                   left: Box::new(left),
+                   right: Box::new(right)
                 };
             }
         }
@@ -120,4 +121,3 @@ fn test_stuff() {
 
 #[cfg(test)]
 pub mod tests;
-
