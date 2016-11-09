@@ -49,13 +49,9 @@ pub struct MerkleTree<D, T> where D: Digest + Clone, T: Hashable + Clone {
 
 impl <T> Tree<T> where T: Hashable + Clone {
 
-    // fn from_chunks<D>(digest: D, iter: Chunks<Tree<T>>) -> Tree<T> where D: Digest {
-
-    // }
-
 }
 
-fn make_hash<D, T>(mut digest: D, bytes: &[u8]) -> Vec<u8> where D: Digest, T: Hashable + Clone {
+fn make_hash<D, T>(mut digest: D, bytes: &[u8]) -> Vec<u8> where D: Digest {
     let mut hash = Vec::with_capacity(digest.output_bytes());
     digest.reset();
     digest.input(bytes);
@@ -74,7 +70,7 @@ fn combine_hashes<D>(mut digest: D, left: &[u8], right: &[u8]) -> Vec<u8> where 
     return hash;
 }
 
-fn make_leaf<D, T>(digest: D, value: T) -> Tree<T> where D: Digest + Clone, T: Hashable + Clone {
+fn make_leaf<D, T>(digest: D, value: T) -> Tree<T> where D: Digest, T: Hashable + Clone {
     return Tree::Leaf {
         hash: make_hash::<D, T>(digest, value.to_bytes()),
         value: value
