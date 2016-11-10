@@ -6,23 +6,29 @@ pub extern crate crypto;
 use crypto::digest::Digest;
 
 pub trait Hashable {
-    fn to_bytes(&self) -> &[u8];
+    fn to_bytes(&self) -> Vec<u8>;
 }
 
 impl Hashable for String {
-    fn to_bytes(&self) -> &[u8] {
-        return self.as_bytes();
+    fn to_bytes(&self) -> Vec<u8> {
+        self.clone().into_bytes()
     }
 }
 
-trait MerkleDigest {
-    fn hash_bytes(&mut self, bytes: &[u8]) -> Vec<u8>;
-    fn combine_hashes(&mut self, left: &[u8], right: &[u8]) -> Vec<u8>;
+impl Hashable for u8 {
+    fn to_bytes(&self) -> Vec<u8> {
+        vec![*self]
+    }
+}
+
+pub trait MerkleDigest {
+    fn hash_bytes(&mut self, bytes: &Vec<u8>) -> Vec<u8>;
+    fn combine_hashes(&mut self, left: &Vec<u8>, right: &Vec<u8>) -> Vec<u8>;
 }
 
 impl <D> MerkleDigest for D where D: Digest {
 
-    fn hash_bytes(&mut self, bytes: &[u8]) -> Vec<u8> {
+    fn hash_bytes(&mut self, bytes: &Vec<u8>) -> Vec<u8> {
         let mut hash = vec![0; self.output_bytes()];
 
         self.reset();
@@ -33,7 +39,7 @@ impl <D> MerkleDigest for D where D: Digest {
         hash
     }
 
-    fn combine_hashes(&mut self, left: &[u8], right: &[u8]) -> Vec<u8> {
+    fn combine_hashes(&mut self, left: &Vec<u8>, right: &Vec<u8>) -> Vec<u8> {
         let mut hash = vec![0; self.output_bytes()];
 
         self.reset();
@@ -78,7 +84,7 @@ impl <T> Tree<T> where T: Hashable {
 }
 
 fn make_leaf<D, T>(digest: &mut D, value: T) -> Tree<T> where D: Digest, T: Hashable {
-    let hash = digest.hash_bytes(value.to_bytes());
+    let hash = digest.hash_bytes(&value.to_bytes());
     Tree::new(hash, value)
 }
 
@@ -116,8 +122,8 @@ impl <D, T> MerkleTree<D, T> where D: Digest, T: Hashable {
                     let left  = cur.pop().unwrap();
 
                     let combined_hash = digest.combine_hashes(
-                        left.get_hash().as_slice(),
-                        right.get_hash().as_slice()
+                        left.get_hash(),
+                        right.get_hash()
                     );
 
                     let node = Tree::Node {
