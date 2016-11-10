@@ -1,4 +1,6 @@
 
+#![allow(dead_code)]
+
 pub extern crate crypto;
 
 use crypto::digest::Digest;
@@ -13,14 +15,30 @@ impl Hashable for String {
     }
 }
 
-impl Hashable for str {
-    fn to_bytes(&self) -> &[u8] {
-        return self.as_bytes();
-    }
+fn make_hash<D, T>(digest: &mut D, bytes: &[u8]) -> Vec<u8> where D: Digest {
+    let mut hash = vec![0; digest.output_bytes()];
+
+    digest.reset();
+    digest.input(bytes);
+    digest.result(&mut hash);
+    digest.reset();
+
+    hash
 }
 
-#[derive(Clone)]
-enum Tree<T> where T: Hashable + Clone {
+fn combine_hashes<D>(digest: &mut D, left: &[u8], right: &[u8]) -> Vec<u8> where D: Digest {
+    let mut hash = vec![0; digest.output_bytes()];
+
+    digest.reset();
+    digest.input(left);
+    digest.input(right);
+    digest.result(&mut hash);
+    digest.reset();
+
+    hash
+}
+
+enum Tree<T> {
     Leaf {
         hash: Vec<u8>,
         value: T
@@ -33,8 +51,16 @@ enum Tree<T> where T: Hashable + Clone {
     }
 }
 
-impl <T> Tree<T> where T: Hashable + Clone {
-    fn get_hash<'a>(&'a self) -> &'a Vec<u8> {
+impl <T> Tree<T> where T: Hashable {
+
+    fn new(hash: Vec<u8>, value: T) -> Self {
+        Tree::Leaf {
+            hash: hash,
+            value: value
+        }
+    }
+
+    fn get_hash(&self) -> &Vec<u8> {
         match *self {
             Tree::Leaf { ref hash, value: _ }          => hash,
             Tree::Node { ref hash, left: _, right: _ } => hash
@@ -42,82 +68,67 @@ impl <T> Tree<T> where T: Hashable + Clone {
     }
 }
 
-pub struct MerkleTree<D, T> where D: Digest + Clone, T: Hashable + Clone {
+fn make_leaf<D, T>(digest: &mut D, value: T) -> Tree<T> where D: Digest, T: Hashable {
+    let hash = make_hash::<D, T>(digest, value.to_bytes());
+    Tree::new(hash, value)
+}
+
+pub struct MerkleTree<D, T> where D: Digest, T: Hashable {
     digest: D,
     tree: Tree<T>
 }
 
-impl <T> Tree<T> where T: Hashable + Clone {
+impl <D, T> MerkleTree<D, T> where D: Digest, T: Hashable {
 
-}
-
-fn make_hash<D, T>(mut digest: D, bytes: &[u8]) -> Vec<u8> where D: Digest {
-    let mut hash = Vec::with_capacity(digest.output_bytes());
-    digest.reset();
-    digest.input(bytes);
-    digest.result(hash.as_mut_slice());
-    digest.reset();
-    return hash;
-}
-
-fn combine_hashes<D>(mut digest: D, left: &[u8], right: &[u8]) -> Vec<u8> where D: Digest {
-    let mut hash = Vec::with_capacity(digest.output_bytes());
-    digest.reset();
-    digest.input(left);
-    digest.input(right);
-    digest.result(hash.as_mut_slice());
-    digest.reset();
-    return hash;
-}
-
-fn make_leaf<D, T>(digest: D, value: T) -> Tree<T> where D: Digest, T: Hashable + Clone {
-    return Tree::Leaf {
-        hash: make_hash::<D, T>(digest, value.to_bytes()),
-        value: value
-    };
-}
-
-impl <D, T> MerkleTree<D, T> where D: Digest + Clone, T: Hashable + Clone {
-
-    // TODO: Don't clone all the things
-    pub fn from_vec(digest: D, values: Vec<T>) -> MerkleTree<D, T> {
+    pub fn from_vec(mut digest: D, values: Vec<T>) -> Self {
         if values.is_empty() {
             panic!("Cannot build a Merkle tree from an empty vector.");
         }
 
-        let mut cur: Vec<_> =
-            values.iter()
-                  .map(|v| make_leaf::<D, T>(digest.clone(), v.clone()))
-                  .collect();
+        let len = values.len();
+        let mut cur = Vec::with_capacity(len);
+
+        for v in values {
+            let leaf = make_leaf(&mut digest, v);
+            cur.push(leaf);
+        }
 
         while cur.len() > 1 {
-            cur = cur.chunks(2).map(|chunk|
-                if chunk.len() == 1 {
-                    chunk[0].clone()
-                } else {
-                    let left:  Tree<T> = chunk[0].clone();
-                    let right: Tree<T> = chunk[1].clone();
+            let mut next = Vec::with_capacity(len);
+
+            while cur.len() > 0 {
+                if cur.len() == 1 {
+                    next.push(cur.remove(0));
+                }
+                else {
+                    let left  = cur.remove(0);
+                    let right = cur.remove(0);
 
                     let combined_hash = combine_hashes::<D>(
-                        digest.clone(),
+                        &mut digest,
                         left.get_hash().as_slice(),
                         right.get_hash().as_slice()
                     );
 
-                    Tree::Node {
+                    let node = Tree::Node {
                        hash: combined_hash,
                        left: Box::new(left),
                        right: Box::new(right)
-                    }
+                    };
+
+                    next.push(node);
                 }
-            ).collect();
+            }
+
+            cur = next;
         }
 
-        return MerkleTree {
-            digest: digest.clone(),
-            tree: cur[0].clone()
-        };
+        let tree = cur.remove(0);
 
+        MerkleTree {
+            digest: digest,
+            tree: tree
+        }
     }
 
 }
