@@ -112,16 +112,18 @@ impl <D, T> MerkleTree<D, T> where D: Digest, T: Hashable {
             cur.push(leaf);
         }
 
+        cur.reverse();
+
         for i in 0 .. height {
             let mut next = Vec::with_capacity(height / 2 << i);
 
             while cur.len() > 0 {
                 if cur.len() == 1 {
-                    next.push(cur.pop().unwrap());
+                    next.push(cur.remove(0));
                 }
                 else {
-                    let right = cur.pop().unwrap();
-                    let left  = cur.pop().unwrap();
+                    let left  = cur.remove(0);
+                    let right = cur.remove(0);
 
                     let combined_hash = digest.combine_hashes(
                         left.get_hash(),
