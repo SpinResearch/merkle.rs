@@ -15,27 +15,36 @@ impl Hashable for String {
     }
 }
 
-fn make_hash<D, T>(digest: &mut D, bytes: &[u8]) -> Vec<u8> where D: Digest {
-    let mut hash = vec![0; digest.output_bytes()];
-
-    digest.reset();
-    digest.input(bytes);
-    digest.result(&mut hash);
-    digest.reset();
-
-    hash
+trait MerkleDigest {
+    fn hash_bytes(&mut self, bytes: &[u8]) -> Vec<u8>;
+    fn combine_hashes(&mut self, left: &[u8], right: &[u8]) -> Vec<u8>;
 }
 
-fn combine_hashes<D>(digest: &mut D, left: &[u8], right: &[u8]) -> Vec<u8> where D: Digest {
-    let mut hash = vec![0; digest.output_bytes()];
+impl <D> MerkleDigest for D where D: Digest {
 
-    digest.reset();
-    digest.input(left);
-    digest.input(right);
-    digest.result(&mut hash);
-    digest.reset();
+    fn hash_bytes(&mut self, bytes: &[u8]) -> Vec<u8> {
+        let mut hash = vec![0; self.output_bytes()];
 
-    hash
+        self.reset();
+        self.input(bytes);
+        self.result(&mut hash);
+        self.reset();
+
+        hash
+    }
+
+    fn combine_hashes(&mut self, left: &[u8], right: &[u8]) -> Vec<u8> {
+        let mut hash = vec![0; self.output_bytes()];
+
+        self.reset();
+        self.input(left);
+        self.input(right);
+        self.result(&mut hash);
+        self.reset();
+
+        hash
+    }
+
 }
 
 enum Tree<T> {
@@ -69,7 +78,7 @@ impl <T> Tree<T> where T: Hashable {
 }
 
 fn make_leaf<D, T>(digest: &mut D, value: T) -> Tree<T> where D: Digest, T: Hashable {
-    let hash = make_hash::<D, T>(digest, value.to_bytes());
+    let hash = digest.hash_bytes(value.to_bytes());
     Tree::new(hash, value)
 }
 
@@ -106,8 +115,7 @@ impl <D, T> MerkleTree<D, T> where D: Digest, T: Hashable {
                     let right = cur.pop().unwrap();
                     let left  = cur.pop().unwrap();
 
-                    let combined_hash = combine_hashes::<D>(
-                        &mut digest,
+                    let combined_hash = digest.combine_hashes(
                         left.get_hash().as_slice(),
                         right.get_hash().as_slice()
                     );
