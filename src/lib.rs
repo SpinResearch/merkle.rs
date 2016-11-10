@@ -90,7 +90,9 @@ fn make_leaf<D, T>(digest: &mut D, value: T) -> Tree<T> where D: Digest, T: Hash
 
 pub struct MerkleTree<D, T> where D: Digest, T: Hashable {
     digest: D,
-    tree: Tree<T>
+    tree: Tree<T>,
+    height: usize,
+    count: usize
 }
 
 impl <D, T> MerkleTree<D, T> where D: Digest, T: Hashable {
@@ -100,18 +102,18 @@ impl <D, T> MerkleTree<D, T> where D: Digest, T: Hashable {
             panic!("Cannot build a Merkle tree from an empty vector.");
         }
 
-        let len = values.len();
-        let mut cur = Vec::with_capacity(len);
+        let count  = values.len();
+        let height = (count as f32 + 1.0).log2().ceil() as usize;
 
-        for v in values {
+        let mut cur = Vec::with_capacity(count);
+
+        for v in values.into_iter().rev() {
             let leaf = make_leaf(&mut digest, v);
             cur.push(leaf);
         }
 
-        cur.reverse();
-
-        while cur.len() > 1 {
-            let mut next = Vec::with_capacity(len);
+        for i in 0 .. height {
+            let mut next = Vec::with_capacity(height / 2 << i);
 
             while cur.len() > 0 {
                 if cur.len() == 1 {
@@ -139,22 +141,24 @@ impl <D, T> MerkleTree<D, T> where D: Digest, T: Hashable {
             cur = next;
         }
 
+        assert!(cur.len() == 1);
+
         let tree = cur.remove(0);
 
         MerkleTree {
             digest: digest,
-            tree: tree
+            tree: tree,
+            height: height,
+            count: count
         }
+    }
+
+    fn root_hash(&self) -> &Vec<u8> {
+        self.tree.get_hash()
     }
 
 }
 
 #[cfg(test)]
-use crypto::sha3::Sha3;
+mod tests;
 
-#[test]
-fn test_stuff() {
-}
-
-#[cfg(test)]
-pub mod tests;
