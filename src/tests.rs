@@ -20,7 +20,7 @@ mod tests {
 
         let root_hash = Sha3::sha3_256().combine_hashes(
             &Sha3::sha3_256().combine_hashes(&hashes[0], &hashes[1]),
-            &Sha3::sha3_256().hash_bytes(&hashes[2])
+            &hashes[2]
         );
 
         assert_eq!(tree.count, 3);
@@ -49,7 +49,7 @@ mod tests {
                     &Sha3::sha3_256().combine_hashes(&hashes[6], &hashes[7])
                 )
             ),
-            &Sha3::sha3_256().hash_bytes(&hashes[8])
+            &hashes[8]
         );
 
         assert_eq!(tree.count, count);
