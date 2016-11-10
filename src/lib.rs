@@ -88,7 +88,7 @@ fn make_leaf<D, T>(digest: &mut D, value: T) -> Tree<T> where D: Digest, T: Hash
     Tree::new(hash, value)
 }
 
-pub struct MerkleTree<D, T> where D: Digest, T: Hashable {
+pub struct MerkleTree<D, T> {
     digest: D,
     tree: Tree<T>,
     height: usize,
