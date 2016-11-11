@@ -2,7 +2,6 @@
 #![allow(dead_code)]
 
 pub extern crate crypto;
-use crypto::digest::Digest;
 
 mod tree;
 pub use tree::{
@@ -18,3 +17,4 @@ pub use merkletree::{
 
 #[cfg(test)]
 mod tests;
+
