@@ -6,6 +6,7 @@ use merkledigest::{ MerkleDigest };
 
 /// The Merkle tree
 pub struct MerkleTree<D, T> {
+    #[allow(dead_code)]
     digest: D,
     tree: Tree<T>,
     pub height: usize,
@@ -24,12 +25,10 @@ impl <D, T> MerkleTree<D, T> where D: Digest, T: Hashable {
 
         let mut cur = Vec::with_capacity(count);
 
-        for v in values.into_iter().rev() {
+        for v in values.into_iter() {
             let leaf = Tree::make_leaf(&mut digest, v);
             cur.push(leaf);
         }
-
-        cur.reverse();
 
         while cur.len() > 1 {
             let mut next = Vec::new();
