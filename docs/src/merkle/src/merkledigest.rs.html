@@ -75,12 +75,22 @@
 <span id="31">31</span>
 <span id="32">32</span>
 <span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>crypto</span>::<span class='ident'>digest</span>::<span class='ident'>Digest</span>;
 
-<span class='doccomment'>/// Extends the standard `crypto::digest::Digest` to play nicely with our Merkle Tree</span>
+<span class='doccomment'>/// The sole purpose of this trait is to extend the standard</span>
+<span class='doccomment'>/// `crypto::digest::Digest` with a couple utility functions.</span>
 <span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>MerkleDigest</span> {
+
+    <span class='doccomment'>/// Compute the hash the given byte array</span>
     <span class='kw'>fn</span> <span class='ident'>hash_bytes</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>bytes</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>;
+
+    <span class='doccomment'>/// Compute the hash of the concatenation of `left` and `right`</span>
     <span class='kw'>fn</span> <span class='ident'>combine_hashes</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>left</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>right</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>;
 }
 
@@ -166,11 +176,9 @@
     <script>
         window.rootPath = "../../../";
         window.currentCrate = "merkle";
-        window.playgroundUrl = "";
     </script>
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
-    
     <script defer src="../../../search-index.js"></script>
 </body>
 </html>

@@ -47,19 +47,39 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-52' class='srclink' href='../src/merkle/src/merkletree.rs.html#8-13' title='goto source code'>[src]</a></span></h1>
-<pre class='rust struct'>pub struct MerkleTree&lt;D,&nbsp;T&gt; {
+               </span><a id='src-10' class='srclink' href='../src/merkle/src/merkletree.rs.html#14-26' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct MerkleTree&lt;D, T&gt; {
+    pub digest: D,
+    pub tree: Tree&lt;T&gt;,
     pub height: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>,
     pub count: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>,
-    // some fields omitted
-}</pre><div class='docblock'><p>The Merkle tree</p>
-</div><h2 class='fields'>Fields</h2><span id='structfield.height' class='structfield'><code>height: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code>
-                           </span><span class='stab '></span><span id='structfield.count' class='structfield'><code>count: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code>
-                           </span><span class='stab '></span><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;D,&nbsp;T&gt; <a class='struct' href='../merkle/struct.MerkleTree.html' title='merkle::MerkleTree'>MerkleTree</a>&lt;D,&nbsp;T&gt; <span class='where'>where D: Digest, T: <a class='trait' href='../merkle/trait.Hashable.html' title='merkle::Hashable'>Hashable</a></span></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-59' class='srclink' href='../src/merkle/src/merkletree.rs.html#15-81' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.from_vec' class='method'><code>fn <a href='#method.from_vec' class='fnname'>from_vec</a>(digest: D, values: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;T&gt;) -&gt; Self</code></h4>
-<div class='docblock'><p>Constructs a Merkle Tree from a vector of data blocks.</p>
-</div><h4 id='method.root_hash' class='method'><code>fn <a href='#method.root_hash' class='fnname'>root_hash</a>(&amp;self) -&gt; &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;</code></h4>
-<div class='docblock'><p>Returns the tree&#39;s root hash.</p>
+}</pre><div class='docblock'><p>A Merkle tree is a binary tree, with values of type <code>T</code> at the leafs,
+and where every node holds the hash of the concatenation of the hashes of
+its children nodes.</p>
+</div><h2 class='fields'>Fields</h2><span id='structfield.digest' class='structfield'>
+                           <span id='digest.v' class='invisible'>
+                           <code>digest: D</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The hashing function used by this Merkle tree</p>
+</div><span id='structfield.tree' class='structfield'>
+                           <span id='tree.v' class='invisible'>
+                           <code>tree: Tree&lt;T&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The inner binary tree</p>
+</div><span id='structfield.height' class='structfield'>
+                           <span id='height.v' class='invisible'>
+                           <code>height: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The height of the tree</p>
+</div><span id='structfield.count' class='structfield'>
+                           <span id='count.v' class='invisible'>
+                           <code>count: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The number of leaf nodes in the tree</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;D, T&gt; <a class='struct' href='../merkle/struct.MerkleTree.html' title='merkle::MerkleTree'>MerkleTree</a>&lt;D, T&gt; <span class='where'>where D: Digest + <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>, T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;&gt; + <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a></span></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-17' class='srclink' href='../src/merkle/src/merkletree.rs.html#28-109' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.from_vec' class='method'><span id='from_vec.v' class='invisible'><code>fn <a href='#method.from_vec' class='fnname'>from_vec</a>(digest: D, values: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;T&gt;) -&gt; Self</code></span></h4>
+<div class='docblock'><p>Constructs a Merkle Tree from a vector of data blocks</p>
+</div><h4 id='method.root_hash' class='method'><span id='root_hash.v' class='invisible'><code>fn <a href='#method.root_hash' class='fnname'>root_hash</a>(&amp;self) -&gt; &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;</code></span></h4>
+<div class='docblock'><p>Returns the tree&#39;s root hash</p>
+</div><h4 id='method.gen_proof' class='method'><span id='gen_proof.v' class='invisible'><code>fn <a href='#method.gen_proof' class='fnname'>gen_proof</a>(&amp;self, value: &amp;T) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../merkle/struct.Proof.html' title='merkle::Proof'>Proof</a>&lt;D, T&gt;&gt;</code></span></h4>
+<div class='docblock'><p>Generate an inclusion proof for the given value.
+<code>None</code> is returned if the given value is not found in the tree.</p>
 </div></div></section>
     <section id='search' class="content hidden"></section>
 
@@ -116,11 +136,9 @@
     <script>
         window.rootPath = "../";
         window.currentCrate = "merkle";
-        window.playgroundUrl = "";
     </script>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
-    
     <script defer src="../search-index.js"></script>
 </body>
 </html>

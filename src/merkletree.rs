@@ -3,17 +3,31 @@ use crypto::digest::Digest;
 use tree::{ Tree };
 use merkledigest::{ MerkleDigest };
 
-/// The Merkle tree
+pub use proof::{
+    Proof,
+    ProofBlock
+};
+
+/// A Merkle tree is a binary tree, with values of type `T` at the leafs,
+/// and where every node holds the hash of the concatenation of the hashes of
+/// its children nodes.
 pub struct MerkleTree<D, T> {
-    #[allow(dead_code)]
-    digest: D,
-    tree: Tree<T>,
+    /// The hashing function used by this Merkle tree
+    pub digest: D,
+
+    /// The inner binary tree
+    pub tree: Tree<T>,
+
+    /// The height of the tree
     pub height: usize,
+
+    /// The number of leaf nodes in the tree
     pub count: usize
 }
 
-impl <D, T> MerkleTree<D, T> where D: Digest, T: Into<Vec<u8>> + Clone {
-    /// Constructs a Merkle Tree from a vector of data blocks.
+impl <D, T> MerkleTree<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
+
+    /// Constructs a Merkle Tree from a vector of data blocks
     pub fn from_vec(mut digest: D, values: Vec<T>) -> Self {
         if values.is_empty() {
             panic!("Cannot build a Merkle tree from an empty vector.");
@@ -71,9 +85,26 @@ impl <D, T> MerkleTree<D, T> where D: Digest, T: Into<Vec<u8>> + Clone {
         }
     }
 
-    /// Returns the tree's root hash.
+    /// Returns the tree's root hash
     pub fn root_hash(&self) -> &Vec<u8> {
         self.tree.get_hash()
     }
 
+    /// Generate an inclusion proof for the given value.
+    /// `None` is returned if the given value is not found in the tree.
+    pub fn gen_proof(&self, value: &T) -> Option<Proof<D, T>> {
+        let mut digest = self.digest.clone();
+        let hash       = digest.hash_bytes(&value.clone().into());
+
+        ProofBlock::new(&self.tree, &hash).map(|block|
+            Proof {
+                digest: digest,
+                root_hash: self.root_hash().clone(),
+                block: block,
+                value: value.clone()
+            }
+        )
+    }
+
 }
+

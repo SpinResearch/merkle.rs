@@ -5,7 +5,7 @@ use crypto::sha3::Sha3;
 
 use merkletree::{ MerkleTree };
 use merkledigest::{ MerkleDigest };
-
+use proof::{ Positioned };
 
 #[test]
 fn test_from_str_vec() {
@@ -120,4 +120,78 @@ fn test_from_vec9() {
     assert_eq!(tree.count, count);
     assert_eq!(tree.height, 4);
     assert_eq!(tree.root_hash().as_slice(), root_hash.as_slice());
+}
+
+#[test]
+fn test_valid_proof() {
+    let digest               = Sha3::sha3_256();
+    let values: Vec<Vec<u8>> = vec![1, 2, 3, 4, 5, 6, 7, 8, 9].iter().map(|x| vec![*x]).collect();
+    let tree                 = MerkleTree::from_vec(digest, values.clone());
+    let root_hash            = tree.root_hash();
+
+    for value in values.iter() {
+        let proof    = tree.gen_proof(value);
+        let is_valid = proof.map(|p| p.validate(&root_hash)).unwrap_or(false);
+
+        assert!(is_valid);
+    }
+}
+
+#[test]
+fn test_valid_proof_str() {
+    let digest    = Sha3::sha3_256();
+    let values    = vec!["Hello", "my", "name", "is", "Rusty"];
+    let tree      = MerkleTree::from_vec(digest, values.clone());
+    let root_hash = tree.root_hash();
+
+    let value = "Rusty";
+
+    let proof    = tree.gen_proof(&value);
+    let is_valid = proof.map(|p| p.validate(&root_hash)).unwrap_or(false);
+
+    assert!(is_valid);
+}
+
+#[test]
+fn test_wrong_proof() {
+    let digest1   = Sha3::sha3_256();
+    let values1   = vec![vec![1], vec![2], vec![3], vec![4]];
+    let tree1     = MerkleTree::from_vec(digest1, values1.clone());
+
+    let digest2   = Sha3::sha3_256();
+    let values2   = vec![vec![4], vec![5], vec![6], vec![7]];
+    let tree2     = MerkleTree::from_vec(digest2, values2.clone());
+    let root_hash = tree2.root_hash();
+
+    for value in values1.iter() {
+        let proof    = tree1.gen_proof(value);
+        let is_valid = proof.map(|p| p.validate(root_hash)).unwrap_or(false);
+
+        assert_eq!(is_valid, false);
+    }
+}
+
+#[test]
+fn test_mutate_proof_first_block() {
+    let digest    = Sha3::sha3_256();
+    let values    = vec![1, 2, 3, 4].iter().map(|x| vec![*x]).collect::<Vec<Vec<u8>>>();
+    let tree      = MerkleTree::from_vec(digest, values.clone());
+    let root_hash = tree.root_hash();
+
+    let mut i = 0;
+
+    for value in values.iter() {
+        let mut proof = tree.gen_proof(value).unwrap();
+
+        if i % 2 == 0 {
+            proof.block.node_hash = vec![1,2,3];
+        } else {
+            proof.block.sibling_hash = Positioned::Left(vec![1,2,3]);
+        }
+
+        let is_valid = proof.validate(root_hash);
+        assert_eq!(is_valid, false);
+
+        i += 1;
+    }
 }
