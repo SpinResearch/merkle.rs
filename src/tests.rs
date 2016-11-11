@@ -89,7 +89,7 @@ fn test_from_vec1() {
     let root_hash = &d.hash_bytes(&"hello, world".to_string().to_bytes());
 
     assert_eq!(tree.count, 1);
-    assert_eq!(tree.height, 1);
+    assert_eq!(tree.height, 0);
     assert_eq!(tree.root_hash().as_slice(), root_hash.as_slice());
 }
 
