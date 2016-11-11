@@ -14,7 +14,7 @@ Documentation is [available](https://spinresearch.github.io/merkle.rs/merkle/ind
 ## Bug Reporting
 
 Please report bugs either as pull requests or as issues in [the issue
-tracker](https://github.com/SpinResearch/lamport.rs). *lamport* has a
+tracker](https://github.com/SpinResearch/merkle.rs). *merkle* has a
 **full disclosure** vulnerability policy. **Please do NOT attempt to report
 any security vulnerability in this code privately to anybody.**
 
