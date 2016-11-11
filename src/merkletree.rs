@@ -3,16 +3,21 @@ use crypto::digest::Digest;
 use tree::{ Tree };
 use merkledigest::{ MerkleDigest };
 
+pub use proof::{
+    Proof,
+    ProofBlock
+};
+
 /// The Merkle tree
 pub struct MerkleTree<D, T> {
-    #[allow(dead_code)]
-    digest: D,
-    tree: Tree<T>,
+    pub digest: D,
+    pub tree: Tree<T>,
     pub height: usize,
     pub count: usize
 }
 
-impl <D, T> MerkleTree<D, T> where D: Digest, T: Into<Vec<u8>> + Clone {
+impl <D, T> MerkleTree<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
+
     /// Constructs a Merkle Tree from a vector of data blocks.
     pub fn from_vec(mut digest: D, values: Vec<T>) -> Self {
         if values.is_empty() {
@@ -76,4 +81,23 @@ impl <D, T> MerkleTree<D, T> where D: Digest, T: Into<Vec<u8>> + Clone {
         self.tree.get_hash()
     }
 
+    /// Generate an inclusion proof for the given value
+    pub fn gen_proof(&mut self, value: &T) -> Option<Proof<D, T>> {
+        let hash = self.digest.hash_bytes(&value.clone().into());
+
+        ProofBlock::new(&self.tree, &hash).map(|block|
+            Proof {
+                digest: self.digest.clone(),
+                root_hash: self.root_hash().clone(),
+                block: block,
+                value: value.clone()
+            }
+        )
+    }
+
+    pub fn is_proof_valid(&mut self, proof: &Proof<D, T>) -> bool {
+        proof.validate_against(self)
+    }
+
 }
+
