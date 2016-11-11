@@ -1,11 +1,8 @@
-extern crate crypto;
 use crypto::digest::Digest;
 
-pub use tree::{
-    Tree,
-    Hashable,
-    MerkleDigest,
-};
+use tree::{ Tree };
+use hashable::{ Hashable };
+use merkledigest::{ MerkleDigest };
 
 pub struct MerkleTree<D, T> {
     digest: D,
