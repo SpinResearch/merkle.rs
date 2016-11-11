@@ -18,11 +18,8 @@ impl <D, T> MerkleTree<D, T> where D: Digest, T: Hashable {
             panic!("Cannot build a Merkle tree from an empty vector.");
         }
 
-        let count  = values.len();
+        let count      = values.len();
         let mut height = 0;
-        if count == 1 {
-            height = 1;
-        }
 
         let mut cur = Vec::with_capacity(count);
 
@@ -57,7 +54,9 @@ impl <D, T> MerkleTree<D, T> where D: Digest, T: Hashable {
                     next.push(node);
                 }
             }
-            height = height + 1;
+
+            height += 1;
+
             cur = next;
         }
 

@@ -30,10 +30,13 @@ fn test_from_str_vec() {
 
     let tree   = MerkleTree::from_vec(digest, values);
 
-    let root_hash = Sha3::sha3_256().combine_hashes(
-        &Sha3::sha3_256().combine_hashes(&hashes[0], &hashes[1]),
-        &Sha3::sha3_256().combine_hashes(&hashes[2], &hashes[3]),
-    );
+
+    let mut d = Sha3::sha3_256();
+
+    let h01 = &d.combine_hashes(&hashes[0], &hashes[1]);
+    let h23 = &d.combine_hashes(&hashes[2], &hashes[3]);
+
+    let root_hash = d.combine_hashes(h01, h23);
 
     assert_eq!(tree.count, count);
     assert_eq!(tree.height, 2);
@@ -62,7 +65,7 @@ fn test_from_vec1() {
     let root_hash = &d.hash_bytes(&"hello, world".to_string().to_bytes());
 
     assert_eq!(tree.count, 1);
-    assert_eq!(tree.height, 1);
+    assert_eq!(tree.height, 0);
     assert_eq!(tree.root_hash().as_slice(), root_hash.as_slice());
 }
 
