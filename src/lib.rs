@@ -1,6 +1,7 @@
 
-#![allow(dead_code)]
+//! *merkle* implements a Merkle Tree in Rust.
 
+#[doc(no_inline)]
 pub extern crate crypto;
 
 mod tree;
@@ -14,4 +15,3 @@ pub use merkledigest::{ MerkleDigest };
 
 #[cfg(test)]
 mod tests;
-

@@ -4,6 +4,7 @@ use tree::{ Tree };
 use hashable::{ Hashable };
 use merkledigest::{ MerkleDigest };
 
+/// The Merkle tree
 pub struct MerkleTree<D, T> {
     digest: D,
     tree: Tree<T>,
@@ -12,7 +13,7 @@ pub struct MerkleTree<D, T> {
 }
 
 impl <D, T> MerkleTree<D, T> where D: Digest, T: Hashable {
-
+    /// Constructs a Merkle Tree from a vector of data blocks.
     pub fn from_vec(mut digest: D, values: Vec<T>) -> Self {
         if values.is_empty() {
             panic!("Cannot build a Merkle tree from an empty vector.");
@@ -72,6 +73,7 @@ impl <D, T> MerkleTree<D, T> where D: Digest, T: Hashable {
         }
     }
 
+    /// Returns the tree's root hash.
     pub fn root_hash(&self) -> &Vec<u8> {
         self.tree.get_hash()
     }

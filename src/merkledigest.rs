@@ -1,5 +1,6 @@
 use crypto::digest::Digest;
 
+/// Extends the standard `crypto::digest::Digest` to play nicely with our Merkle Tree
 pub trait MerkleDigest {
     fn hash_bytes(&mut self, bytes: &Vec<u8>) -> Vec<u8>;
     fn combine_hashes(&mut self, left: &Vec<u8>, right: &Vec<u8>) -> Vec<u8>;
