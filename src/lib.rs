@@ -9,18 +9,6 @@ pub trait Hashable {
     fn to_bytes(&self) -> Vec<u8>;
 }
 
-impl Hashable for String {
-    fn to_bytes(&self) -> Vec<u8> {
-        self.clone().into_bytes()
-    }
-}
-
-impl Hashable for u8 {
-    fn to_bytes(&self) -> Vec<u8> {
-        vec![*self]
-    }
-}
-
 pub trait MerkleDigest {
     fn hash_bytes(&mut self, bytes: &Vec<u8>) -> Vec<u8>;
     fn combine_hashes(&mut self, left: &Vec<u8>, right: &Vec<u8>) -> Vec<u8>;
@@ -103,8 +91,11 @@ impl <D, T> MerkleTree<D, T> where D: Digest, T: Hashable {
         }
 
         let count  = values.len();
-        let height = (count as f32 + 1.0).log2().ceil() as usize;
-
+        let mut height = 0;
+        if count == 1 {
+            height = 1;
+        }
+        
         let mut cur = Vec::with_capacity(count);
 
         for v in values.into_iter().rev() {
@@ -114,9 +105,8 @@ impl <D, T> MerkleTree<D, T> where D: Digest, T: Hashable {
 
         cur.reverse();
 
-        for i in 0 .. height {
-            let mut next = Vec::with_capacity(height / 2 << i);
-
+        while cur.len() > 1 {
+            let mut next = Vec::new();
             while cur.len() > 0 {
                 if cur.len() == 1 {
                     next.push(cur.remove(0));
@@ -139,7 +129,7 @@ impl <D, T> MerkleTree<D, T> where D: Digest, T: Hashable {
                     next.push(node);
                 }
             }
-
+            height = height + 1;
             cur = next;
         }
 
@@ -163,4 +153,3 @@ impl <D, T> MerkleTree<D, T> where D: Digest, T: Hashable {
 
 #[cfg(test)]
 mod tests;
-

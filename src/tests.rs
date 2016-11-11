@@ -7,6 +7,59 @@ use MerkleTree;
 use MerkleDigest;
 use Hashable;
 
+impl Hashable for String {
+    fn to_bytes(&self) -> Vec<u8> {
+        self.clone().into_bytes()
+    }
+}
+
+impl Hashable for u8 {
+    fn to_bytes(&self) -> Vec<u8> {
+        vec![*self]
+    }
+}
+
+
+impl Hashable for &'static str {
+    fn to_bytes(&self) -> Vec<u8> {
+        self.as_bytes().to_vec()
+    }
+}
+
+
+#[test]
+fn test_from_str_vec() {
+    let mut digest = Sha3::sha3_256();
+
+    let values = vec![
+                        "one",
+                        "two",
+                        "three",
+                        "four"
+                    ];
+
+    let hashes = vec![
+                        digest.hash_bytes(&values[0].to_bytes()),
+                        digest.hash_bytes(&values[1].to_bytes()),
+                        digest.hash_bytes(&values[2].to_bytes()),
+                        digest.hash_bytes(&values[3].to_bytes())
+                    ];
+
+    let count  = values.len();
+
+    let tree   = MerkleTree::from_vec(digest, values);
+
+    let root_hash = Sha3::sha3_256().combine_hashes(
+        &Sha3::sha3_256().combine_hashes(&hashes[0], &hashes[1]),
+        &Sha3::sha3_256().combine_hashes(&hashes[2], &hashes[3]),
+    );
+
+    assert_eq!(tree.count, count);
+    assert_eq!(tree.height, 2);
+    assert_eq!(tree.root_hash().as_slice(), root_hash.as_slice());
+}
+
+
 #[test]
 #[should_panic]
 fn test_from_vec_empty() {
@@ -85,4 +138,3 @@ fn test_from_vec9() {
     assert_eq!(tree.height, 4);
     assert_eq!(tree.root_hash().as_slice(), root_hash.as_slice());
 }
-
