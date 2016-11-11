@@ -3,9 +3,14 @@
 
 use crypto::sha3::Sha3;
 
-use MerkleTree;
-use MerkleDigest;
-use Hashable;
+use tree::{
+    Hashable,
+    MerkleDigest,
+};
+
+use merkletree::{
+    MerkleTree
+};
 
 impl Hashable for String {
     fn to_bytes(&self) -> Vec<u8> {
