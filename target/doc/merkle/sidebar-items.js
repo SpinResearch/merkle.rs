@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Tree","Binary Tree where leaves hold a stand-alone value."]],"struct":[["MerkleTree","The Merkle tree"]],"trait":[["Hashable","By definition, data in the Merkle Tree must implement Hashable"],["MerkleDigest","Extends the standard `crypto::digest::Digest` to play nicely with our Merkle Tree"]]});
