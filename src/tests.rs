@@ -136,6 +136,19 @@ fn test_valid_proof() {
 }
 
 #[test]
+fn test_valid_proof_str() {
+    let digest   = Sha3::sha3_256();
+    let values   = vec!["Hello", "my", "name", "is", "Rusty"];
+    let mut tree = MerkleTree::from_vec(digest, values.clone());
+    let value = "Rusty";
+
+    let proof    = tree.gen_proof(&value);
+    let is_valid = proof.map(|p| tree.is_proof_valid(&p)).unwrap_or(false);
+
+    assert!(is_valid);
+}
+
+#[test]
 #[should_panic]
 fn test_invalid_proof() {
     let digest1   = Sha3::sha3_256();
