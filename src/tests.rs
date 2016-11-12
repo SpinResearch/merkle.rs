@@ -149,7 +149,6 @@ fn test_valid_proof_str() {
 }
 
 #[test]
-#[should_panic]
 fn test_invalid_proof() {
     let digest1   = Sha3::sha3_256();
     let values1   = vec![vec![1], vec![2], vec![3], vec![4]];
@@ -163,6 +162,6 @@ fn test_invalid_proof() {
         let proof    = tree1.gen_proof(value);
         let is_valid = proof.map(|p| tree2.is_proof_valid(&p)).unwrap_or(false);
 
-        assert!(is_valid);
+        assert_eq!(is_valid, false);
     }
 }
