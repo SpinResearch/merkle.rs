@@ -18,4 +18,3 @@ pub use proof::{ Proof, ProofBlock };
 
 #[cfg(test)]
 mod tests;
-

@@ -100,50 +100,46 @@ impl ProofBlock {
 
     pub fn new<T>(tree: &Tree<T>, needle: &Vec<u8>) -> Option<ProofBlock> where T: Into<Vec<u8>> + Clone {
         match *tree {
-            Tree::Leaf { ref hash, value: _ } =>
-                if hash == needle {
-                    Some(ProofBlock {
-                        node_hash: hash.clone(),
-                        sibling_hash: Positioned::Nowhere,
-                        sub_proof: None
-                    })
-                }
-                else {
-                    None
-                },
+            Tree::Leaf { ref hash, value: _ } => ProofBlock::new_leaf_proof(hash, needle),
 
-            Tree::Node { ref hash, ref left, ref right } =>
-                if hash == needle {
-                    Some(ProofBlock {
-                        node_hash: hash.clone(),
-                        sibling_hash: Positioned::Nowhere,
-                        sub_proof: None
-                    })
-                }
-                else {
-                    ProofBlock::new(left, needle)
-                        .map(|block| {
-                            let right_hash = right.get_hash().clone();
-                            let sub_proof = Positioned::Right(right_hash);
-                            (block, sub_proof)
-                        })
-                        .or_else(|| {
-                            let sub_proof = ProofBlock::new(right, needle);
-                            sub_proof.map(|block| {
-                                let left_hash = left.get_hash().clone();
-                                let sub_proof = Positioned::Left(left_hash);
-                                (block, sub_proof)
-                            })
-                        })
-                        .map(|(sub_proof, sibling_hash)| {
-                            ProofBlock {
-                                node_hash: hash.clone(),
-                                sibling_hash: sibling_hash,
-                                sub_proof: Some(Box::new(sub_proof))
-                            }
-                        })
-                }
+            Tree::Node { ref hash, ref left, ref right } => ProofBlock::new_tree_proof(hash, needle, left, right)
         }
+    }
+
+    fn new_leaf_proof(hash: &Vec<u8>, needle: &Vec<u8>) -> Option<ProofBlock> {
+        if *hash == *needle {
+            Some(ProofBlock {
+                node_hash: hash.clone(),
+                sibling_hash: Positioned::Nowhere,
+                sub_proof: None
+            })
+        } else {
+            None
+        }
+    }
+
+    fn new_tree_proof<T>(hash: &Vec<u8>, needle: &Vec<u8>, left: &Tree<T>, right: &Tree<T>) -> Option<ProofBlock> where T : Hashable {
+        ProofBlock::new(left, needle)
+            .map(|block| {
+                let right_hash = right.get_hash().clone();
+                let sub_proof = Positioned::Right(right_hash);
+                (block, sub_proof)
+            })
+            .or_else(|| {
+                let sub_proof = ProofBlock::new(right, needle);
+                sub_proof.map(|block| {
+                    let left_hash = left.get_hash().clone();
+                    let sub_proof = Positioned::Left(left_hash);
+                    (block, sub_proof)
+                })
+            })
+            .map(|(sub_proof, sibling_hash)| {
+                ProofBlock {
+                    node_hash: hash.clone(),
+                    sibling_hash: sibling_hash,
+                    sub_proof: Some(Box::new(sub_proof))
+                }
+            })
     }
 
 }
@@ -153,4 +149,3 @@ pub enum Positioned<T> {
     Left(T),
     Right(T)
 }
-
