@@ -38,7 +38,7 @@ impl <D, T> Proof<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
                 Tree::Node { ref hash, ref left, ref right } =>
                     match block.sibling_hash {
                         Positioned::Nowhere =>
-                            return node.is_leaf(),
+                            return false,
 
                         Positioned::Left(ref left_hash) => {
                             if left_hash != left.get_hash() {
@@ -98,11 +98,15 @@ pub struct ProofBlock {
 
 impl ProofBlock {
 
-    pub fn new<T>(tree: &Tree<T>, needle: &Vec<u8>) -> Option<ProofBlock> where T: Into<Vec<u8>> + Clone {
+    pub fn new<T>(tree: &Tree<T>, needle: &Vec<u8>) -> Option<ProofBlock>
+        where T: Into<Vec<u8>> + Clone
+    {
         match *tree {
-            Tree::Leaf { ref hash, value: _ } => ProofBlock::new_leaf_proof(hash, needle),
+            Tree::Leaf { ref hash, .. } =>
+                ProofBlock::new_leaf_proof(hash, needle),
 
-            Tree::Node { ref hash, ref left, ref right } => ProofBlock::new_tree_proof(hash, needle, left, right)
+            Tree::Node { ref hash, ref left, ref right } =>
+                ProofBlock::new_tree_proof(hash, needle, left, right)
         }
     }
 
@@ -118,7 +122,9 @@ impl ProofBlock {
         }
     }
 
-    fn new_tree_proof<T>(hash: &Vec<u8>, needle: &Vec<u8>, left: &Tree<T>, right: &Tree<T>) -> Option<ProofBlock> where T : Hashable {
+    fn new_tree_proof<T>(hash: &Vec<u8>, needle: &Vec<u8>, left: &Tree<T>, right: &Tree<T>) -> Option<ProofBlock>
+        where T: Into<Vec<u8>> + Clone
+    {
         ProofBlock::new(left, needle)
             .map(|block| {
                 let right_hash = right.get_hash().clone();

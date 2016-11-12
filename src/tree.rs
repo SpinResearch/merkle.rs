@@ -46,13 +46,5 @@ impl <T> Tree<T> where T: Into<Vec<u8>> + Clone {
         }
     }
 
-    /// Returns whether self is a leaf or not
-    pub fn is_leaf(&self) -> bool {
-        match *self {
-            Tree::Leaf { .. } => true,
-            Tree::Node { .. } => false
-        }
-    }
-
 }
 
