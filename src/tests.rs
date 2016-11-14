@@ -5,6 +5,7 @@ use crypto::sha3::Sha3;
 
 use merkletree::{ MerkleTree };
 use merkledigest::{ MerkleDigest };
+use proof::{ Positioned };
 
 #[test]
 fn test_from_str_vec() {
@@ -149,7 +150,7 @@ fn test_valid_proof_str() {
 }
 
 #[test]
-fn test_invalid_proof() {
+fn test_wrong_proof() {
     let digest1   = Sha3::sha3_256();
     let values1   = vec![vec![1], vec![2], vec![3], vec![4]];
     let mut tree1 = MerkleTree::from_vec(digest1, values1.clone());
@@ -165,3 +166,27 @@ fn test_invalid_proof() {
         assert_eq!(is_valid, false);
     }
 }
+
+#[test]
+fn test_mutate_proof_first_block() {
+    let digest   = Sha3::sha3_256();
+    let values   = vec![1, 2, 3, 4].iter().map(|x| vec![*x]).collect::<Vec<Vec<u8>>>();
+    let mut tree = MerkleTree::from_vec(digest, values.clone());
+    let mut i    = 0;
+
+    for value in values.iter() {
+        let mut proof = tree.gen_proof(value).unwrap();
+
+        if i % 2 == 0 {
+            proof.block.node_hash = vec![1,2,3];
+        } else {
+            proof.block.sibling_hash = Positioned::Left(vec![1,2,3]);
+        }
+
+        let is_valid = tree.is_proof_valid(&proof);
+        assert_eq!(is_valid, false);
+
+        i += 1;
+    }
+}
+
