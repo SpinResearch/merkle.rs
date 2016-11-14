@@ -1,20 +1,19 @@
 
 //! *merkle* implements a Merkle Tree in Rust.
 
-#[doc(no_inline)]
-pub extern crate crypto;
-
-mod tree;
-pub use tree::{ Tree };
+extern crate crypto;
 
 mod merkletree;
 pub use merkletree::{ MerkleTree };
 
+mod proof;
+pub use proof::{ Proof, ProofBlock, Positioned };
+
 mod merkledigest;
 pub use merkledigest::{ MerkleDigest };
 
-mod proof;
-pub use proof::{ Proof, ProofBlock };
+mod tree;
 
 #[cfg(test)]
 mod tests;
+

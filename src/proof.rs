@@ -5,6 +5,10 @@ use merkledigest::{ MerkleDigest };
 use merkletree::{ MerkleTree };
 use tree::{ Tree };
 
+/// An inclusion proof represent the fact that `value` is a member of a `MerkleTree`
+/// with root hash `root_hash`, and hash function `digest`.
+/// A proof is a linked-list of `ProofBlock`s.
+/// TODO: Represent a proof as a vector of ProofBlock instead of a linked-list?
 pub struct Proof<D, T> {
     pub digest: D,
     pub root_hash: Vec<u8>,
@@ -14,7 +18,7 @@ pub struct Proof<D, T> {
 
 impl <D, T> Proof<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
 
-    /// TODO: Refactor this mess (@romac)
+    // TODO: Refactor this mess (@romac)
     pub fn validate_against(&self, tree: &mut MerkleTree<D, T>) -> bool {
         if &self.root_hash != tree.root_hash() {
             return false;
@@ -90,6 +94,9 @@ impl <D, T> Proof<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
 
 }
 
+
+/// A `ProofBlock` is a linked-list holding the hash of the node, the hash of its sibling node,
+/// and the rest of the inclusion proof.
 pub struct ProofBlock {
     pub node_hash: Vec<u8>,
     pub sibling_hash: Positioned<Vec<u8>>,
@@ -98,6 +105,7 @@ pub struct ProofBlock {
 
 impl ProofBlock {
 
+    /// Attempt to generate a proof that the hash `needle` is a member of the given `tree`.
     pub fn new<T>(tree: &Tree<T>, needle: &Vec<u8>) -> Option<ProofBlock>
         where T: Into<Vec<u8>> + Clone
     {
@@ -150,8 +158,16 @@ impl ProofBlock {
 
 }
 
+/// Tags a value so that we know from in branch (if any) it was found.
 pub enum Positioned<T> {
+
+    /// No value was found
     Nowhere,
+
+    /// The value was found in the left branch
     Left(T),
+
+    /// The value was found in the right branch
     Right(T)
 }
+
