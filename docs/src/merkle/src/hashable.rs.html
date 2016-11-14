@@ -67,32 +67,40 @@
 <span id="23">23</span>
 <span id="24">24</span>
 <span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
 </pre><pre class='rust '>
-<span class='doccomment'>/// By definition, data in the Merkle Tree must implement Hashable</span>
+
+<span class='doccomment'>/// To be hashed, a value must be representable as a byte vector</span>
 <span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Hashable</span> {
+
+    <span class='doccomment'>/// Convert `self` to a byte vector</span>
     <span class='kw'>fn</span> <span class='ident'>to_bytes</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>;
 }
 
-<span class='doccomment'>/// Hashable implementation for standard String type</span>
+<span class='comment'>// TODO: Provide a more generic default implementation</span>
+<span class='comment'>//       based on `From/Into`.</span>
+
 <span class='kw'>impl</span> <span class='ident'>Hashable</span> <span class='kw'>for</span> <span class='ident'>String</span> {
     <span class='kw'>fn</span> <span class='ident'>to_bytes</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> {
         <span class='self'>self</span>.<span class='ident'>clone</span>().<span class='ident'>into_bytes</span>()
     }
 }
 
-<span class='comment'>// Implementation for standard u8 type</span>
 <span class='kw'>impl</span> <span class='ident'>Hashable</span> <span class='kw'>for</span> <span class='ident'>u8</span> {
     <span class='kw'>fn</span> <span class='ident'>to_bytes</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> {
         <span class='macro'>vec</span><span class='macro'>!</span>[<span class='op'>*</span><span class='self'>self</span>]
     }
 }
 
-<span class='comment'>// Implementation for standard &amp;str type</span>
 <span class='kw'>impl</span> <span class='ident'>Hashable</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> {
     <span class='kw'>fn</span> <span class='ident'>to_bytes</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> {
         <span class='self'>self</span>.<span class='ident'>as_bytes</span>().<span class='ident'>to_vec</span>()
     }
 }
+
 </pre>
 </section>
     <section id='search' class="content hidden"></section>

@@ -47,24 +47,43 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-0' class='srclink' href='../src/merkle/src/lib.rs.html#2-17' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-0' class='srclink' href='../src/merkle/src/lib.rs.html#2-21' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p><em>merkle</em> implements a Merkle Tree in Rust.</p>
-</div><h2 id='reexports' class='section-header'><a href="#reexports">Reexports</a></h2>
-<table><tr><td><code>pub extern crate crypto;</code></td></tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.MerkleTree.html'
                                   title='merkle::MerkleTree'>MerkleTree</a></td>
                            <td class='docblock short'>
-                                <p>The Merkle tree</p>
+                                <p>A Merkle tree is a binary tree, with values of type <code>T</code> at the leafs,
+and where every node holds the hash of the concatenation of the hashes of
+its children nodes.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.Proof.html'
+                                  title='merkle::Proof'>Proof</a></td>
+                           <td class='docblock short'>
+                                <p>An inclusion proof represent the fact that <code>value</code> is a member of a <code>MerkleTree</code>
+with root hash <code>root_hash</code>, and hash function <code>digest</code>.<br>
+A proof is a linked-list of <code>ProofBlock</code>s.<br>
+TODO: Represent a proof as a vector of ProofBlock instead of a linked-list?</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.ProofBlock.html'
+                                  title='merkle::ProofBlock'>ProofBlock</a></td>
+                           <td class='docblock short'>
+                                <p>A <code>ProofBlock</code> is a linked-list holding the hash of the node, the hash of its sibling node,
+and the rest of the inclusion proof.</p>
                            </td>
                        </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class='enum' href='enum.Tree.html'
-                                  title='merkle::Tree'>Tree</a></td>
+                           <td><a class='enum' href='enum.Positioned.html'
+                                  title='merkle::Positioned'>Positioned</a></td>
                            <td class='docblock short'>
-                                <p>Binary Tree where leaves hold a stand-alone value.</p>
+                                <p>Tags a value so that we know from in branch (if any) it was found.</p>
                            </td>
                        </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
 <table>
@@ -72,14 +91,15 @@
                            <td><a class='trait' href='trait.Hashable.html'
                                   title='merkle::Hashable'>Hashable</a></td>
                            <td class='docblock short'>
-                                <p>By definition, data in the Merkle Tree must implement Hashable</p>
+                                <p>To be hashed, a value must be representable as a byte vector</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='trait' href='trait.MerkleDigest.html'
                                   title='merkle::MerkleDigest'>MerkleDigest</a></td>
                            <td class='docblock short'>
-                                <p>Extends the standard <code>crypto::digest::Digest</code> to play nicely with our Merkle Tree</p>
+                                <p>The sole purpose of this trait is to extend the standard
+<code>crypto::digest::Digest</code> with a couple utility functions.</p>
                            </td>
                        </tr></table></section>
     <section id='search' class="content hidden"></section>

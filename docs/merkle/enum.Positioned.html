@@ -4,17 +4,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `Hashable` trait in crate `merkle`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, Hashable">
+    <meta name="description" content="API documentation for the Rust `Positioned` enum in crate `merkle`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Positioned">
 
-    <title>merkle::Hashable - Rust</title>
+    <title>merkle::Positioned - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
-    
 
-    
-    
+
+
+
 </head>
 <body class="rustdoc">
     <!--[if lte IE 8]>
@@ -24,11 +24,11 @@
     </div>
     <![endif]-->
 
-    
+
 
     <nav class="sidebar">
-        
-        <p class='location'><a href='index.html'>merkle</a></p><script>window.sidebarCurrent = {name: 'Hashable', ty: 'trait', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+
+        <p class='location'><a href='index.html'>merkle</a></p><script>window.sidebarCurrent = {name: 'Positioned', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </nav>
 
     <nav class="sub">
@@ -42,28 +42,22 @@
         </form>
     </nav>
 
-    <section id='main' class="content trait">
-<h1 class='fqn'><span class='in-band'>Trait <a href='index.html'>merkle</a>::<wbr><a class='trait' href=''>Hashable</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content enum">
+<h1 class='fqn'><span class='in-band'>Enum <a href='index.html'>merkle</a>::<wbr><a class='enum' href=''>Positioned</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-6' class='srclink' href='../src/merkle/src/hashable.rs.html#3-7' title='goto source code'>[src]</a></span></h1>
-<pre class='rust trait'>pub trait Hashable {
-    fn <a href='#tymethod.to_bytes' class='fnname'>to_bytes</a>(&amp;self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;;
-}</pre><div class='docblock'><p>To be hashed, a value must be representable as a byte vector</p>
-</div>
-            <h2 id='required-methods'>Required Methods</h2>
-            <div class='methods'>
-        <h3 id='tymethod.to_bytes' class='method stab '><code>fn <a href='#tymethod.to_bytes' class='fnname'>to_bytes</a>(&amp;self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;</code></h3><div class='docblock'><p>Convert <code>self</code> to a byte vector</p>
-</div></div>
-        <h2 id='implementors'>Implementors</h2>
-        <ul class='item-list' id='implementors-list'>
-    <li><code>impl Hashable for <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code></li>
-<li><code>impl Hashable for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a></code></li>
-<li><code>impl Hashable for &amp;'static <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a></code></li>
-</ul><script type="text/javascript" async
-                         src="../implementors/merkle/trait.Hashable.js">
-                 </script></section>
+               </span><a id='src-130' class='srclink' href='../src/merkle/src/proof.rs.html#159-169' title='goto source code'>[src]</a></span></h1>
+<pre class='rust enum'>pub enum Positioned&lt;T&gt; {
+    Nowhere,
+    Left(T),
+    Right(T),
+}</pre><div class='docblock'><p>Tags a value so that we know from in branch (if any) it was found.</p>
+</div><h2 class='variants'>Variants</h2>
+<span id='variant.Nowhere' class='variant'><code>Nowhere</code></span><div class='docblock'><p>No value was found</p>
+</div><span id='variant.Left' class='variant'><code>Left(T)</code></span><div class='docblock'><p>The value was found in the left branch</p>
+</div><span id='variant.Right' class='variant'><code>Right(T)</code></span><div class='docblock'><p>The value was found in the right branch</p>
+</div></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
@@ -114,7 +108,7 @@
         </div>
     </aside>
 
-    
+
 
     <script>
         window.rootPath = "../";
@@ -123,7 +117,7 @@
     </script>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
-    
+
     <script defer src="../search-index.js"></script>
 </body>
 </html>
