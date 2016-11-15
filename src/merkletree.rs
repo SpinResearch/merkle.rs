@@ -1,7 +1,6 @@
 use crypto::digest::Digest;
 
 use tree::{ Tree };
-use hashable::{ Hashable };
 use merkledigest::{ MerkleDigest };
 
 /// The Merkle tree
@@ -13,7 +12,7 @@ pub struct MerkleTree<D, T> {
     pub count: usize
 }
 
-impl <D, T> MerkleTree<D, T> where D: Digest, T: Hashable {
+impl <D, T> MerkleTree<D, T> where D: Digest, T: Into<Vec<u8>> + Clone {
     /// Constructs a Merkle Tree from a vector of data blocks.
     pub fn from_vec(mut digest: D, values: Vec<T>) -> Self {
         if values.is_empty() {

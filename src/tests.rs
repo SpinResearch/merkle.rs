@@ -3,7 +3,6 @@
 
 use crypto::sha3::Sha3;
 
-use hashable::{ Hashable };
 use merkletree::{ MerkleTree };
 use merkledigest::{ MerkleDigest };
 
@@ -20,10 +19,10 @@ fn test_from_str_vec() {
                     ];
 
     let hashes = vec![
-                        digest.hash_bytes(&values[0].to_bytes()),
-                        digest.hash_bytes(&values[1].to_bytes()),
-                        digest.hash_bytes(&values[2].to_bytes()),
-                        digest.hash_bytes(&values[3].to_bytes())
+                        digest.hash_bytes(&values[0].into()),
+                        digest.hash_bytes(&values[1].into()),
+                        digest.hash_bytes(&values[2].into()),
+                        digest.hash_bytes(&values[3].into())
                     ];
 
     let count  = values.len();
@@ -48,7 +47,7 @@ fn test_from_str_vec() {
 #[should_panic]
 fn test_from_vec_empty() {
     let digest          = Sha3::sha3_256();
-    let values: Vec<u8> = vec![];
+    let values: Vec<Vec<u8>> = vec![];
 
     MerkleTree::from_vec(digest, values);
 }
@@ -62,7 +61,7 @@ fn test_from_vec1() {
 
     let mut d = Sha3::sha3_256();
 
-    let root_hash = &d.hash_bytes(&"hello, world".to_string().to_bytes());
+    let root_hash = &d.hash_bytes(&"hello, world".to_string().into());
 
     assert_eq!(tree.count, 1);
     assert_eq!(tree.height, 0);
@@ -74,15 +73,15 @@ fn test_from_vec1() {
 fn test_from_vec3() {
     let digest = Sha3::sha3_256();
 
-    let values = vec![1, 2, 3];
+    let values = vec![vec![1], vec![2], vec![3]];
     let tree = MerkleTree::from_vec(digest, values);
 
     let mut d = Sha3::sha3_256();
 
     let hashes = vec![
-        d.hash_bytes(&1.to_bytes()),
-        d.hash_bytes(&2.to_bytes()),
-        d.hash_bytes(&3.to_bytes())
+        d.hash_bytes(&vec![1].into()),
+        d.hash_bytes(&vec![2].into()),
+        d.hash_bytes(&vec![3].into())
     ];
 
     let h01       = &d.combine_hashes(&hashes[0], &hashes[1]);
@@ -98,14 +97,14 @@ fn test_from_vec3() {
 fn test_from_vec9() {
     let digest = Sha3::sha3_256();
 
-    let values = vec![1, 2, 3, 4, 5, 6, 7, 8, 9];
+    let values = vec![vec![1], vec![2], vec![3], vec![4], vec![5], vec![6], vec![7], vec![8], vec![9]];
     let count  = values.len();
 
     let tree = MerkleTree::from_vec(digest, values.clone());
 
     let mut d = Sha3::sha3_256();
 
-    let hashes = values.iter().map(|v| d.hash_bytes(&v.to_bytes())).collect::<Vec<_>>();
+    let hashes = values.iter().map(|v| d.hash_bytes(v.into())).collect::<Vec<_>>();
 
     let h01   = &d.combine_hashes(&hashes[0], &hashes[1]);
     let h23   = &d.combine_hashes(&hashes[2], &hashes[3]);

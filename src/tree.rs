@@ -1,6 +1,5 @@
 use crypto::digest::Digest;
 
-use hashable::{ Hashable };
 use merkledigest::{ MerkleDigest };
 
 /// Binary Tree where leaves hold a stand-alone value.
@@ -17,7 +16,7 @@ pub enum Tree<T> {
     }
 }
 
-impl <T> Tree<T> where T: Hashable {
+impl <T> Tree<T> where T: Into<Vec<u8>> + Clone {
     /// Create a new tree
     pub fn new(hash: Vec<u8>, value: T) -> Self {
         Tree::Leaf {
@@ -36,7 +35,7 @@ impl <T> Tree<T> where T: Hashable {
 
     /// Create a new leaf
     pub fn make_leaf<D: Digest>(digest: &mut D, value: T) -> Tree<T> {
-        let hash = digest.hash_bytes(&value.to_bytes());
+        let hash = digest.hash_bytes(&value.clone().into());
         Tree::new(hash, value)
     }
 }
