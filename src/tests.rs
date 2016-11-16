@@ -175,7 +175,7 @@ fn test_wrong_proof() {
 fn test_mutate_proof_first_block() {
     let digest    = Sha3::sha3_256();
     let values    = vec![1, 2, 3, 4].iter().map(|x| vec![*x]).collect::<Vec<Vec<u8>>>();
-    let     tree  = MerkleTree::from_vec(digest, values.clone());
+    let tree      = MerkleTree::from_vec(digest, values.clone());
     let root_hash = tree.root_hash();
 
     let mut i = 0;
@@ -195,4 +195,3 @@ fn test_mutate_proof_first_block() {
         i += 1;
     }
 }
-
