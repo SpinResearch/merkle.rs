@@ -11,10 +11,10 @@
 
     <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
+    
 
-
-
-
+    
+    
 </head>
 <body class="rustdoc">
     <!--[if lte IE 8]>
@@ -24,11 +24,11 @@
     </div>
     <![endif]-->
 
-
+    
 
     <nav class="sidebar">
-
-
+        
+        
     </nav>
 
     <nav class="sub">
@@ -174,56 +174,16 @@
 <span id="130">130</span>
 <span id="131">131</span>
 <span id="132">132</span>
-<span id="133">133</span>
-<span id="134">134</span>
-<span id="135">135</span>
-<span id="136">136</span>
-<span id="137">137</span>
-<span id="138">138</span>
-<span id="139">139</span>
-<span id="140">140</span>
-<span id="141">141</span>
-<span id="142">142</span>
-<span id="143">143</span>
-<span id="144">144</span>
-<span id="145">145</span>
-<span id="146">146</span>
-<span id="147">147</span>
-<span id="148">148</span>
-<span id="149">149</span>
-<span id="150">150</span>
-<span id="151">151</span>
-<span id="152">152</span>
-<span id="153">153</span>
-<span id="154">154</span>
-<span id="155">155</span>
-<span id="156">156</span>
-<span id="157">157</span>
-<span id="158">158</span>
-<span id="159">159</span>
-<span id="160">160</span>
-<span id="161">161</span>
-<span id="162">162</span>
-<span id="163">163</span>
-<span id="164">164</span>
-<span id="165">165</span>
-<span id="166">166</span>
-<span id="167">167</span>
-<span id="168">168</span>
-<span id="169">169</span>
-<span id="170">170</span>
 </pre><pre class='rust '>
 
 <span class='kw'>use</span> <span class='ident'>crypto</span>::<span class='ident'>digest</span>::<span class='ident'>Digest</span>;
 
-<span class='kw'>use</span> <span class='ident'>hashable</span>::{ <span class='ident'>Hashable</span> };
 <span class='kw'>use</span> <span class='ident'>merkledigest</span>::{ <span class='ident'>MerkleDigest</span> };
-<span class='kw'>use</span> <span class='ident'>merkletree</span>::{ <span class='ident'>MerkleTree</span> };
 <span class='kw'>use</span> <span class='ident'>tree</span>::{ <span class='ident'>Tree</span> };
 
 <span class='doccomment'>/// An inclusion proof represent the fact that `value` is a member of a `MerkleTree`</span>
-<span class='doccomment'>/// with root hash `root_hash`, and hash function `digest`.  </span>
-<span class='doccomment'>/// A proof is a linked-list of `ProofBlock`s.  </span>
+<span class='doccomment'>/// with root hash `root_hash`, and hash function `digest`.</span>
+<span class='doccomment'>/// A proof is a linked-list of `ProofBlock`s.</span>
 <span class='doccomment'>/// TODO: Represent a proof as a vector of ProofBlock instead of a linked-list?</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Proof</span><span class='op'>&lt;</span><span class='ident'>D</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>pub</span> <span class='ident'>digest</span>: <span class='ident'>D</span>,
@@ -232,79 +192,38 @@
     <span class='kw'>pub</span> <span class='ident'>value</span>: <span class='ident'>T</span>
 }
 
-<span class='kw'>impl</span> <span class='op'>&lt;</span><span class='ident'>D</span>, <span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>Proof</span><span class='op'>&lt;</span><span class='ident'>D</span>, <span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>D</span>: <span class='ident'>Digest</span> <span class='op'>+</span> <span class='ident'>Clone</span>, <span class='ident'>T</span>: <span class='ident'>Hashable</span> <span class='op'>+</span> <span class='ident'>Clone</span> {
+<span class='kw'>impl</span> <span class='op'>&lt;</span><span class='ident'>D</span>, <span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>Proof</span><span class='op'>&lt;</span><span class='ident'>D</span>, <span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>D</span>: <span class='ident'>Digest</span> <span class='op'>+</span> <span class='ident'>Clone</span>, <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span> <span class='op'>+</span> <span class='ident'>Clone</span> {
 
-    <span class='comment'>// TODO: Refactor this mess (@romac)</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>validate_against</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>tree</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>MerkleTree</span><span class='op'>&lt;</span><span class='ident'>D</span>, <span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-        <span class='kw'>if</span> <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>root_hash</span> <span class='op'>!=</span> <span class='ident'>tree</span>.<span class='ident'>root_hash</span>() {
-            <span class='kw'>return</span> <span class='bool-val'>false</span>;
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>validate</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>root_hash</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
+        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>root_hash</span> <span class='op'>!=</span> <span class='op'>*</span><span class='ident'>root_hash</span> <span class='op'>||</span> <span class='self'>self</span>.<span class='ident'>block</span>.<span class='ident'>node_hash</span> <span class='op'>!=</span> <span class='op'>*</span><span class='ident'>root_hash</span> {
+            <span class='kw'>return</span> <span class='bool-val'>false</span>
         }
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>block</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>block</span>;
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>node</span>  <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>tree</span>.<span class='ident'>tree</span>;
+        <span class='self'>self</span>.<span class='ident'>validate_block</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>block</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>digest</span>.<span class='ident'>clone</span>())
+    }
 
-        <span class='kw'>loop</span> {
-            <span class='kw'>if</span> <span class='kw-2'>&amp;</span><span class='ident'>block</span>.<span class='ident'>node_hash</span> <span class='op'>!=</span> <span class='ident'>node</span>.<span class='ident'>get_hash</span>() {
-                <span class='kw'>return</span> <span class='bool-val'>false</span>;
-            }
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>validate_block</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>block</span>: <span class='kw-2'>&amp;</span><span class='ident'>ProofBlock</span>, <span class='ident'>digest</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>D</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
+        <span class='kw'>match</span> <span class='ident'>block</span>.<span class='ident'>sub_proof</span> {
 
-            <span class='kw'>match</span> <span class='op'>*</span><span class='ident'>node</span> {
-                <span class='ident'>Tree</span>::<span class='ident'>Leaf</span> { .. } <span class='op'>=&gt;</span>
-                    <span class='kw'>match</span> <span class='ident'>block</span>.<span class='ident'>sibling_hash</span> {
-                        <span class='ident'>Positioned</span>::<span class='ident'>Nowhere</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='bool-val'>true</span>,
-                        _                   <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='bool-val'>false</span>
-                    },
+            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span>
+                <span class='ident'>block</span>.<span class='ident'>sibling_hash</span> <span class='op'>==</span> <span class='ident'>Positioned</span>::<span class='ident'>Nowhere</span>,
 
-                <span class='ident'>Tree</span>::<span class='ident'>Node</span> { <span class='kw-2'>ref</span> <span class='ident'>hash</span>, <span class='kw-2'>ref</span> <span class='ident'>left</span>, <span class='kw-2'>ref</span> <span class='ident'>right</span> } <span class='op'>=&gt;</span>
-                    <span class='kw'>match</span> <span class='ident'>block</span>.<span class='ident'>sibling_hash</span> {
-                        <span class='ident'>Positioned</span>::<span class='ident'>Nowhere</span> <span class='op'>=&gt;</span>
-                            <span class='kw'>return</span> <span class='bool-val'>false</span>,
+            <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>sub</span>) <span class='op'>=&gt;</span>
+                <span class='kw'>match</span> <span class='ident'>block</span>.<span class='ident'>sibling_hash</span> {
+                    <span class='ident'>Positioned</span>::<span class='ident'>Nowhere</span> <span class='op'>=&gt;</span>
+                        <span class='bool-val'>false</span>,
 
-                        <span class='ident'>Positioned</span>::<span class='ident'>Left</span>(<span class='kw-2'>ref</span> <span class='ident'>left_hash</span>) <span class='op'>=&gt;</span> {
-                            <span class='kw'>if</span> <span class='ident'>left_hash</span> <span class='op'>!=</span> <span class='ident'>left</span>.<span class='ident'>get_hash</span>() {
-                                <span class='kw'>return</span> <span class='bool-val'>false</span>
-                            }
-
-                            <span class='kw'>match</span> <span class='ident'>block</span>.<span class='ident'>sub_proof</span> {
-                                <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>sub_proof</span>) <span class='op'>=&gt;</span> {
-                                    <span class='kw'>let</span> <span class='ident'>combined_hash</span> <span class='op'>=</span> <span class='ident'>tree</span>.<span class='ident'>digest</span>.<span class='ident'>combine_hashes</span>(<span class='ident'>left_hash</span>, <span class='kw-2'>&amp;</span><span class='ident'>sub_proof</span>.<span class='ident'>node_hash</span>);
-
-                                    <span class='kw'>if</span> <span class='kw-2'>&amp;</span><span class='ident'>combined_hash</span> <span class='op'>!=</span> <span class='ident'>hash</span> {
-                                        <span class='kw'>return</span> <span class='bool-val'>false</span>
-                                    }
-
-                                    <span class='ident'>node</span>  <span class='op'>=</span> <span class='ident'>right</span>;
-                                    <span class='ident'>block</span> <span class='op'>=</span> <span class='ident'>sub_proof</span>;
-                                }
-
-                                <span class='prelude-val'>None</span> <span class='op'>=&gt;</span>
-                                    <span class='kw'>return</span> <span class='bool-val'>false</span>
-                            }
-                        },
-
-                        <span class='ident'>Positioned</span>::<span class='ident'>Right</span>(<span class='kw-2'>ref</span> <span class='ident'>right_hash</span>) <span class='op'>=&gt;</span> {
-                            <span class='kw'>if</span> <span class='ident'>right_hash</span> <span class='op'>!=</span> <span class='ident'>right</span>.<span class='ident'>get_hash</span>() {
-                                <span class='kw'>return</span> <span class='bool-val'>false</span>
-                            }
-
-                            <span class='kw'>match</span> <span class='ident'>block</span>.<span class='ident'>sub_proof</span> {
-                                <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>sub_proof</span>) <span class='op'>=&gt;</span> {
-                                    <span class='kw'>let</span> <span class='ident'>combined_hash</span> <span class='op'>=</span> <span class='ident'>tree</span>.<span class='ident'>digest</span>.<span class='ident'>combine_hashes</span>(<span class='kw-2'>&amp;</span><span class='ident'>sub_proof</span>.<span class='ident'>node_hash</span>, <span class='ident'>right_hash</span>);
-
-                                    <span class='kw'>if</span> <span class='kw-2'>&amp;</span><span class='ident'>combined_hash</span> <span class='op'>!=</span> <span class='ident'>hash</span> {
-                                        <span class='kw'>return</span> <span class='bool-val'>false</span>
-                                    }
-
-                                    <span class='ident'>node</span>  <span class='op'>=</span> <span class='ident'>left</span>;
-                                    <span class='ident'>block</span> <span class='op'>=</span> <span class='ident'>sub_proof</span>;
-                                }
-
-                                <span class='prelude-val'>None</span> <span class='op'>=&gt;</span>
-                                    <span class='kw'>return</span> <span class='bool-val'>false</span>
-                            }
-                        }
+                    <span class='ident'>Positioned</span>::<span class='ident'>Left</span>(<span class='kw-2'>ref</span> <span class='ident'>hash</span>) <span class='op'>=&gt;</span> {
+                        <span class='kw'>let</span> <span class='ident'>hashes_match</span> <span class='op'>=</span> <span class='ident'>digest</span>.<span class='ident'>combine_hashes</span>(<span class='kw-2'>&amp;</span><span class='ident'>hash</span>, <span class='kw-2'>&amp;</span><span class='ident'>sub</span>.<span class='ident'>node_hash</span>) <span class='op'>==</span> <span class='ident'>block</span>.<span class='ident'>node_hash</span>;
+                        <span class='ident'>hashes_match</span> <span class='op'>&amp;&amp;</span> <span class='self'>self</span>.<span class='ident'>validate_block</span>(<span class='ident'>sub</span>, <span class='ident'>digest</span>)
                     }
-            }
+
+                    <span class='ident'>Positioned</span>::<span class='ident'>Right</span>(<span class='kw-2'>ref</span> <span class='ident'>hash</span>) <span class='op'>=&gt;</span> {
+                        <span class='kw'>let</span> <span class='ident'>hashes_match</span> <span class='op'>=</span> <span class='ident'>digest</span>.<span class='ident'>combine_hashes</span>(<span class='kw-2'>&amp;</span><span class='ident'>sub</span>.<span class='ident'>node_hash</span>, <span class='kw-2'>&amp;</span><span class='ident'>hash</span>) <span class='op'>==</span> <span class='ident'>block</span>.<span class='ident'>node_hash</span>;
+                        <span class='ident'>hashes_match</span> <span class='op'>&amp;&amp;</span> <span class='self'>self</span>.<span class='ident'>validate_block</span>(<span class='ident'>sub</span>, <span class='ident'>digest</span>)
+                    }
+
+                }
         }
     }
 
@@ -322,7 +241,9 @@
 <span class='kw'>impl</span> <span class='ident'>ProofBlock</span> {
 
     <span class='doccomment'>/// Attempt to generate a proof that the hash `needle` is a member of the given `tree`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>(<span class='ident'>tree</span>: <span class='kw-2'>&amp;</span><span class='ident'>Tree</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>, <span class='ident'>needle</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>ProofBlock</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>T</span>: <span class='ident'>Hashable</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>(<span class='ident'>tree</span>: <span class='kw-2'>&amp;</span><span class='ident'>Tree</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>, <span class='ident'>needle</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>ProofBlock</span><span class='op'>&gt;</span>
+        <span class='kw'>where</span> <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span> <span class='op'>+</span> <span class='ident'>Clone</span>
+    {
         <span class='kw'>match</span> <span class='op'>*</span><span class='ident'>tree</span> {
             <span class='ident'>Tree</span>::<span class='ident'>Leaf</span> { <span class='kw-2'>ref</span> <span class='ident'>hash</span>, .. } <span class='op'>=&gt;</span>
                 <span class='ident'>ProofBlock</span>::<span class='ident'>new_leaf_proof</span>(<span class='ident'>hash</span>, <span class='ident'>needle</span>),
@@ -344,7 +265,9 @@
         }
     }
 
-    <span class='kw'>fn</span> <span class='ident'>new_tree_proof</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>(<span class='ident'>hash</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>needle</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>left</span>: <span class='kw-2'>&amp;</span><span class='ident'>Tree</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>, <span class='ident'>right</span>: <span class='kw-2'>&amp;</span><span class='ident'>Tree</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>ProofBlock</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>T</span> : <span class='ident'>Hashable</span> {
+    <span class='kw'>fn</span> <span class='ident'>new_tree_proof</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>(<span class='ident'>hash</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>needle</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>left</span>: <span class='kw-2'>&amp;</span><span class='ident'>Tree</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>, <span class='ident'>right</span>: <span class='kw-2'>&amp;</span><span class='ident'>Tree</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>ProofBlock</span><span class='op'>&gt;</span>
+        <span class='kw'>where</span> <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span> <span class='op'>+</span> <span class='ident'>Clone</span>
+    {
         <span class='ident'>ProofBlock</span>::<span class='ident'>new</span>(<span class='ident'>left</span>, <span class='ident'>needle</span>)
             .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>block</span><span class='op'>|</span> {
                 <span class='kw'>let</span> <span class='ident'>right_hash</span> <span class='op'>=</span> <span class='ident'>right</span>.<span class='ident'>get_hash</span>().<span class='ident'>clone</span>();
@@ -371,6 +294,7 @@
 }
 
 <span class='doccomment'>/// Tags a value so that we know from in branch (if any) it was found.</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>PartialEq</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>Positioned</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
 
     <span class='doccomment'>/// No value was found</span>
@@ -435,16 +359,14 @@
         </div>
     </aside>
 
-
+    
 
     <script>
         window.rootPath = "../../../";
         window.currentCrate = "merkle";
-        window.playgroundUrl = "";
     </script>
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
-
     <script defer src="../../../search-index.js"></script>
 </body>
 </html>
