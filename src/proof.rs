@@ -2,7 +2,6 @@
 use crypto::digest::Digest;
 
 use merkledigest::{ MerkleDigest };
-use merkletree::{ MerkleTree };
 use tree::{ Tree };
 
 /// An inclusion proof represent the fact that `value` is a member of a `MerkleTree`
@@ -18,77 +17,36 @@ pub struct Proof<D, T> {
 
 impl <D, T> Proof<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
 
-    // TODO: Refactor this mess (@romac)
-    pub fn validate_against(&self, tree: &mut MerkleTree<D, T>) -> bool {
-        if &self.root_hash != tree.root_hash() {
-            return false;
+    pub fn validate(&self, root_hash: &Vec<u8>) -> bool {
+        if self.root_hash != *root_hash || self.block.node_hash != *root_hash {
+            return false
         }
 
-        let mut block = &self.block;
-        let mut node  = &tree.tree;
+        self.validate_block(&self.block, &mut self.digest.clone())
+    }
 
-        loop {
-            if &block.node_hash != node.get_hash() {
-                return false;
-            }
+    pub fn validate_block(&self, block: &ProofBlock, digest: &mut D) -> bool {
+        match block.sub_proof {
 
-            match *node {
-                Tree::Leaf { .. } =>
-                    match block.sibling_hash {
-                        Positioned::Nowhere => return true,
-                        _                   => return false
-                    },
+            None =>
+                block.sibling_hash == Positioned::Nowhere,
 
-                Tree::Node { ref hash, ref left, ref right } =>
-                    match block.sibling_hash {
-                        Positioned::Nowhere =>
-                            return false,
+            Some(ref sub) =>
+                match block.sibling_hash {
+                    Positioned::Nowhere =>
+                        false,
 
-                        Positioned::Left(ref left_hash) => {
-                            if left_hash != left.get_hash() {
-                                return false
-                            }
-
-                            match block.sub_proof {
-                                Some(ref sub_proof) => {
-                                    let combined_hash = tree.digest.combine_hashes(left_hash, &sub_proof.node_hash);
-
-                                    if &combined_hash != hash {
-                                        return false
-                                    }
-
-                                    node  = right;
-                                    block = sub_proof;
-                                }
-
-                                None =>
-                                    return false
-                            }
-                        },
-
-                        Positioned::Right(ref right_hash) => {
-                            if right_hash != right.get_hash() {
-                                return false
-                            }
-
-                            match block.sub_proof {
-                                Some(ref sub_proof) => {
-                                    let combined_hash = tree.digest.combine_hashes(&sub_proof.node_hash, right_hash);
-
-                                    if &combined_hash != hash {
-                                        return false
-                                    }
-
-                                    node  = left;
-                                    block = sub_proof;
-                                }
-
-                                None =>
-                                    return false
-                            }
-                        }
+                    Positioned::Left(ref hash) => {
+                        let hashes_match = digest.combine_hashes(&hash, &sub.node_hash) == block.node_hash;
+                        hashes_match && self.validate_block(sub, digest)
                     }
-            }
+
+                    Positioned::Right(ref hash) => {
+                        let hashes_match = digest.combine_hashes(&sub.node_hash, &hash) == block.node_hash;
+                        hashes_match && self.validate_block(sub, digest)
+                    }
+
+                }
         }
     }
 
@@ -159,6 +117,7 @@ impl ProofBlock {
 }
 
 /// Tags a value so that we know from in branch (if any) it was found.
+#[derive(PartialEq)]
 pub enum Positioned<T> {
 
     /// No value was found

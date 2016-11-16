@@ -92,23 +92,18 @@ impl <D, T> MerkleTree<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
 
     /// Generate an inclusion proof for the given value.
     /// `None` is returned if the given value is not found in the tree.
-    pub fn gen_proof(&mut self, value: &T) -> Option<Proof<D, T>> {
-        let hash = self.digest.hash_bytes(&value.clone().into());
+    pub fn gen_proof(&self, value: &T) -> Option<Proof<D, T>> {
+        let mut digest = self.digest.clone();
+        let hash       = digest.hash_bytes(&value.clone().into());
 
         ProofBlock::new(&self.tree, &hash).map(|block|
             Proof {
-                digest: self.digest.clone(),
+                digest: digest,
                 root_hash: self.root_hash().clone(),
                 block: block,
                 value: value.clone()
             }
         )
-    }
-
-    /// Validate the given proof against the tree, and returns
-    /// whether or not the given proof is valid.
-    pub fn is_proof_valid(&mut self, proof: &Proof<D, T>) -> bool {
-        proof.validate_against(self)
     }
 
 }

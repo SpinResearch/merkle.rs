@@ -124,13 +124,14 @@ fn test_from_vec9() {
 
 #[test]
 fn test_valid_proof() {
-    let digest   = Sha3::sha3_256();
+    let digest               = Sha3::sha3_256();
     let values: Vec<Vec<u8>> = vec![1, 2, 3, 4, 5, 6, 7, 8, 9].iter().map(|x| vec![*x]).collect();
-    let mut tree = MerkleTree::from_vec(digest, values.clone());
+    let tree                 = MerkleTree::from_vec(digest, values.clone());
+    let root_hash            = tree.root_hash();
 
     for value in values.iter() {
         let proof    = tree.gen_proof(value);
-        let is_valid = proof.map(|p| tree.is_proof_valid(&p)).unwrap_or(false);
+        let is_valid = proof.map(|p| p.validate(&root_hash)).unwrap_or(false);
 
         assert!(is_valid);
     }
@@ -138,13 +139,15 @@ fn test_valid_proof() {
 
 #[test]
 fn test_valid_proof_str() {
-    let digest   = Sha3::sha3_256();
-    let values   = vec!["Hello", "my", "name", "is", "Rusty"];
-    let mut tree = MerkleTree::from_vec(digest, values.clone());
+    let digest    = Sha3::sha3_256();
+    let values    = vec!["Hello", "my", "name", "is", "Rusty"];
+    let tree      = MerkleTree::from_vec(digest, values.clone());
+    let root_hash = tree.root_hash();
+
     let value = "Rusty";
 
     let proof    = tree.gen_proof(&value);
-    let is_valid = proof.map(|p| tree.is_proof_valid(&p)).unwrap_or(false);
+    let is_valid = proof.map(|p| p.validate(&root_hash)).unwrap_or(false);
 
     assert!(is_valid);
 }
@@ -153,15 +156,16 @@ fn test_valid_proof_str() {
 fn test_wrong_proof() {
     let digest1   = Sha3::sha3_256();
     let values1   = vec![vec![1], vec![2], vec![3], vec![4]];
-    let mut tree1 = MerkleTree::from_vec(digest1, values1.clone());
+    let tree1     = MerkleTree::from_vec(digest1, values1.clone());
 
     let digest2   = Sha3::sha3_256();
     let values2   = vec![vec![4], vec![5], vec![6], vec![7]];
-    let mut tree2 = MerkleTree::from_vec(digest2, values2.clone());
+    let tree2     = MerkleTree::from_vec(digest2, values2.clone());
+    let root_hash = tree2.root_hash();
 
     for value in values1.iter() {
         let proof    = tree1.gen_proof(value);
-        let is_valid = proof.map(|p| tree2.is_proof_valid(&p)).unwrap_or(false);
+        let is_valid = proof.map(|p| p.validate(root_hash)).unwrap_or(false);
 
         assert_eq!(is_valid, false);
     }
@@ -169,10 +173,12 @@ fn test_wrong_proof() {
 
 #[test]
 fn test_mutate_proof_first_block() {
-    let digest   = Sha3::sha3_256();
-    let values   = vec![1, 2, 3, 4].iter().map(|x| vec![*x]).collect::<Vec<Vec<u8>>>();
-    let mut tree = MerkleTree::from_vec(digest, values.clone());
-    let mut i    = 0;
+    let digest    = Sha3::sha3_256();
+    let values    = vec![1, 2, 3, 4].iter().map(|x| vec![*x]).collect::<Vec<Vec<u8>>>();
+    let     tree  = MerkleTree::from_vec(digest, values.clone());
+    let root_hash = tree.root_hash();
+
+    let mut i = 0;
 
     for value in values.iter() {
         let mut proof = tree.gen_proof(value).unwrap();
@@ -183,7 +189,7 @@ fn test_mutate_proof_first_block() {
             proof.block.sibling_hash = Positioned::Left(vec![1,2,3]);
         }
 
-        let is_valid = tree.is_proof_valid(&proof);
+        let is_valid = proof.validate(root_hash);
         assert_eq!(is_valid, false);
 
         i += 1;
