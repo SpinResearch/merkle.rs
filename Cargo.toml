@@ -1,4 +1,3 @@
-
 [package]
 name = "merkle"
 version = "0.1.0"
@@ -7,6 +6,12 @@ authors = [
   "Dylan Bourgeois <dtsbourg@gmail.com>",
   "Romain Ruetschi <romain.ruetschi@gmail.com>"
 ]
+
+description = "Merkle is a Rust implementation of a Merkle tree with support for generation of inclusion proofs."
+license = "BSD-3-Clause"
+documentation = "https://spinresearch.github.io/merkle.rs/merkle/index.html"
+homepage = "https://github.com/SpinResearch/merkle.rs"
+repository = "https://github.com/SpinResearch/merkle.rs"
 
 [dependencies]
 rust-crypto = "^0.2.36"
