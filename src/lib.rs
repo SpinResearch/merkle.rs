@@ -4,13 +4,12 @@
 extern crate crypto;
 
 mod merkletree;
-pub use merkletree::{ MerkleTree };
+pub use merkletree::MerkleTree;
 
 mod proof;
-pub use proof::{ Proof, ProofBlock, Positioned };
+pub use proof::Proof;
 
 mod merkledigest;
-pub use merkledigest::{ MerkleDigest };
 
 mod tree;
 

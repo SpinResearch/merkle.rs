@@ -4,10 +4,8 @@ use crypto::digest::Digest;
 use merkledigest::{ MerkleDigest };
 use tree::{ Tree };
 
-/// An inclusion proof represent the fact that `value` is a member of a `MerkleTree`
-/// with root hash `root_hash`, and hash function `digest`.
-/// A proof is a linked-list of `ProofBlock`s.
-/// TODO: Represent a proof as a vector of ProofBlock instead of a linked-list?
+/// An inclusion proof represent the fact that a `value` is a member
+/// of a `MerkleTree` with root hash `root_hash`, and hash function `digest`.
 pub struct Proof<D, T> {
     pub digest: D,
     pub root_hash: Vec<u8>,
