@@ -60,7 +60,6 @@
 <span id="16">16</span>
 <span id="17">17</span>
 <span id="18">18</span>
-<span id="19">19</span>
 </pre><pre class='rust '>
 
 <span class='doccomment'>//! *merkle* implements a Merkle Tree in Rust.</span>
@@ -68,13 +67,12 @@
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>crypto</span>;
 
 <span class='kw'>mod</span> <span class='ident'>merkletree</span>;
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>merkletree</span>::{ <span class='ident'>MerkleTree</span> };
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>merkletree</span>::<span class='ident'>MerkleTree</span>;
 
 <span class='kw'>mod</span> <span class='ident'>proof</span>;
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>proof</span>::{ <span class='ident'>Proof</span>, <span class='ident'>ProofBlock</span>, <span class='ident'>Positioned</span> };
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>proof</span>::<span class='ident'>Proof</span>;
 
 <span class='kw'>mod</span> <span class='ident'>merkledigest</span>;
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>merkledigest</span>::{ <span class='ident'>MerkleDigest</span> };
 
 <span class='kw'>mod</span> <span class='ident'>tree</span>;
 
@@ -138,9 +136,11 @@
     <script>
         window.rootPath = "../../../";
         window.currentCrate = "merkle";
+        window.playgroundUrl = "";
     </script>
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
+    
     <script defer src="../../../search-index.js"></script>
 </body>
 </html>
