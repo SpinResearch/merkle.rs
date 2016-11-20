@@ -21,7 +21,7 @@ fn test_from_str_vec() {
     ];
 
     let count = values.len();
-    let tree  = MerkleTree::from_vec(Sha3::sha3_256(), values);
+    let tree  = MerkleTree::from_vec_unsafe(Sha3::sha3_256(), values);
 
     let h01 = digest.combine_hashes(&hashes[0], &hashes[1]);
     let h23 = digest.combine_hashes(&hashes[2], &hashes[3]);
@@ -38,13 +38,13 @@ fn test_from_str_vec() {
 #[should_panic]
 fn test_from_vec_empty() {
     let values: Vec<Vec<u8>> = vec![];
-    MerkleTree::from_vec(Sha3::sha3_256(), values);
+    MerkleTree::from_vec_unsafe(Sha3::sha3_256(), values);
 }
 
 #[test]
 fn test_from_vec1() {
     let values = vec!["hello, world".to_string()];
-    let tree   = MerkleTree::from_vec(Sha3::sha3_256(), values);
+    let tree   = MerkleTree::from_vec_unsafe(Sha3::sha3_256(), values);
 
     let mut d     = Sha3::sha3_256();
     let root_hash = &d.hash_bytes(&"hello, world".to_string().into());
@@ -58,7 +58,7 @@ fn test_from_vec1() {
 #[test]
 fn test_from_vec3() {
     let values = vec![vec![1], vec![2], vec![3]];
-    let tree   = MerkleTree::from_vec(Sha3::sha3_256(), values);
+    let tree   = MerkleTree::from_vec_unsafe(Sha3::sha3_256(), values);
 
     let mut d = Sha3::sha3_256();
 
@@ -80,7 +80,7 @@ fn test_from_vec3() {
 #[test]
 fn test_from_vec9() {
     let values = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
-    let tree   = MerkleTree::from_vec(Sha3::sha3_256(), values.clone());
+    let tree   = MerkleTree::from_vec_unsafe(Sha3::sha3_256(), values.clone());
 
     let mut d = Sha3::sha3_256();
 
@@ -105,7 +105,7 @@ fn test_from_vec9() {
 #[test]
 fn test_valid_proof() {
     let values    = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
-    let tree      = MerkleTree::from_vec(Sha3::sha3_256(), values.clone());
+    let tree      = MerkleTree::from_vec_unsafe(Sha3::sha3_256(), values.clone());
     let root_hash = tree.root_hash();
 
     for value in values.iter() {
@@ -119,7 +119,7 @@ fn test_valid_proof() {
 #[test]
 fn test_valid_proof_str() {
     let values    = vec!["Hello", "my", "name", "is", "Rusty"];
-    let tree      = MerkleTree::from_vec(Sha3::sha3_256(), values.clone());
+    let tree      = MerkleTree::from_vec_unsafe(Sha3::sha3_256(), values.clone());
     let root_hash = tree.root_hash();
 
     let value = "Rusty";
@@ -133,10 +133,10 @@ fn test_valid_proof_str() {
 #[test]
 fn test_wrong_proof() {
     let values1   = vec![vec![1], vec![2], vec![3], vec![4]];
-    let tree1     = MerkleTree::from_vec(Sha3::sha3_256(), values1.clone());
+    let tree1     = MerkleTree::from_vec_unsafe(Sha3::sha3_256(), values1.clone());
 
     let values2   = vec![vec![4], vec![5], vec![6], vec![7]];
-    let tree2     = MerkleTree::from_vec(Sha3::sha3_256(), values2.clone());
+    let tree2     = MerkleTree::from_vec_unsafe(Sha3::sha3_256(), values2.clone());
 
     let root_hash = tree2.root_hash();
 
@@ -151,7 +151,7 @@ fn test_wrong_proof() {
 #[test]
 fn test_mutate_proof_first_lemma() {
     let values    = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
-    let tree      = MerkleTree::from_vec(Sha3::sha3_256(), values.clone());
+    let tree      = MerkleTree::from_vec_unsafe(Sha3::sha3_256(), values.clone());
     let root_hash = tree.root_hash();
 
     let mut i = 0;
