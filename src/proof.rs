@@ -6,16 +6,25 @@ use crypto::digest::Digest;
 use tree::Tree;
 use merkledigest::MerkleDigest;
 
+use proto::{ ProofProto, LemmaProto };
+
 /// An inclusion proof represent the fact that a `value` is a member
 /// of a `MerkleTree` with root hash `root_hash`, and hash function `digest`.
 pub struct Proof<D, T> {
-    digest: D,
-    root_hash: Vec<u8>,
-    lemma: Lemma,
+
+    /// The hash function used in the original `MerkleTree`
+    pub digest: D,
+
+    /// The hash of the root of the original `MerkleTree`
+    pub root_hash: Vec<u8>,
+
+    /// The first `Lemma` of the `Proof`
+    pub lemma: Lemma,
+
     _value_marker: PhantomData<T>
 }
 
-impl <D, T> Proof<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
+impl <D, T> Proof<D, T> {
 
     /// Constructs a new `Proof`
     pub fn new(digest: D, root_hash: Vec<u8>, lemma: Lemma) -> Self {
@@ -29,7 +38,7 @@ impl <D, T> Proof<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
 
     /// Checks whether this inclusion proof is well-formed,
     /// and whether its root hash matches the given `root_hash`.
-    pub fn validate(&self, root_hash: &Vec<u8>) -> bool {
+    pub fn validate(&self, root_hash: &Vec<u8>) -> bool where D: Digest + Clone {
         if self.root_hash != *root_hash || self.lemma.node_hash != *root_hash {
             return false
         }
@@ -37,7 +46,7 @@ impl <D, T> Proof<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
         self.validate_lemma(&self.lemma, &mut self.digest.clone())
     }
 
-    fn validate_lemma(&self, lemma: &Lemma, digest: &mut D) -> bool {
+    fn validate_lemma(&self, lemma: &Lemma, digest: &mut D) -> bool where D: Digest {
         match lemma.sub_lemma {
 
             None =>
@@ -62,9 +71,8 @@ impl <D, T> Proof<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
         }
     }
 
-    #[cfg(test)]
-    pub fn lemma_mut(&mut self) -> &mut Lemma {
-        &mut self.lemma
+    fn serialize(self) -> ProofProto {
+        ProofProto::from(self)
     }
 
 }
@@ -74,9 +82,9 @@ impl <D, T> Proof<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
 /// and a sub lemma, whose `node_hash`, when combined with this `sibling_hash`
 /// must be equal to this `node_hash`.
 pub struct Lemma {
-    node_hash: Vec<u8>,
-    sibling_hash: Option<Positioned<Vec<u8>>>,
-    sub_lemma: Option<Box<Lemma>>
+    pub node_hash: Vec<u8>,
+    pub sibling_hash: Option<Positioned<Vec<u8>>>,
+    pub sub_lemma: Option<Box<Lemma>>
 }
 
 impl Lemma {
@@ -104,9 +112,7 @@ impl Lemma {
         }
     }
 
-    fn new_tree_proof<T>(hash: &Vec<u8>, needle: &Vec<u8>, left: &Tree<T>, right: &Tree<T>) -> Option<Lemma>
-        where T: Into<Vec<u8>> + Clone
-    {
+    fn new_tree_proof<T>(hash: &Vec<u8>, needle: &Vec<u8>, left: &Tree<T>, right: &Tree<T>) -> Option<Lemma> where T: Into<Vec<u8>> + Clone {
         Lemma::new(left, needle)
             .map(|lemma| {
                 let right_hash = right.hash().clone();
@@ -130,19 +136,8 @@ impl Lemma {
             })
     }
 
-    #[cfg(test)]
-    pub fn node_hash_mut(&mut self) -> &mut Vec<u8> {
-        &mut self.node_hash
-    }
-
-    #[cfg(test)]
-    pub fn sibling_hash_mut(&mut self) -> &mut Option<Positioned<Vec<u8>>> {
-        &mut self.sibling_hash
-    }
-
-    #[cfg(test)]
-    pub fn sub_lemma_mut(&mut self) -> &mut Option<Box<Lemma>> {
-        &mut self.sub_lemma
+    fn serialize(self) -> LemmaProto {
+        LemmaProto::from(self)
     }
 
 }

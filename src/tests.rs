@@ -11,7 +11,7 @@ use proof::{ Positioned };
 fn test_from_str_vec() {
     let mut digest = Sha3::sha3_256();
 
-    let values = vec![ "one", "two", "three", "four" ];
+    let values = vec!["one", "two", "three", "four"];
 
     let hashes = vec![
         digest.hash_bytes(&values[0].into()),
@@ -161,16 +161,13 @@ fn test_mutate_proof_first_lemma() {
 
         match i % 3 {
             0 => {
-                let sibling_hash = proof.lemma_mut().node_hash_mut();
-                *sibling_hash    = vec![1,2,3];
+                proof.lemma.node_hash = vec![1, 2, 3];
             },
             1 => {
-                let sibling_hash = proof.lemma_mut().sibling_hash_mut();
-                *sibling_hash    = Some(Positioned::Left(vec![1, 2, 3]));
+                proof.lemma.sibling_hash = Some(Positioned::Left(vec![1, 2, 3]));
             },
             _ => {
-                let sibling_hash = proof.lemma_mut().sibling_hash_mut();
-                *sibling_hash    = Some(Positioned::Right(vec![1, 2, 3]));
+                proof.lemma.sibling_hash = Some(Positioned::Right(vec![1, 2, 3]));
             }
         }
 
