@@ -15,4 +15,5 @@ repository = "https://github.com/SpinResearch/merkle.rs"
 
 [dependencies]
 rust-crypto = "^0.2.36"
+protobuf = "^1.0.0"
 

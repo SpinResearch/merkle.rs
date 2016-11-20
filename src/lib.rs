@@ -3,6 +3,7 @@
 //! *merkle* implements a Merkle Tree in Rust.
 
 extern crate crypto;
+extern crate protobuf;
 
 mod merkletree;
 pub use merkletree::MerkleTree;
@@ -13,6 +14,8 @@ pub use proof::Proof;
 mod merkledigest;
 
 mod tree;
+
+mod proto;
 
 #[cfg(test)]
 mod tests;
