@@ -47,22 +47,18 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-50' class='srclink' href='../src/merkle/src/proof.rs.html#9-14' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-60' class='srclink' href='../src/merkle/src/proof.rs.html#11-16' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Proof&lt;D,&nbsp;T&gt; {
-    pub digest: D,
-    pub root_hash: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;,
-    pub block: ProofBlock,
-    pub value: T,
+    // some fields omitted
 }</pre><div class='docblock'><p>An inclusion proof represent the fact that a <code>value</code> is a member
 of a <code>MerkleTree</code> with root hash <code>root_hash</code>, and hash function <code>digest</code>.</p>
-</div><h2 class='fields'>Fields</h2><span id='structfield.digest' class='structfield'><code>digest: D</code>
-                           </span><span class='stab '></span><span id='structfield.root_hash' class='structfield'><code>root_hash: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;</code>
-                           </span><span class='stab '></span><span id='structfield.block' class='structfield'><code>block: ProofBlock</code>
-                           </span><span class='stab '></span><span id='structfield.value' class='structfield'><code>value: T</code>
-                           </span><span class='stab '></span><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;D,&nbsp;T&gt; <a class='struct' href='../merkle/struct.Proof.html' title='merkle::Proof'>Proof</a>&lt;D,&nbsp;T&gt; <span class='where'>where D: Digest + <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>, T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;&gt; + <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a></span></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-57' class='srclink' href='../src/merkle/src/proof.rs.html#16-51' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.validate' class='method'><code>fn <a href='#method.validate' class='fnname'>validate</a>(&amp;self, root_hash: &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
-<h4 id='method.validate_block' class='method'><code>fn <a href='#method.validate_block' class='fnname'>validate_block</a>(&amp;self, block: &amp;ProofBlock, digest: &amp;mut D) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
-</div></section>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;D,&nbsp;T&gt; <a class='struct' href='../merkle/struct.Proof.html' title='merkle::Proof'>Proof</a>&lt;D,&nbsp;T&gt; <span class='where'>where D: Digest + <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>, T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;&gt; + <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a></span></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-67' class='srclink' href='../src/merkle/src/proof.rs.html#18-70' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(digest: D, root_hash: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;, lemma: Lemma) -&gt; Self</code></h4>
+<div class='docblock'><p>Constructs a new <code>Proof</code></p>
+</div><h4 id='method.validate' class='method'><code>fn <a href='#method.validate' class='fnname'>validate</a>(&amp;self, root_hash: &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+<div class='docblock'><p>Checks whether this inclusion proof is well-formed,
+and whether its root hash matches the given <code>root_hash</code>.</p>
+</div></div></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
