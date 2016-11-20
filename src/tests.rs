@@ -37,8 +37,8 @@ fn test_from_str_vec() {
 
     let root_hash = d.combine_hashes(h01, h23);
 
-    assert_eq!(tree.count, count);
-    assert_eq!(tree.height, 2);
+    assert_eq!(tree.count(), count);
+    assert_eq!(tree.height(), 2);
     assert_eq!(tree.root_hash().as_slice(), root_hash.as_slice());
 }
 
@@ -63,8 +63,8 @@ fn test_from_vec1() {
 
     let root_hash = &d.hash_bytes(&"hello, world".to_string().into());
 
-    assert_eq!(tree.count, 1);
-    assert_eq!(tree.height, 0);
+    assert_eq!(tree.count(), 1);
+    assert_eq!(tree.height(), 0);
     assert_eq!(tree.root_hash().as_slice(), root_hash.as_slice());
 }
 
@@ -88,8 +88,8 @@ fn test_from_vec3() {
     let h2        = &hashes[2];
     let root_hash = &d.combine_hashes(h01, h2);
 
-    assert_eq!(tree.count, 3);
-    assert_eq!(tree.height, 2);
+    assert_eq!(tree.count(), 3);
+    assert_eq!(tree.height(), 2);
     assert_eq!(tree.root_hash().as_slice(), root_hash.as_slice());
 }
 
@@ -117,8 +117,8 @@ fn test_from_vec9() {
 
     let root_hash = &d.combine_hashes(h1to7, h8);
 
-    assert_eq!(tree.count, count);
-    assert_eq!(tree.height, 4);
+    assert_eq!(tree.count(), count);
+    assert_eq!(tree.height(), 4);
     assert_eq!(tree.root_hash().as_slice(), root_hash.as_slice());
 }
 
@@ -172,7 +172,7 @@ fn test_wrong_proof() {
 }
 
 #[test]
-fn test_mutate_proof_first_block() {
+fn test_mutate_proof_first_lemma() {
     let digest    = Sha3::sha3_256();
     let values    = vec![1, 2, 3, 4].iter().map(|x| vec![*x]).collect::<Vec<Vec<u8>>>();
     let tree      = MerkleTree::from_vec(digest, values.clone());
@@ -184,9 +184,11 @@ fn test_mutate_proof_first_block() {
         let mut proof = tree.gen_proof(value).unwrap();
 
         if i % 2 == 0 {
-            proof.block.node_hash = vec![1,2,3];
+            let sibling_hash = proof.lemma_mut().node_hash_mut();
+            *sibling_hash = vec![1,2,3];
         } else {
-            proof.block.sibling_hash = Positioned::Left(vec![1,2,3]);
+            let sibling_hash = proof.lemma_mut().sibling_hash_mut();
+            *sibling_hash = Positioned::Left(vec![1,2,3]);
         }
 
         let is_valid = proof.validate(root_hash);

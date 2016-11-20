@@ -1,28 +1,26 @@
+
 use crypto::digest::Digest;
 
-use tree::{ Tree };
-use merkledigest::{ MerkleDigest };
+use tree::Tree;
+use merkledigest::MerkleDigest;
 
-pub use proof::{
-    Proof,
-    ProofBlock
-};
+use proof::{ Proof, Lemma };
 
 /// A Merkle tree is a binary tree, with values of type `T` at the leafs,
 /// and where every node holds the hash of the concatenation of the hashes of
 /// its children nodes.
 pub struct MerkleTree<D, T> {
     /// The hashing function used by this Merkle tree
-    pub digest: D,
+    digest: D,
 
     /// The inner binary tree
-    pub tree: Tree<T>,
+    tree: Tree<T>,
 
     /// The height of the tree
-    pub height: usize,
+    height: usize,
 
     /// The number of leaf nodes in the tree
-    pub count: usize
+    count: usize
 }
 
 impl <D, T> MerkleTree<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
@@ -85,24 +83,30 @@ impl <D, T> MerkleTree<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
         }
     }
 
-    /// Returns the tree's root hash
+    /// Returns the root hash of Merkle tree
     pub fn root_hash(&self) -> &Vec<u8> {
         self.tree.get_hash()
+    }
+
+    /// Returns the height of Merkle tree
+    pub fn height(&self) -> usize {
+        self.height
+    }
+
+    /// Returns the number of leaves in the Merkle tree
+    pub fn count(&self) -> usize {
+        self.count
     }
 
     /// Generate an inclusion proof for the given value.
     /// `None` is returned if the given value is not found in the tree.
     pub fn gen_proof(&self, value: &T) -> Option<Proof<D, T>> {
         let mut digest = self.digest.clone();
-        let hash       = digest.hash_bytes(&value.clone().into());
+        let root_hash  = self.root_hash().clone();
+        let node_hash  = digest.hash_bytes(&value.clone().into());
 
-        ProofBlock::new(&self.tree, &hash).map(|block|
-            Proof {
-                digest: digest,
-                root_hash: self.root_hash().clone(),
-                block: block,
-                value: value.clone()
-            }
+        Lemma::new(&self.tree, &node_hash).map(|lemma|
+            Proof::new(digest, root_hash, lemma)
         )
     }
 

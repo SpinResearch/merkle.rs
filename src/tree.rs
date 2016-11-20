@@ -4,7 +4,7 @@ use merkledigest::{ MerkleDigest };
 
 pub use proof::{
     Proof,
-    ProofBlock,
+    Lemma,
     Positioned
 };
 
