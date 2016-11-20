@@ -1,3 +1,4 @@
+#![warn(missing_docs)]
 
 //! *merkle* implements a Merkle Tree in Rust.
 

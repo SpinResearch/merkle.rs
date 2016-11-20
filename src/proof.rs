@@ -17,6 +17,7 @@ pub struct Proof<D, T> {
 
 impl <D, T> Proof<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
 
+    /// Constructs a new `Proof`
     pub fn new(digest: D, root_hash: Vec<u8>, lemma: Lemma) -> Self {
         Proof {
             digest: digest,
@@ -26,6 +27,8 @@ impl <D, T> Proof<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
         }
     }
 
+    /// Checks whether this inclusion proof is well-formed,
+    /// and whether its root hash matches the given `root_hash`.
     pub fn validate(&self, root_hash: &Vec<u8>) -> bool {
         if self.root_hash != *root_hash || self.lemma.node_hash != *root_hash {
             return false
@@ -34,7 +37,7 @@ impl <D, T> Proof<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
         self.validate_lemma(&self.lemma, &mut self.digest.clone())
     }
 
-    pub fn validate_lemma(&self, lemma: &Lemma, digest: &mut D) -> bool {
+    fn validate_lemma(&self, lemma: &Lemma, digest: &mut D) -> bool {
         match lemma.sub_lemma {
 
             None =>
@@ -78,7 +81,7 @@ pub struct Lemma {
 
 impl Lemma {
 
-    /// Attempt to generate a proof that the hash `needle` is a member of the given `tree`.
+    /// Attempts to generate a proof that the a value with hash `needle` is a member of the given `tree`.
     pub fn new<T>(tree: &Tree<T>, needle: &Vec<u8>) -> Option<Lemma> where T: Into<Vec<u8>> + Clone {
         match *tree {
             Tree::Leaf { ref hash, .. } =>
