@@ -35,22 +35,22 @@ impl <D, T> Proof<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
     }
 
     pub fn validate_lemma(&self, lemma: &Lemma, digest: &mut D) -> bool {
-        match lemma.sub_proof {
+        match lemma.sub_lemma {
 
             None =>
-                lemma.sibling_hash == Positioned::Nowhere,
+                lemma.sibling_hash.is_none(),
 
             Some(ref sub) =>
                 match lemma.sibling_hash {
-                    Positioned::Nowhere =>
+                    None =>
                         false,
 
-                    Positioned::Left(ref hash) => {
+                    Some(Positioned::Left(ref hash)) => {
                         let hashes_match = digest.combine_hashes(&hash, &sub.node_hash) == lemma.node_hash;
                         hashes_match && self.validate_lemma(sub, digest)
                     }
 
-                    Positioned::Right(ref hash) => {
+                    Some(Positioned::Right(ref hash)) => {
                         let hashes_match = digest.combine_hashes(&sub.node_hash, &hash) == lemma.node_hash;
                         hashes_match && self.validate_lemma(sub, digest)
                     }
@@ -67,12 +67,13 @@ impl <D, T> Proof<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
 }
 
 
-/// A `Lemma` is a linked-list holding the hash of the node, the hash of its sibling node,
-/// and the rest of the inclusion proof.
+/// A `Lemma` holds the hash of a node, the hash of its sibling node,
+/// and a sub lemma, whose `node_hash`, when combined with this `sibling_hash`
+/// must be equal to this `node_hash`.
 pub struct Lemma {
     node_hash: Vec<u8>,
-    sibling_hash: Positioned<Vec<u8>>,
-    sub_proof: Option<Box<Lemma>>
+    sibling_hash: Option<Positioned<Vec<u8>>>,
+    sub_lemma: Option<Box<Lemma>>
 }
 
 impl Lemma {
@@ -92,8 +93,8 @@ impl Lemma {
         if *hash == *needle {
             Some(Lemma {
                 node_hash: hash.clone(),
-                sibling_hash: Positioned::Nowhere,
-                sub_proof: None
+                sibling_hash: None,
+                sub_lemma: None
             })
         } else {
             None
@@ -106,22 +107,22 @@ impl Lemma {
         Lemma::new(left, needle)
             .map(|lemma| {
                 let right_hash = right.get_hash().clone();
-                let sub_proof = Positioned::Right(right_hash);
-                (lemma, sub_proof)
+                let sub_lemma = Some(Positioned::Right(right_hash));
+                (lemma, sub_lemma)
             })
             .or_else(|| {
-                let sub_proof = Lemma::new(right, needle);
-                sub_proof.map(|lemma| {
+                let sub_lemma = Lemma::new(right, needle);
+                sub_lemma.map(|lemma| {
                     let left_hash = left.get_hash().clone();
-                    let sub_proof = Positioned::Left(left_hash);
-                    (lemma, sub_proof)
+                    let sub_lemma = Some(Positioned::Left(left_hash));
+                    (lemma, sub_lemma)
                 })
             })
-            .map(|(sub_proof, sibling_hash)| {
+            .map(|(sub_lemma, sibling_hash)| {
                 Lemma {
                     node_hash: hash.clone(),
                     sibling_hash: sibling_hash,
-                    sub_proof: Some(Box::new(sub_proof))
+                    sub_lemma: Some(Box::new(sub_lemma))
                 }
             })
     }
@@ -132,23 +133,20 @@ impl Lemma {
     }
 
     #[cfg(test)]
-    pub fn sibling_hash_mut(&mut self) -> &mut Positioned<Vec<u8>> {
+    pub fn sibling_hash_mut(&mut self) -> &mut Option<Positioned<Vec<u8>>> {
         &mut self.sibling_hash
     }
 
     #[cfg(test)]
-    pub fn sub_proof_mut(&mut self) -> &mut Option<Box<Lemma>> {
-        &mut self.sub_proof
+    pub fn sub_lemma_mut(&mut self) -> &mut Option<Box<Lemma>> {
+        &mut self.sub_lemma
     }
 
 }
 
-/// Tags a value so that we know from in branch (if any) it was found.
+/// Tags a value so that we know from which branch of a `Tree` (if any) it was found.
 #[derive(PartialEq)]
 pub enum Positioned<T> {
-
-    /// No value was found
-    Nowhere,
 
     /// The value was found in the left branch
     Left(T),

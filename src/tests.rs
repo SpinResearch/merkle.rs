@@ -150,7 +150,7 @@ fn test_wrong_proof() {
 
 #[test]
 fn test_mutate_proof_first_lemma() {
-    let values    = (1..5).map(|x| vec![x]).collect::<Vec<_>>();
+    let values    = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
     let tree      = MerkleTree::from_vec(Sha3::sha3_256(), values.clone());
     let root_hash = tree.root_hash();
 
@@ -159,12 +159,19 @@ fn test_mutate_proof_first_lemma() {
     for value in values.iter() {
         let mut proof = tree.gen_proof(value).unwrap();
 
-        if i % 2 == 0 {
-            let sibling_hash = proof.lemma_mut().node_hash_mut();
-            *sibling_hash    = vec![1,2,3];
-        } else {
-            let sibling_hash = proof.lemma_mut().sibling_hash_mut();
-            *sibling_hash    = Positioned::Left(vec![1, 2, 3]);
+        match i % 3 {
+            0 => {
+                let sibling_hash = proof.lemma_mut().node_hash_mut();
+                *sibling_hash    = vec![1,2,3];
+            },
+            1 => {
+                let sibling_hash = proof.lemma_mut().sibling_hash_mut();
+                *sibling_hash    = Some(Positioned::Left(vec![1, 2, 3]));
+            },
+            _ => {
+                let sibling_hash = proof.lemma_mut().sibling_hash_mut();
+                *sibling_hash    = Some(Positioned::Right(vec![1, 2, 3]));
+            }
         }
 
         let is_valid = proof.validate(root_hash);
