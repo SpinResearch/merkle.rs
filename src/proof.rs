@@ -1,82 +1,96 @@
 
+use std::marker::PhantomData;
+
 use crypto::digest::Digest;
 
-use merkledigest::{ MerkleDigest };
-use tree::{ Tree };
+use tree::Tree;
+use merkledigest::MerkleDigest;
 
 /// An inclusion proof represent the fact that a `value` is a member
 /// of a `MerkleTree` with root hash `root_hash`, and hash function `digest`.
 pub struct Proof<D, T> {
-    pub digest: D,
-    pub root_hash: Vec<u8>,
-    pub block: ProofBlock,
-    pub value: T
+    digest: D,
+    root_hash: Vec<u8>,
+    lemma: Lemma,
+    _value_marker: PhantomData<T>
 }
 
 impl <D, T> Proof<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
 
+    pub fn new(digest: D, root_hash: Vec<u8>, lemma: Lemma) -> Self {
+        Proof {
+            digest: digest,
+            root_hash: root_hash,
+            lemma: lemma,
+            _value_marker: PhantomData
+        }
+    }
+
     pub fn validate(&self, root_hash: &Vec<u8>) -> bool {
-        if self.root_hash != *root_hash || self.block.node_hash != *root_hash {
+        if self.root_hash != *root_hash || self.lemma.node_hash != *root_hash {
             return false
         }
 
-        self.validate_block(&self.block, &mut self.digest.clone())
+        self.validate_lemma(&self.lemma, &mut self.digest.clone())
     }
 
-    pub fn validate_block(&self, block: &ProofBlock, digest: &mut D) -> bool {
-        match block.sub_proof {
+    pub fn validate_lemma(&self, lemma: &Lemma, digest: &mut D) -> bool {
+        match lemma.sub_proof {
 
             None =>
-                block.sibling_hash == Positioned::Nowhere,
+                lemma.sibling_hash == Positioned::Nowhere,
 
             Some(ref sub) =>
-                match block.sibling_hash {
+                match lemma.sibling_hash {
                     Positioned::Nowhere =>
                         false,
 
                     Positioned::Left(ref hash) => {
-                        let hashes_match = digest.combine_hashes(&hash, &sub.node_hash) == block.node_hash;
-                        hashes_match && self.validate_block(sub, digest)
+                        let hashes_match = digest.combine_hashes(&hash, &sub.node_hash) == lemma.node_hash;
+                        hashes_match && self.validate_lemma(sub, digest)
                     }
 
                     Positioned::Right(ref hash) => {
-                        let hashes_match = digest.combine_hashes(&sub.node_hash, &hash) == block.node_hash;
-                        hashes_match && self.validate_block(sub, digest)
+                        let hashes_match = digest.combine_hashes(&sub.node_hash, &hash) == lemma.node_hash;
+                        hashes_match && self.validate_lemma(sub, digest)
                     }
 
                 }
         }
     }
 
+    #[cfg(test)]
+    pub fn lemma_mut(&mut self) -> &mut Lemma {
+        &mut self.lemma
+    }
+
 }
 
 
-/// A `ProofBlock` is a linked-list holding the hash of the node, the hash of its sibling node,
+/// A `Lemma` is a linked-list holding the hash of the node, the hash of its sibling node,
 /// and the rest of the inclusion proof.
-pub struct ProofBlock {
-    pub node_hash: Vec<u8>,
-    pub sibling_hash: Positioned<Vec<u8>>,
-    pub sub_proof: Option<Box<ProofBlock>>
+pub struct Lemma {
+    node_hash: Vec<u8>,
+    sibling_hash: Positioned<Vec<u8>>,
+    sub_proof: Option<Box<Lemma>>
 }
 
-impl ProofBlock {
+impl Lemma {
 
     /// Attempt to generate a proof that the hash `needle` is a member of the given `tree`.
-    pub fn new<T>(tree: &Tree<T>, needle: &Vec<u8>) -> Option<ProofBlock>
-        where T: Into<Vec<u8>> + Clone
-    {
+    pub fn new<T>(tree: &Tree<T>, needle: &Vec<u8>) -> Option<Lemma> where T: Into<Vec<u8>> + Clone {
         match *tree {
             Tree::Leaf { ref hash, .. } =>
-                ProofBlock::new_leaf_proof(hash, needle),
+                Lemma::new_leaf_proof(hash, needle),
 
             Tree::Node { ref hash, ref left, ref right } =>
-                ProofBlock::new_tree_proof(hash, needle, left, right)
+                Lemma::new_tree_proof(hash, needle, left, right)
         }
     }
 
-    fn new_leaf_proof(hash: &Vec<u8>, needle: &Vec<u8>) -> Option<ProofBlock> {
+    fn new_leaf_proof(hash: &Vec<u8>, needle: &Vec<u8>) -> Option<Lemma> {
         if *hash == *needle {
-            Some(ProofBlock {
+            Some(Lemma {
                 node_hash: hash.clone(),
                 sibling_hash: Positioned::Nowhere,
                 sub_proof: None
@@ -86,30 +100,45 @@ impl ProofBlock {
         }
     }
 
-    fn new_tree_proof<T>(hash: &Vec<u8>, needle: &Vec<u8>, left: &Tree<T>, right: &Tree<T>) -> Option<ProofBlock>
+    fn new_tree_proof<T>(hash: &Vec<u8>, needle: &Vec<u8>, left: &Tree<T>, right: &Tree<T>) -> Option<Lemma>
         where T: Into<Vec<u8>> + Clone
     {
-        ProofBlock::new(left, needle)
-            .map(|block| {
+        Lemma::new(left, needle)
+            .map(|lemma| {
                 let right_hash = right.get_hash().clone();
                 let sub_proof = Positioned::Right(right_hash);
-                (block, sub_proof)
+                (lemma, sub_proof)
             })
             .or_else(|| {
-                let sub_proof = ProofBlock::new(right, needle);
-                sub_proof.map(|block| {
+                let sub_proof = Lemma::new(right, needle);
+                sub_proof.map(|lemma| {
                     let left_hash = left.get_hash().clone();
                     let sub_proof = Positioned::Left(left_hash);
-                    (block, sub_proof)
+                    (lemma, sub_proof)
                 })
             })
             .map(|(sub_proof, sibling_hash)| {
-                ProofBlock {
+                Lemma {
                     node_hash: hash.clone(),
                     sibling_hash: sibling_hash,
                     sub_proof: Some(Box::new(sub_proof))
                 }
             })
+    }
+
+    #[cfg(test)]
+    pub fn node_hash_mut(&mut self) -> &mut Vec<u8> {
+        &mut self.node_hash
+    }
+
+    #[cfg(test)]
+    pub fn sibling_hash_mut(&mut self) -> &mut Positioned<Vec<u8>> {
+        &mut self.sibling_hash
+    }
+
+    #[cfg(test)]
+    pub fn sub_proof_mut(&mut self) -> &mut Option<Box<Lemma>> {
+        &mut self.sub_proof
     }
 
 }
