@@ -13,8 +13,8 @@ pub struct MerkleTree<D, T> {
     /// The hashing function used by this Merkle tree
     digest: D,
 
-    /// The inner binary tree
-    tree: Tree<T>,
+    /// The root of the inner binary tree
+    root: Tree<T>,
 
     /// The height of the tree
     height: usize,
@@ -58,8 +58,8 @@ impl <D, T> MerkleTree<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
                     let right = cur.remove(0);
 
                     let combined_hash = digest.combine_hashes(
-                        left.get_hash(),
-                        right.get_hash()
+                        left.hash(),
+                        right.hash()
                     );
 
                     let node = Tree::Node {
@@ -79,23 +79,24 @@ impl <D, T> MerkleTree<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
 
         assert!(cur.len() == 1);
 
-        let tree = cur.remove(0);
+        let root = cur.remove(0);
 
         Some(MerkleTree {
             digest: digest,
-            tree: tree,
+            root: root,
             height: height,
             count: count
         })
     }
 
+    /// Returns the hash function used in this Merkle tree
     pub fn digest(&self) -> &D {
         &self.digest
     }
 
     /// Returns the root hash of Merkle tree
     pub fn root_hash(&self) -> &Vec<u8> {
-        self.tree.get_hash()
+        self.root.hash()
     }
 
     /// Returns the height of Merkle tree
@@ -109,13 +110,13 @@ impl <D, T> MerkleTree<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
     }
 
     /// Generate an inclusion proof for the given value.
-    /// `None` is returned if the given value is not found in the tree.
+    /// Returns `None` if the given value is not found in the tree.
     pub fn gen_proof(&self, value: &T) -> Option<Proof<D, T>> {
         let mut digest = self.digest.clone();
         let root_hash  = self.root_hash().clone();
         let node_hash  = digest.hash_bytes(&value.clone().into());
 
-        Lemma::new(&self.tree, &node_hash).map(|lemma|
+        Lemma::new(&self.root, &node_hash).map(|lemma|
             Proof::new(digest, root_hash, lemma)
         )
     }

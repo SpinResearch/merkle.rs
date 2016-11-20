@@ -106,14 +106,14 @@ impl Lemma {
     {
         Lemma::new(left, needle)
             .map(|lemma| {
-                let right_hash = right.get_hash().clone();
+                let right_hash = right.hash().clone();
                 let sub_lemma = Some(Positioned::Right(right_hash));
                 (lemma, sub_lemma)
             })
             .or_else(|| {
                 let sub_lemma = Lemma::new(right, needle);
                 sub_lemma.map(|lemma| {
-                    let left_hash = left.get_hash().clone();
+                    let left_hash = left.hash().clone();
                     let sub_lemma = Some(Positioned::Left(left_hash));
                     (lemma, sub_lemma)
                 })
