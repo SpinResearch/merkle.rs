@@ -9,7 +9,7 @@ use proof::{ Proof, Lemma };
 /// A Merkle tree is a binary tree, with values of type `T` at the leafs,
 /// and where every node holds the hash of the concatenation of the hashes of
 /// its children nodes.
-#[derive(Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct MerkleTree<D, T> {
     /// The hashing function used by this Merkle tree
     digest: D,
