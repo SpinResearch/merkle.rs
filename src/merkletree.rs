@@ -112,13 +112,13 @@ impl <D, T> MerkleTree<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
 
     /// Generate an inclusion proof for the given value.
     /// Returns `None` if the given value is not found in the tree.
-    pub fn gen_proof(&self, value: &T) -> Option<Proof<D, T>> {
+    pub fn gen_proof(&self, value: T) -> Option<Proof<D, T>> {
         let mut digest = self.digest.clone();
         let root_hash  = self.root_hash().clone();
         let node_hash  = digest.hash_bytes(&value.clone().into());
 
         Lemma::new(&self.root, &node_hash).map(|lemma|
-            Proof::new(digest, root_hash, lemma)
+            Proof::new(digest, root_hash, lemma, value)
         )
     }
 

@@ -108,7 +108,7 @@ fn test_valid_proof() {
     let tree      = MerkleTree::from_vec_unsafe(Sha3::sha3_256(), values.clone());
     let root_hash = tree.root_hash();
 
-    for value in values.iter() {
+    for value in values {
         let proof    = tree.gen_proof(value);
         let is_valid = proof.map(|p| p.validate(&root_hash)).unwrap_or(false);
 
@@ -140,7 +140,7 @@ fn test_wrong_proof() {
 
     let root_hash = tree2.root_hash();
 
-    for value in values1.iter() {
+    for value in values1 {
         let proof    = tree1.gen_proof(value);
         let is_valid = proof.map(|p| p.validate(root_hash)).unwrap_or(false);
 
@@ -156,7 +156,7 @@ fn test_mutate_proof_first_lemma() {
 
     let mut i = 0;
 
-    for value in values.iter() {
+    for value in values {
         let mut proof = tree.gen_proof(value).unwrap();
 
         match i % 3 {

@@ -4,6 +4,7 @@ syntax = "proto3";
 message ProofProto {
   bytes root_hash = 1;
   LemmaProto lemma = 2;
+  bytes value = 3;
 }
 
 message LemmaProto {

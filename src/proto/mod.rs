@@ -11,22 +11,28 @@ use protobuf::core::parse_from_bytes;
 impl <D, T> Proof<D, T> {
 
     /// Constructs a `Proof` struct from its Protobuf representation.
-    pub fn from_protobuf(digest: D, proto: ProofProto) -> Option<Self> {
+    pub fn from_protobuf(digest: D, proto: ProofProto) -> Option<Self>
+        where T: From<Vec<u8>>
+    {
         proto.into_proof(digest)
     }
 
     /// Encode this `Proof` to its Protobuf representation.
-    pub fn into_protobuf(self) -> ProofProto {
+    pub fn into_protobuf(self) -> ProofProto
+        where T: Into<Vec<u8>>
+    {
         ProofProto::from_proof(self)
     }
 
     /// Parse a `Proof` from its Protobuf binary representation.
-    pub fn parse_from_bytes(bytes: &[u8], digest: D) -> ProtobufResult<Option<Proof<D, T>>> {
+    pub fn parse_from_bytes(bytes: &[u8], digest: D) -> ProtobufResult<Option<Proof<D, T>>>
+        where T: From<Vec<u8>>
+    {
         parse_from_bytes::<ProofProto>(bytes).map(|proto| proto.into_proof(digest))
     }
 
     /// Serialize this `Proof` with Protobuf.
-    pub fn write_to_bytes(self) -> ProtobufResult<Vec<u8>> {
+    pub fn write_to_bytes(self) -> ProtobufResult<Vec<u8>> where T: Into<Vec<u8>>  {
         self.into_protobuf().write_to_bytes()
     }
 
@@ -34,20 +40,25 @@ impl <D, T> Proof<D, T> {
 
 impl ProofProto {
 
-    pub fn from_proof<D, T>(proof: Proof<D, T>) -> Self  {
+    pub fn from_proof<D, T>(proof: Proof<D, T>) -> Self
+        where T: Into<Vec<u8>>
+    {
         let mut proto = Self::new();
 
         match proof {
-            Proof { root_hash, lemma, .. } => {
+            Proof { root_hash, lemma, value, .. } => {
                 proto.set_root_hash(root_hash);
                 proto.set_lemma(LemmaProto::from_lemma(lemma));
+                proto.set_value(value.into());
             }
         }
 
         proto
     }
 
-    pub fn into_proof<D, T>(mut self, digest: D) -> Option<Proof<D, T>> {
+    pub fn into_proof<D, T>(mut self, digest: D) -> Option<Proof<D, T>>
+        where T: From<Vec<u8>>
+    {
         if !self.has_root_hash() || !self.has_lemma() {
             return None;
         }
@@ -56,7 +67,8 @@ impl ProofProto {
             Proof::new(
                 digest,
                 self.take_root_hash(),
-                lemma
+                lemma,
+                self.take_value().into()
             )
         })
     }

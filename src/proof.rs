@@ -1,6 +1,4 @@
 
-use std::marker::PhantomData;
-
 use crypto::digest::Digest;
 
 use tree::Tree;
@@ -20,18 +18,19 @@ pub struct Proof<D, T> {
     /// The first `Lemma` of the `Proof`
     pub lemma: Lemma,
 
-    _value_marker: PhantomData<T>
+    /// The value concerned by this `Proof`
+    pub value: T
 }
 
 impl <D, T> Proof<D, T> {
 
     /// Constructs a new `Proof`
-    pub fn new(digest: D, root_hash: Vec<u8>, lemma: Lemma) -> Self {
+    pub fn new(digest: D, root_hash: Vec<u8>, lemma: Lemma, value: T) -> Self {
         Proof {
             digest: digest,
             root_hash: root_hash,
             lemma: lemma,
-            _value_marker: PhantomData
+            value: value
         }
     }
 
