@@ -4,6 +4,8 @@
 //! *merkle* implements a Merkle Tree in Rust.
 
 extern crate crypto;
+
+#[cfg(feature = "serialization-protobuf")]
 extern crate protobuf;
 
 mod merkletree;
@@ -16,6 +18,7 @@ mod merkledigest;
 
 mod tree;
 
+#[cfg(feature = "serialization-protobuf")]
 mod proto;
 
 #[cfg(test)]
