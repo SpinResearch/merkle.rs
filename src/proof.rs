@@ -6,8 +6,6 @@ use crypto::digest::Digest;
 use tree::Tree;
 use merkledigest::MerkleDigest;
 
-use proto::{ ProofProto, LemmaProto };
-
 /// An inclusion proof represent the fact that a `value` is a member
 /// of a `MerkleTree` with root hash `root_hash`, and hash function `digest`.
 pub struct Proof<D, T> {
@@ -71,10 +69,6 @@ impl <D, T> Proof<D, T> {
         }
     }
 
-    fn serialize(self) -> ProofProto {
-        ProofProto::from(self)
-    }
-
 }
 
 
@@ -134,10 +128,6 @@ impl Lemma {
                     sub_lemma: Some(Box::new(sub_lemma))
                 }
             })
-    }
-
-    fn serialize(self) -> LemmaProto {
-        LemmaProto::from(self)
     }
 
 }

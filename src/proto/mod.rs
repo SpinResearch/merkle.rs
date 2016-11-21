@@ -4,6 +4,30 @@ mod proof;
 use proof::{ Proof, Lemma, Positioned };
 pub use self::proof::{ ProofProto, LemmaProto };
 
+use protobuf::Message;
+use protobuf::error::ProtobufResult;
+use protobuf::core::parse_from_bytes;
+
+impl <D, T> Proof<D, T> {
+
+    pub fn from_protobuf(digest: D, proto: ProofProto) -> Option<Self> {
+        proto.to(digest)
+    }
+
+    pub fn to_protobuf(self) -> ProofProto {
+        ProofProto::from(self)
+    }
+
+    pub fn write_to_bytes(self) -> ProtobufResult<Vec<u8>> {
+        self.to_protobuf().write_to_bytes()
+    }
+
+    pub fn parse_from_bytes(bytes: &[u8], digest: D) -> ProtobufResult<Option<Proof<D, T>>> {
+        parse_from_bytes::<ProofProto>(bytes).map(|proto| proto.to(digest))
+    }
+
+}
+
 impl ProofProto {
 
     pub fn from<D, T>(proof: Proof<D, T>) -> Self  {
