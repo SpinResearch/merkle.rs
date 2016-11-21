@@ -115,7 +115,7 @@ impl LemmaProto {
                 Some(Positioned::Left(self.take_left_sibling_hash()))
             }
             else if self.has_right_sibling_hash() {
-                Some(Positioned::Left(self.take_right_sibling_hash()))
+                Some(Positioned::Right(self.take_right_sibling_hash()))
             }
             else {
                 None
