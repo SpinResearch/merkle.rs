@@ -61,12 +61,33 @@
 <span id="17">17</span>
 <span id="18">18</span>
 <span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
 </pre><pre class='rust '>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>warn</span>(<span class='ident'>missing_docs</span>)]</span>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>deny</span>(
+    <span class='ident'>missing_docs</span>,
+    <span class='ident'>missing_debug_implementations</span>, <span class='ident'>missing_copy_implementations</span>,
+    <span class='ident'>trivial_casts</span>, <span class='ident'>trivial_numeric_casts</span>,
+    <span class='ident'>unsafe_code</span>, <span class='ident'>unstable_features</span>,
+    <span class='ident'>unused_import_braces</span>, <span class='ident'>unused_qualifications</span>
+)]</span>
 
 <span class='doccomment'>//! *merkle* implements a Merkle Tree in Rust.</span>
 
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>crypto</span>;
+
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;serialization-protobuf&quot;</span>)]</span>
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>protobuf</span>;
 
 <span class='kw'>mod</span> <span class='ident'>merkletree</span>;
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>merkletree</span>::<span class='ident'>MerkleTree</span>;
@@ -77,6 +98,9 @@
 <span class='kw'>mod</span> <span class='ident'>merkledigest</span>;
 
 <span class='kw'>mod</span> <span class='ident'>tree</span>;
+
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;serialization-protobuf&quot;</span>)]</span>
+<span class='kw'>mod</span> <span class='ident'>proto</span>;
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
 <span class='kw'>mod</span> <span class='ident'>tests</span>;
@@ -138,11 +162,9 @@
     <script>
         window.rootPath = "../../../";
         window.currentCrate = "merkle";
-        window.playgroundUrl = "";
     </script>
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
-    
     <script defer src="../../../search-index.js"></script>
 </body>
 </html>

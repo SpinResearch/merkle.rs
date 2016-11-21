@@ -188,23 +188,7 @@
 <span id="144">144</span>
 <span id="145">145</span>
 <span id="146">146</span>
-<span id="147">147</span>
-<span id="148">148</span>
-<span id="149">149</span>
-<span id="150">150</span>
-<span id="151">151</span>
-<span id="152">152</span>
-<span id="153">153</span>
-<span id="154">154</span>
-<span id="155">155</span>
-<span id="156">156</span>
-<span id="157">157</span>
-<span id="158">158</span>
-<span id="159">159</span>
-<span id="160">160</span>
 </pre><pre class='rust '>
-
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>marker</span>::<span class='ident'>PhantomData</span>;
 
 <span class='kw'>use</span> <span class='ident'>crypto</span>::<span class='ident'>digest</span>::<span class='ident'>Digest</span>;
 
@@ -213,36 +197,45 @@
 
 <span class='doccomment'>/// An inclusion proof represent the fact that a `value` is a member</span>
 <span class='doccomment'>/// of a `MerkleTree` with root hash `root_hash`, and hash function `digest`.</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Proof</span><span class='op'>&lt;</span><span class='ident'>D</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
-    <span class='ident'>digest</span>: <span class='ident'>D</span>,
-    <span class='ident'>root_hash</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>,
-    <span class='ident'>lemma</span>: <span class='ident'>Lemma</span>,
-    <span class='ident'>_value_marker</span>: <span class='ident'>PhantomData</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>
+
+    <span class='doccomment'>/// The hash function used in the original `MerkleTree`</span>
+    <span class='kw'>pub</span> <span class='ident'>digest</span>: <span class='ident'>D</span>,
+
+    <span class='doccomment'>/// The hash of the root of the original `MerkleTree`</span>
+    <span class='kw'>pub</span> <span class='ident'>root_hash</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>,
+
+    <span class='doccomment'>/// The first `Lemma` of the `Proof`</span>
+    <span class='kw'>pub</span> <span class='ident'>lemma</span>: <span class='ident'>Lemma</span>,
+
+    <span class='doccomment'>/// The value concerned by this `Proof`</span>
+    <span class='kw'>pub</span> <span class='ident'>value</span>: <span class='ident'>T</span>
 }
 
-<span class='kw'>impl</span> <span class='op'>&lt;</span><span class='ident'>D</span>, <span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>Proof</span><span class='op'>&lt;</span><span class='ident'>D</span>, <span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>D</span>: <span class='ident'>Digest</span> <span class='op'>+</span> <span class='ident'>Clone</span>, <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span> <span class='op'>+</span> <span class='ident'>Clone</span> {
+<span class='kw'>impl</span> <span class='op'>&lt;</span><span class='ident'>D</span>, <span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>Proof</span><span class='op'>&lt;</span><span class='ident'>D</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
 
     <span class='doccomment'>/// Constructs a new `Proof`</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>digest</span>: <span class='ident'>D</span>, <span class='ident'>root_hash</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>lemma</span>: <span class='ident'>Lemma</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>digest</span>: <span class='ident'>D</span>, <span class='ident'>root_hash</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>lemma</span>: <span class='ident'>Lemma</span>, <span class='ident'>value</span>: <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
         <span class='ident'>Proof</span> {
             <span class='ident'>digest</span>: <span class='ident'>digest</span>,
             <span class='ident'>root_hash</span>: <span class='ident'>root_hash</span>,
             <span class='ident'>lemma</span>: <span class='ident'>lemma</span>,
-            <span class='ident'>_value_marker</span>: <span class='ident'>PhantomData</span>
+            <span class='ident'>value</span>: <span class='ident'>value</span>
         }
     }
 
     <span class='doccomment'>/// Checks whether this inclusion proof is well-formed,</span>
     <span class='doccomment'>/// and whether its root hash matches the given `root_hash`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>validate</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>root_hash</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>root_hash</span> <span class='op'>!=</span> <span class='op'>*</span><span class='ident'>root_hash</span> <span class='op'>||</span> <span class='self'>self</span>.<span class='ident'>lemma</span>.<span class='ident'>node_hash</span> <span class='op'>!=</span> <span class='op'>*</span><span class='ident'>root_hash</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>validate</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>root_hash</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='ident'>bool</span> <span class='kw'>where</span> <span class='ident'>D</span>: <span class='ident'>Digest</span> <span class='op'>+</span> <span class='ident'>Clone</span> {
+        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>root_hash</span> <span class='op'>!=</span> <span class='ident'>root_hash</span> <span class='op'>||</span> <span class='self'>self</span>.<span class='ident'>lemma</span>.<span class='ident'>node_hash</span> <span class='op'>!=</span> <span class='ident'>root_hash</span> {
             <span class='kw'>return</span> <span class='bool-val'>false</span>
         }
 
         <span class='self'>self</span>.<span class='ident'>validate_lemma</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>lemma</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>digest</span>.<span class='ident'>clone</span>())
     }
 
-    <span class='kw'>fn</span> <span class='ident'>validate_lemma</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>lemma</span>: <span class='kw-2'>&amp;</span><span class='ident'>Lemma</span>, <span class='ident'>digest</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>D</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
+    <span class='kw'>fn</span> <span class='ident'>validate_lemma</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>lemma</span>: <span class='kw-2'>&amp;</span><span class='ident'>Lemma</span>, <span class='ident'>digest</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>D</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> <span class='kw'>where</span> <span class='ident'>D</span>: <span class='ident'>Digest</span> {
         <span class='kw'>match</span> <span class='ident'>lemma</span>.<span class='ident'>sub_lemma</span> {
 
             <span class='prelude-val'>None</span> <span class='op'>=&gt;</span>
@@ -254,22 +247,17 @@
                         <span class='bool-val'>false</span>,
 
                     <span class='prelude-val'>Some</span>(<span class='ident'>Positioned</span>::<span class='ident'>Left</span>(<span class='kw-2'>ref</span> <span class='ident'>hash</span>)) <span class='op'>=&gt;</span> {
-                        <span class='kw'>let</span> <span class='ident'>hashes_match</span> <span class='op'>=</span> <span class='ident'>digest</span>.<span class='ident'>combine_hashes</span>(<span class='kw-2'>&amp;</span><span class='ident'>hash</span>, <span class='kw-2'>&amp;</span><span class='ident'>sub</span>.<span class='ident'>node_hash</span>) <span class='op'>==</span> <span class='ident'>lemma</span>.<span class='ident'>node_hash</span>;
+                        <span class='kw'>let</span> <span class='ident'>hashes_match</span> <span class='op'>=</span> <span class='ident'>digest</span>.<span class='ident'>combine_hashes</span>(<span class='ident'>hash</span>, <span class='kw-2'>&amp;</span><span class='ident'>sub</span>.<span class='ident'>node_hash</span>) <span class='op'>==</span> <span class='ident'>lemma</span>.<span class='ident'>node_hash</span>;
                         <span class='ident'>hashes_match</span> <span class='op'>&amp;&amp;</span> <span class='self'>self</span>.<span class='ident'>validate_lemma</span>(<span class='ident'>sub</span>, <span class='ident'>digest</span>)
                     }
 
                     <span class='prelude-val'>Some</span>(<span class='ident'>Positioned</span>::<span class='ident'>Right</span>(<span class='kw-2'>ref</span> <span class='ident'>hash</span>)) <span class='op'>=&gt;</span> {
-                        <span class='kw'>let</span> <span class='ident'>hashes_match</span> <span class='op'>=</span> <span class='ident'>digest</span>.<span class='ident'>combine_hashes</span>(<span class='kw-2'>&amp;</span><span class='ident'>sub</span>.<span class='ident'>node_hash</span>, <span class='kw-2'>&amp;</span><span class='ident'>hash</span>) <span class='op'>==</span> <span class='ident'>lemma</span>.<span class='ident'>node_hash</span>;
+                        <span class='kw'>let</span> <span class='ident'>hashes_match</span> <span class='op'>=</span> <span class='ident'>digest</span>.<span class='ident'>combine_hashes</span>(<span class='kw-2'>&amp;</span><span class='ident'>sub</span>.<span class='ident'>node_hash</span>, <span class='ident'>hash</span>) <span class='op'>==</span> <span class='ident'>lemma</span>.<span class='ident'>node_hash</span>;
                         <span class='ident'>hashes_match</span> <span class='op'>&amp;&amp;</span> <span class='self'>self</span>.<span class='ident'>validate_lemma</span>(<span class='ident'>sub</span>, <span class='ident'>digest</span>)
                     }
 
                 }
         }
-    }
-
-    <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>lemma_mut</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Lemma</span> {
-        <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>lemma</span>
     }
 
 }
@@ -278,16 +266,17 @@
 <span class='doccomment'>/// A `Lemma` holds the hash of a node, the hash of its sibling node,</span>
 <span class='doccomment'>/// and a sub lemma, whose `node_hash`, when combined with this `sibling_hash`</span>
 <span class='doccomment'>/// must be equal to this `node_hash`.</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Lemma</span> {
-    <span class='ident'>node_hash</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>,
-    <span class='ident'>sibling_hash</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Positioned</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span>,
-    <span class='ident'>sub_lemma</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Lemma</span><span class='op'>&gt;&gt;</span>
+    <span class='kw'>pub</span> <span class='ident'>node_hash</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>,
+    <span class='kw'>pub</span> <span class='ident'>sibling_hash</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Positioned</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span>,
+    <span class='kw'>pub</span> <span class='ident'>sub_lemma</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Lemma</span><span class='op'>&gt;&gt;</span>
 }
 
 <span class='kw'>impl</span> <span class='ident'>Lemma</span> {
 
     <span class='doccomment'>/// Attempts to generate a proof that the a value with hash `needle` is a member of the given `tree`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>(<span class='ident'>tree</span>: <span class='kw-2'>&amp;</span><span class='ident'>Tree</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>, <span class='ident'>needle</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Lemma</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span> <span class='op'>+</span> <span class='ident'>Clone</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>(<span class='ident'>tree</span>: <span class='kw-2'>&amp;</span><span class='ident'>Tree</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>, <span class='ident'>needle</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Lemma</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span> <span class='op'>+</span> <span class='ident'>Clone</span> {
         <span class='kw'>match</span> <span class='op'>*</span><span class='ident'>tree</span> {
             <span class='ident'>Tree</span>::<span class='ident'>Leaf</span> { <span class='kw-2'>ref</span> <span class='ident'>hash</span>, .. } <span class='op'>=&gt;</span>
                 <span class='ident'>Lemma</span>::<span class='ident'>new_leaf_proof</span>(<span class='ident'>hash</span>, <span class='ident'>needle</span>),
@@ -297,10 +286,10 @@
         }
     }
 
-    <span class='kw'>fn</span> <span class='ident'>new_leaf_proof</span>(<span class='ident'>hash</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>needle</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Lemma</span><span class='op'>&gt;</span> {
+    <span class='kw'>fn</span> <span class='ident'>new_leaf_proof</span>(<span class='ident'>hash</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='ident'>needle</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Lemma</span><span class='op'>&gt;</span> {
         <span class='kw'>if</span> <span class='op'>*</span><span class='ident'>hash</span> <span class='op'>==</span> <span class='op'>*</span><span class='ident'>needle</span> {
             <span class='prelude-val'>Some</span>(<span class='ident'>Lemma</span> {
-                <span class='ident'>node_hash</span>: <span class='ident'>hash</span>.<span class='ident'>clone</span>(),
+                <span class='ident'>node_hash</span>: <span class='ident'>hash</span>.<span class='ident'>into</span>(),
                 <span class='ident'>sibling_hash</span>: <span class='prelude-val'>None</span>,
                 <span class='ident'>sub_lemma</span>: <span class='prelude-val'>None</span>
             })
@@ -309,9 +298,7 @@
         }
     }
 
-    <span class='kw'>fn</span> <span class='ident'>new_tree_proof</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>(<span class='ident'>hash</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>needle</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>left</span>: <span class='kw-2'>&amp;</span><span class='ident'>Tree</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>, <span class='ident'>right</span>: <span class='kw-2'>&amp;</span><span class='ident'>Tree</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Lemma</span><span class='op'>&gt;</span>
-        <span class='kw'>where</span> <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span> <span class='op'>+</span> <span class='ident'>Clone</span>
-    {
+    <span class='kw'>fn</span> <span class='ident'>new_tree_proof</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>(<span class='ident'>hash</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='ident'>needle</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='ident'>left</span>: <span class='kw-2'>&amp;</span><span class='ident'>Tree</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>, <span class='ident'>right</span>: <span class='kw-2'>&amp;</span><span class='ident'>Tree</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Lemma</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span> <span class='op'>+</span> <span class='ident'>Clone</span> {
         <span class='ident'>Lemma</span>::<span class='ident'>new</span>(<span class='ident'>left</span>, <span class='ident'>needle</span>)
             .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>lemma</span><span class='op'>|</span> {
                 <span class='kw'>let</span> <span class='ident'>right_hash</span> <span class='op'>=</span> <span class='ident'>right</span>.<span class='ident'>hash</span>().<span class='ident'>clone</span>();
@@ -328,32 +315,17 @@
             })
             .<span class='ident'>map</span>(<span class='op'>|</span>(<span class='ident'>sub_lemma</span>, <span class='ident'>sibling_hash</span>)<span class='op'>|</span> {
                 <span class='ident'>Lemma</span> {
-                    <span class='ident'>node_hash</span>: <span class='ident'>hash</span>.<span class='ident'>clone</span>(),
+                    <span class='ident'>node_hash</span>: <span class='ident'>hash</span>.<span class='ident'>into</span>(),
                     <span class='ident'>sibling_hash</span>: <span class='ident'>sibling_hash</span>,
                     <span class='ident'>sub_lemma</span>: <span class='prelude-val'>Some</span>(<span class='ident'>Box</span>::<span class='ident'>new</span>(<span class='ident'>sub_lemma</span>))
                 }
             })
     }
 
-    <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>node_hash_mut</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> {
-        <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>node_hash</span>
-    }
-
-    <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>sibling_hash_mut</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Positioned</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span> {
-        <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>sibling_hash</span>
-    }
-
-    <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>sub_lemma_mut</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Lemma</span><span class='op'>&gt;&gt;</span> {
-        <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>sub_lemma</span>
-    }
-
 }
 
 <span class='doccomment'>/// Tags a value so that we know from which branch of a `Tree` (if any) it was found.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>PartialEq</span>)]</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>, <span class='ident'>PartialEq</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>Positioned</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
 
     <span class='doccomment'>/// The value was found in the left branch</span>
@@ -420,11 +392,9 @@
     <script>
         window.rootPath = "../../../";
         window.currentCrate = "merkle";
-        window.playgroundUrl = "";
     </script>
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
-    
     <script defer src="../../../search-index.js"></script>
 </body>
 </html>
