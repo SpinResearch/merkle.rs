@@ -9,6 +9,7 @@ use proof::{ Proof, Lemma };
 /// A Merkle tree is a binary tree, with values of type `T` at the leafs,
 /// and where every node holds the hash of the concatenation of the hashes of
 /// its children nodes.
+#[derive(Debug)]
 pub struct MerkleTree<D, T> {
     /// The hashing function used by this Merkle tree
     digest: D,
@@ -42,14 +43,14 @@ impl <D, T> MerkleTree<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
         let mut height = 0;
         let mut cur    = Vec::with_capacity(count);
 
-        for v in values.into_iter() {
+        for v in values {
             let leaf = Tree::make_leaf(&mut digest, v);
             cur.push(leaf);
         }
 
         while cur.len() > 1 {
             let mut next = Vec::new();
-            while cur.len() > 0 {
+            while !cur.is_empty() {
                 if cur.len() == 1 {
                     next.push(cur.remove(0));
                 }

@@ -3,21 +3,21 @@
 
 use crypto::sha3::Sha3;
 
-use merkletree::{ MerkleTree };
-use merkledigest::{ MerkleDigest };
-use proof::{ Positioned };
+use merkletree::MerkleTree;
+use merkledigest::MerkleDigest;
+use proof::Positioned;
 
 #[test]
 fn test_from_str_vec() {
     let mut digest = Sha3::sha3_256();
 
-    let values = vec![ "one", "two", "three", "four" ];
+    let values = vec!["one", "two", "three", "four"];
 
     let hashes = vec![
-        digest.hash_bytes(&values[0].into()),
-        digest.hash_bytes(&values[1].into()),
-        digest.hash_bytes(&values[2].into()),
-        digest.hash_bytes(&values[3].into())
+        digest.hash_bytes(&values[0].as_bytes()),
+        digest.hash_bytes(&values[1].as_bytes()),
+        digest.hash_bytes(&values[2].as_bytes()),
+        digest.hash_bytes(&values[3].as_bytes())
     ];
 
     let count = values.len();
@@ -30,7 +30,7 @@ fn test_from_str_vec() {
 
     assert_eq!(tree.count(), count);
     assert_eq!(tree.height(), 2);
-    assert_eq!(tree.root_hash().as_slice(), root_hash.as_slice());
+    assert_eq!(tree.root_hash(), &root_hash);
 }
 
 
@@ -47,7 +47,7 @@ fn test_from_vec1() {
     let tree   = MerkleTree::from_vec_unsafe(Sha3::sha3_256(), values);
 
     let mut d     = Sha3::sha3_256();
-    let root_hash = &d.hash_bytes(&"hello, world".to_string().into());
+    let root_hash = &d.hash_bytes(&"hello, world".as_bytes());
 
     assert_eq!(tree.count(), 1);
     assert_eq!(tree.height(), 0);
@@ -63,9 +63,9 @@ fn test_from_vec3() {
     let mut d = Sha3::sha3_256();
 
     let hashes = vec![
-        d.hash_bytes(&vec![1].into()),
-        d.hash_bytes(&vec![2].into()),
-        d.hash_bytes(&vec![3].into())
+        d.hash_bytes(&vec![1]),
+        d.hash_bytes(&vec![2]),
+        d.hash_bytes(&vec![3])
     ];
 
     let h01       = &d.combine_hashes(&hashes[0], &hashes[1]);
@@ -84,7 +84,7 @@ fn test_from_vec9() {
 
     let mut d = Sha3::sha3_256();
 
-    let hashes = values.iter().map(|v| d.hash_bytes(v.into())).collect::<Vec<_>>();
+    let hashes = values.iter().map(|v| d.hash_bytes(v)).collect::<Vec<_>>();
 
     let h01   = &d.combine_hashes(&hashes[0], &hashes[1]);
     let h23   = &d.combine_hashes(&hashes[2], &hashes[3]);
@@ -161,16 +161,13 @@ fn test_mutate_proof_first_lemma() {
 
         match i % 3 {
             0 => {
-                let sibling_hash = proof.lemma_mut().node_hash_mut();
-                *sibling_hash    = vec![1,2,3];
+                proof.lemma.node_hash = vec![1, 2, 3];
             },
             1 => {
-                let sibling_hash = proof.lemma_mut().sibling_hash_mut();
-                *sibling_hash    = Some(Positioned::Left(vec![1, 2, 3]));
+                proof.lemma.sibling_hash = Some(Positioned::Left(vec![1, 2, 3]));
             },
             _ => {
-                let sibling_hash = proof.lemma_mut().sibling_hash_mut();
-                *sibling_hash    = Some(Positioned::Right(vec![1, 2, 3]));
+                proof.lemma.sibling_hash = Some(Positioned::Right(vec![1, 2, 3]));
             }
         }
 

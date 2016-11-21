@@ -1,6 +1,6 @@
 use crypto::digest::Digest;
 
-use merkledigest::{ MerkleDigest };
+use merkledigest::MerkleDigest;
 
 pub use proof::{
     Proof,
@@ -9,6 +9,7 @@ pub use proof::{
 };
 
 /// Binary Tree where leaves hold a stand-alone value.
+#[derive(Debug)]
 pub enum Tree<T> {
     Leaf {
         hash: Vec<u8>,
@@ -41,8 +42,8 @@ impl <T> Tree<T> where T: Into<Vec<u8>> + Clone {
     /// Returns a hash from the tree.
     pub fn hash(&self) -> &Vec<u8> {
         match *self {
-            Tree::Leaf { ref hash, .. } => hash,
-            Tree::Node { ref hash, .. } => hash
+            Tree::Leaf { ref hash, .. } | Tree::Node { ref hash, .. } =>
+                hash
         }
     }
 

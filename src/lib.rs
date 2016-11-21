@@ -1,8 +1,17 @@
-#![warn(missing_docs)]
+#![deny(
+    missing_docs,
+    missing_debug_implementations, missing_copy_implementations,
+    trivial_casts, trivial_numeric_casts,
+    unsafe_code, unstable_features,
+    unused_import_braces, unused_qualifications
+)]
 
 //! *merkle* implements a Merkle Tree in Rust.
 
 extern crate crypto;
+
+#[cfg(feature = "serialization-protobuf")]
+extern crate protobuf;
 
 mod merkletree;
 pub use merkletree::MerkleTree;
@@ -13,6 +22,9 @@ pub use proof::Proof;
 mod merkledigest;
 
 mod tree;
+
+#[cfg(feature = "serialization-protobuf")]
+mod proto;
 
 #[cfg(test)]
 mod tests;

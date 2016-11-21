@@ -10,3 +10,11 @@ matrix:
   allow_failures:
     - rust: nightly
 
+script:
+  - cargo build
+  - cargo test
+  - cargo doc --no-deps
+  - cargo build --all-features
+  - cargo test --all-features
+  - cargo doc --all-features --no-deps
+

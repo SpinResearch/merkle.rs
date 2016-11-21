@@ -1,0 +1,18 @@
+
+syntax = "proto3";
+
+message ProofProto {
+  bytes root_hash = 1;
+  LemmaProto lemma = 2;
+}
+
+message LemmaProto {
+  bytes node_hash = 1;
+  LemmaProto sub_lemma = 2;
+
+  oneof sibling_hash {
+    bytes left_sibling_hash = 3;
+    bytes right_sibling_hash = 4;
+  }
+
+}

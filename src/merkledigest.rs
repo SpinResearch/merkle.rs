@@ -5,15 +5,15 @@ use crypto::digest::Digest;
 pub trait MerkleDigest {
 
     /// Compute the hash the given byte array
-    fn hash_bytes(&mut self, bytes: &Vec<u8>) -> Vec<u8>;
+    fn hash_bytes(&mut self, bytes: &[u8]) -> Vec<u8>;
 
     /// Compute the hash of the concatenation of `left` and `right`
-    fn combine_hashes(&mut self, left: &Vec<u8>, right: &Vec<u8>) -> Vec<u8>;
+    fn combine_hashes(&mut self, left: &[u8], right: &[u8]) -> Vec<u8>;
 }
 
 impl <D> MerkleDigest for D where D: Digest {
 
-    fn hash_bytes(&mut self, bytes: &Vec<u8>) -> Vec<u8> {
+    fn hash_bytes(&mut self, bytes: &[u8]) -> Vec<u8> {
         let mut hash = vec![0; self.output_bytes()];
 
         self.reset();
@@ -24,7 +24,7 @@ impl <D> MerkleDigest for D where D: Digest {
         hash
     }
 
-    fn combine_hashes(&mut self, left: &Vec<u8>, right: &Vec<u8>) -> Vec<u8> {
+    fn combine_hashes(&mut self, left: &[u8], right: &[u8]) -> Vec<u8> {
         let mut hash = vec![0; self.output_bytes()];
 
         self.reset();
