@@ -10,20 +10,24 @@ use protobuf::core::parse_from_bytes;
 
 impl <D, T> Proof<D, T> {
 
+    /// Constructs a `Proof` struct from its Protobuf representation.
     pub fn from_protobuf(digest: D, proto: ProofProto) -> Option<Self> {
         proto.to(digest)
     }
 
+    /// Encode this `Proof` to its Protobuf representation.
     pub fn to_protobuf(self) -> ProofProto {
         ProofProto::from(self)
     }
 
-    pub fn write_to_bytes(self) -> ProtobufResult<Vec<u8>> {
-        self.to_protobuf().write_to_bytes()
-    }
-
+    /// Parse a `Proof` from its Protobuf binary representation.
     pub fn parse_from_bytes(bytes: &[u8], digest: D) -> ProtobufResult<Option<Proof<D, T>>> {
         parse_from_bytes::<ProofProto>(bytes).map(|proto| proto.to(digest))
+    }
+
+    /// Serialize this `Proof` with Protobuf.
+    pub fn write_to_bytes(self) -> ProtobufResult<Vec<u8>> {
+        self.to_protobuf().write_to_bytes()
     }
 
 }

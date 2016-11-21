@@ -8,6 +8,7 @@ use merkledigest::MerkleDigest;
 
 /// An inclusion proof represent the fact that a `value` is a member
 /// of a `MerkleTree` with root hash `root_hash`, and hash function `digest`.
+#[derive(Debug)]
 pub struct Proof<D, T> {
 
     /// The hash function used in the original `MerkleTree`
@@ -75,6 +76,7 @@ impl <D, T> Proof<D, T> {
 /// A `Lemma` holds the hash of a node, the hash of its sibling node,
 /// and a sub lemma, whose `node_hash`, when combined with this `sibling_hash`
 /// must be equal to this `node_hash`.
+#[derive(Debug)]
 pub struct Lemma {
     pub node_hash: Vec<u8>,
     pub sibling_hash: Option<Positioned<Vec<u8>>>,
@@ -133,7 +135,7 @@ impl Lemma {
 }
 
 /// Tags a value so that we know from which branch of a `Tree` (if any) it was found.
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq)]
 pub enum Positioned<T> {
 
     /// The value was found in the left branch

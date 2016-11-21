@@ -3,9 +3,9 @@
 
 use crypto::sha3::Sha3;
 
-use merkletree::{ MerkleTree };
-use merkledigest::{ MerkleDigest };
-use proof::{ Positioned };
+use merkletree::MerkleTree;
+use merkledigest::MerkleDigest;
+use proof::Positioned;
 
 #[test]
 fn test_from_str_vec() {
