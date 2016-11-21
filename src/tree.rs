@@ -9,7 +9,7 @@ pub use proof::{
 };
 
 /// Binary Tree where leaves hold a stand-alone value.
-#[derive(Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Tree<T> {
     Leaf {
         hash: Vec<u8>,
