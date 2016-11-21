@@ -19,6 +19,20 @@ impl ProofProto {
         proto
     }
 
+    pub fn to<D, T>(mut self, digest: D) -> Option<Proof<D, T>> {
+        if !self.has_root_hash() || !self.has_lemma() {
+            return None;
+        }
+
+        self.take_lemma().to().map(|lemma| {
+            Proof::new(
+                digest,
+                self.take_root_hash(),
+                lemma
+            )
+        })
+    }
+
 }
 
 impl LemmaProto {
@@ -47,6 +61,48 @@ impl LemmaProto {
         }
 
         proto
+    }
+
+    pub fn to(mut self) -> Option<Lemma> {
+        if !self.has_node_hash() {
+            return None;
+        }
+
+        let node_hash = self.take_node_hash();
+
+        let sibling_hash =
+            if self.has_left_sibling_hash() {
+                Some(Positioned::Left(self.take_left_sibling_hash()))
+            }
+            else if self.has_right_sibling_hash() {
+                Some(Positioned::Left(self.take_right_sibling_hash()))
+            }
+            else {
+                None
+            };
+
+        if self.has_sub_lemma() {
+            // If a `sub_lemma` is present is the Protobuf,
+            // then we expect it to unserialize to a valid `Lemma`,
+            // otherwise we return `None`
+            self.take_sub_lemma().to().map(|sub_lemma| {
+                Lemma {
+                    node_hash: node_hash,
+                    sibling_hash: sibling_hash,
+                    sub_lemma: Some(Box::new(sub_lemma))
+                }
+            })
+        }
+        else {
+            // We might very well not have a sub_lemma,
+            // in which case we just set it to `None`,
+            // but still return a potentially valid `Lemma`.
+            Some(Lemma {
+                node_hash: node_hash,
+                sibling_hash: sibling_hash,
+                sub_lemma: None
+            })
+        }
     }
 
 }
