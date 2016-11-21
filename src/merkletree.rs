@@ -43,14 +43,14 @@ impl <D, T> MerkleTree<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
         let mut height = 0;
         let mut cur    = Vec::with_capacity(count);
 
-        for v in values.into_iter() {
+        for v in values {
             let leaf = Tree::make_leaf(&mut digest, v);
             cur.push(leaf);
         }
 
         while cur.len() > 1 {
             let mut next = Vec::new();
-            while cur.len() > 0 {
+            while !cur.is_empty() {
                 if cur.len() == 1 {
                     next.push(cur.remove(0));
                 }

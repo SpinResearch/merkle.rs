@@ -42,8 +42,8 @@ impl <T> Tree<T> where T: Into<Vec<u8>> + Clone {
     /// Returns a hash from the tree.
     pub fn hash(&self) -> &Vec<u8> {
         match *self {
-            Tree::Leaf { ref hash, .. } => hash,
-            Tree::Node { ref hash, .. } => hash
+            Tree::Leaf { ref hash, .. } | Tree::Node { ref hash, .. } =>
+                hash
         }
     }
 

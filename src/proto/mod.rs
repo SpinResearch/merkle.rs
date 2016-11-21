@@ -12,47 +12,47 @@ impl <D, T> Proof<D, T> {
 
     /// Constructs a `Proof` struct from its Protobuf representation.
     pub fn from_protobuf(digest: D, proto: ProofProto) -> Option<Self> {
-        proto.to(digest)
+        proto.into_proof(digest)
     }
 
     /// Encode this `Proof` to its Protobuf representation.
-    pub fn to_protobuf(self) -> ProofProto {
-        ProofProto::from(self)
+    pub fn into_protobuf(self) -> ProofProto {
+        ProofProto::from_proof(self)
     }
 
     /// Parse a `Proof` from its Protobuf binary representation.
     pub fn parse_from_bytes(bytes: &[u8], digest: D) -> ProtobufResult<Option<Proof<D, T>>> {
-        parse_from_bytes::<ProofProto>(bytes).map(|proto| proto.to(digest))
+        parse_from_bytes::<ProofProto>(bytes).map(|proto| proto.into_proof(digest))
     }
 
     /// Serialize this `Proof` with Protobuf.
     pub fn write_to_bytes(self) -> ProtobufResult<Vec<u8>> {
-        self.to_protobuf().write_to_bytes()
+        self.into_protobuf().write_to_bytes()
     }
 
 }
 
 impl ProofProto {
 
-    pub fn from<D, T>(proof: Proof<D, T>) -> Self  {
+    pub fn from_proof<D, T>(proof: Proof<D, T>) -> Self  {
         let mut proto = Self::new();
 
         match proof {
             Proof { root_hash, lemma, .. } => {
                 proto.set_root_hash(root_hash);
-                proto.set_lemma(LemmaProto::from(lemma));
+                proto.set_lemma(LemmaProto::from_lemma(lemma));
             }
         }
 
         proto
     }
 
-    pub fn to<D, T>(mut self, digest: D) -> Option<Proof<D, T>> {
+    pub fn into_proof<D, T>(mut self, digest: D) -> Option<Proof<D, T>> {
         if !self.has_root_hash() || !self.has_lemma() {
             return None;
         }
 
-        self.take_lemma().to().map(|lemma| {
+        self.take_lemma().into_lemma().map(|lemma| {
             Proof::new(
                 digest,
                 self.take_root_hash(),
@@ -65,14 +65,14 @@ impl ProofProto {
 
 impl LemmaProto {
 
-    pub fn from(lemma: Lemma) -> Self {
+    pub fn from_lemma(lemma: Lemma) -> Self {
         let mut proto = Self::new();
 
         match lemma {
             Lemma { node_hash, sibling_hash, sub_lemma } => {
                 proto.set_node_hash(node_hash);
 
-                if let Some(sub_proto) = sub_lemma.map(|l| Self::from(*l)) {
+                if let Some(sub_proto) = sub_lemma.map(|l| Self::from_lemma(*l)) {
                     proto.set_sub_lemma(sub_proto);
                 }
 
@@ -91,7 +91,7 @@ impl LemmaProto {
         proto
     }
 
-    pub fn to(mut self) -> Option<Lemma> {
+    pub fn into_lemma(mut self) -> Option<Lemma> {
         if !self.has_node_hash() {
             return None;
         }
@@ -113,7 +113,7 @@ impl LemmaProto {
             // If a `sub_lemma` is present is the Protobuf,
             // then we expect it to unserialize to a valid `Lemma`,
             // otherwise we return `None`
-            self.take_sub_lemma().to().map(|sub_lemma| {
+            self.take_sub_lemma().into_lemma().map(|sub_lemma| {
                 Lemma {
                     node_hash: node_hash,
                     sibling_hash: sibling_hash,
