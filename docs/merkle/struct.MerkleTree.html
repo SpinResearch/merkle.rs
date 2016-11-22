@@ -47,30 +47,31 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-10' class='srclink' href='../src/merkle/src/merkletree.rs.html#12-24' title='goto source code'>[src]</a></span></h1>
-<pre class='rust struct'>pub struct MerkleTree&lt;D,&nbsp;T&gt; {
-    // some fields omitted
-}</pre><div class='docblock'><p>A Merkle tree is a binary tree, with values of type <code>T</code> at the leafs,
+               </span><a id='src-144' class='srclink' href='../src/merkle/src/merkletree.rs.html#13-25' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct MerkleTree&lt;D, T&gt; { /* fields omitted */ }</pre><div class='docblock'><p>A Merkle tree is a binary tree, with values of type <code>T</code> at the leafs,
 and where every node holds the hash of the concatenation of the hashes of
 its children nodes.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;D,&nbsp;T&gt; <a class='struct' href='../merkle/struct.MerkleTree.html' title='merkle::MerkleTree'>MerkleTree</a>&lt;D,&nbsp;T&gt; <span class='where'>where D: Digest + <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>, T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;&gt; + <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a></span></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-17' class='srclink' href='../src/merkle/src/merkletree.rs.html#26-124' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.from_vec_unsafe' class='method'><code>fn <a href='#method.from_vec_unsafe' class='fnname'>from_vec_unsafe</a>(digest: D, values: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;T&gt;) -&gt; Self</code></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;D, T&gt; <a class='struct' href='../merkle/struct.MerkleTree.html' title='merkle::MerkleTree'>MerkleTree</a>&lt;D, T&gt; <span class='where'>where D: Digest + <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>, T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;&gt; + <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a></span></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-10' class='srclink' href='../src/merkle/src/merkletree.rs.html#27-125' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.from_vec_unsafe' class='method'><span id='from_vec_unsafe.v' class='invisible'><code>fn <a href='#method.from_vec_unsafe' class='fnname'>from_vec_unsafe</a>(digest: D, values: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;T&gt;) -&gt; Self</code></span></h4>
 <div class='docblock'><p>Constructs a Merkle Tree from a vector of data blocks.
 WARNING: Panics if <code>values</code> is empty!</p>
-</div><h4 id='method.from_vec' class='method'><code>fn <a href='#method.from_vec' class='fnname'>from_vec</a>(digest: D, values: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;T&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;Self&gt;</code></h4>
+</div><h4 id='method.from_vec' class='method'><span id='from_vec.v' class='invisible'><code>fn <a href='#method.from_vec' class='fnname'>from_vec</a>(digest: D, values: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;T&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;Self&gt;</code></span></h4>
 <div class='docblock'><p>Constructs a Merkle Tree from a vector of data blocks.
 Returns None if <code>values</code> is empty.</p>
-</div><h4 id='method.digest' class='method'><code>fn <a href='#method.digest' class='fnname'>digest</a>(&amp;self) -&gt; &amp;D</code></h4>
+</div><h4 id='method.digest' class='method'><span id='digest.v' class='invisible'><code>fn <a href='#method.digest' class='fnname'>digest</a>(&amp;self) -&gt; &amp;D</code></span></h4>
 <div class='docblock'><p>Returns the hash function used in this Merkle tree</p>
-</div><h4 id='method.root_hash' class='method'><code>fn <a href='#method.root_hash' class='fnname'>root_hash</a>(&amp;self) -&gt; &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;</code></h4>
+</div><h4 id='method.root_hash' class='method'><span id='root_hash.v' class='invisible'><code>fn <a href='#method.root_hash' class='fnname'>root_hash</a>(&amp;self) -&gt; &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;</code></span></h4>
 <div class='docblock'><p>Returns the root hash of Merkle tree</p>
-</div><h4 id='method.height' class='method'><code>fn <a href='#method.height' class='fnname'>height</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></h4>
+</div><h4 id='method.height' class='method'><span id='height.v' class='invisible'><code>fn <a href='#method.height' class='fnname'>height</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></span></h4>
 <div class='docblock'><p>Returns the height of Merkle tree</p>
-</div><h4 id='method.count' class='method'><code>fn <a href='#method.count' class='fnname'>count</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></h4>
+</div><h4 id='method.count' class='method'><span id='count.v' class='invisible'><code>fn <a href='#method.count' class='fnname'>count</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></span></h4>
 <div class='docblock'><p>Returns the number of leaves in the Merkle tree</p>
-</div><h4 id='method.gen_proof' class='method'><code>fn <a href='#method.gen_proof' class='fnname'>gen_proof</a>(&amp;self, value: &amp;T) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../merkle/struct.Proof.html' title='merkle::Proof'>Proof</a>&lt;D,&nbsp;T&gt;&gt;</code></h4>
+</div><h4 id='method.gen_proof' class='method'><span id='gen_proof.v' class='invisible'><code>fn <a href='#method.gen_proof' class='fnname'>gen_proof</a>(&amp;self, value: T) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../merkle/struct.Proof.html' title='merkle::Proof'>Proof</a>&lt;D, T&gt;&gt;</code></span></h4>
 <div class='docblock'><p>Generate an inclusion proof for the given value.
 Returns <code>None</code> if the given value is not found in the tree.</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;D:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a>, T:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a>&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../merkle/struct.MerkleTree.html' title='merkle::MerkleTree'>MerkleTree</a>&lt;D, T&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-151' class='srclink' href='../src/merkle/src/merkletree.rs.html#12' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class='method'><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
+<div class='docblock'><p>Formats the value using the given formatter.</p>
 </div></div></section>
     <section id='search' class="content hidden"></section>
 
@@ -127,11 +128,9 @@ Returns <code>None</code> if the given value is not found in the tree.</p>
     <script>
         window.rootPath = "../";
         window.currentCrate = "merkle";
-        window.playgroundUrl = "";
     </script>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
-    
     <script defer src="../search-index.js"></script>
 </body>
 </html>
