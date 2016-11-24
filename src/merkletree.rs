@@ -26,13 +26,7 @@ pub struct MerkleTree<D, T> {
 
 impl <D, T> MerkleTree<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
 
-    /// Constructs a Merkle Tree from a vector of data blocks.  
-    /// WARNING: Panics if `values` is empty!
-    pub fn from_vec_unsafe(digest: D, values: Vec<T>) -> Self {
-        Self::from_vec(digest, values).unwrap()
-    }
-
-    /// Constructs a Merkle Tree from a vector of data blocks.  
+    /// Constructs a Merkle Tree from a vector of data blocks.
     /// Returns None if `values` is empty.
     pub fn from_vec(mut digest: D, values: Vec<T>) -> Option<Self> {
         if values.is_empty() {
@@ -123,4 +117,3 @@ impl <D, T> MerkleTree<D, T> where D: Digest + Clone, T: Into<Vec<u8>> + Clone {
     }
 
 }
-

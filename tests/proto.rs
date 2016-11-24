@@ -13,7 +13,7 @@ fn test_protobuf_inverse() {
     let digest = Sha3::sha3_256();
     let values = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
 
-    let tree = MerkleTree::from_vec_unsafe(digest.clone(), values.clone());
+    let tree = MerkleTree::from_vec(digest.clone(), values.clone()).unwrap();
 
     for value in values {
         let proof = tree.gen_proof(value).unwrap();
@@ -25,4 +25,3 @@ fn test_protobuf_inverse() {
         assert_eq!(proof.lemma, res.lemma);
     }
 }
-

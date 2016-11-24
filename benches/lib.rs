@@ -28,7 +28,7 @@ fn bench_small_str_tree(b: &mut Bencher) {
 fn bench_small_str_proof_gen(b: &mut Bencher) {
     let digest = Sha3::sha3_256();
     let values = vec!["one", "two", "three", "four"];
-    let tree   = MerkleTree::from_vec_unsafe(digest, values.clone());
+    let tree   = MerkleTree::from_vec(digest, values.clone()).unwrap();
 
     b.iter(|| {
         for value in &values {
@@ -42,7 +42,7 @@ fn bench_small_str_proof_gen(b: &mut Bencher) {
 fn bench_small_str_proof_check(b: &mut Bencher) {
     let digest = Sha3::sha3_256();
     let values = vec!["one", "two", "three", "four"];
-    let tree   = MerkleTree::from_vec_unsafe(digest, values.clone());
+    let tree   = MerkleTree::from_vec(digest, values.clone()).unwrap();
     let proofs = values.iter().map(|v| tree.gen_proof(v).unwrap()).collect::<Vec<_>>();
 
     b.iter(|| {
@@ -63,7 +63,7 @@ fn bench_big_rnd_tree(b: &mut Bencher) {
     }
 
     b.iter(|| {
-        MerkleTree::from_vec_unsafe(digest, values.clone())
+        MerkleTree::from_vec(digest, values.clone()).unwrap()
     });
 }
 
@@ -77,7 +77,7 @@ fn bench_big_rnd_proof_gen(b: &mut Bencher) {
         rng.fill_bytes(&mut v);
     }
 
-    let tree = MerkleTree::from_vec_unsafe(digest, values.clone());
+    let tree = MerkleTree::from_vec(digest, values.clone()).unwrap();
 
     b.iter(|| {
         for value in &values {
@@ -97,7 +97,7 @@ fn bench_big_rnd_proof_check(b: &mut Bencher) {
         rng.fill_bytes(&mut v);
     }
 
-    let tree   = MerkleTree::from_vec_unsafe(digest, values.clone());
+    let tree   = MerkleTree::from_vec(digest, values.clone()).unwrap();
     let proofs = values.into_iter().map(|v| tree.gen_proof(v).unwrap()).collect::<Vec<_>>();
 
     b.iter(|| {
