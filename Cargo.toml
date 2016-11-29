@@ -1,6 +1,6 @@
 [package]
 name    = "merkle"
-version = "0.1.0"
+version = "1.0.0"
 authors = [
   "Frederic Jacobs <me@fredericjacobs.com>",
   "Dylan Bourgeois <dtsbourg@gmail.com>",
@@ -19,4 +19,3 @@ protobuf = { version = "^1.0.0", optional = true }
 
 [features]
 serialization-protobuf = [ "protobuf" ]
-
