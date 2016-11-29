@@ -14,7 +14,7 @@ homepage      = "https://github.com/SpinResearch/merkle.rs"
 repository    = "https://github.com/SpinResearch/merkle.rs"
 
 [dependencies]
-rust-crypto = "^0.2.36"
+ring = "0.6.0-alpha"
 protobuf = { version = "^1.0.0", optional = true }
 
 [features]

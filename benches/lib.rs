@@ -6,17 +6,20 @@ extern crate test;
 extern crate rand;
 
 extern crate merkle;
-extern crate crypto;
+extern crate ring;
 
 use test::Bencher;
 use rand::Rng;
 
+use ring::digest::{Algorithm, SHA512};
+
 use merkle::MerkleTree;
-use crypto::sha3::Sha3;
+
+#[allow(non_upper_case_globals)]
+static digest: &'static Algorithm = &SHA512;
 
 #[bench]
 fn bench_small_str_tree(b: &mut Bencher) {
-    let digest = Sha3::sha3_256();
     let values = vec!["one", "two", "three", "four"];
 
     b.iter(|| {
@@ -26,7 +29,6 @@ fn bench_small_str_tree(b: &mut Bencher) {
 
 #[bench]
 fn bench_small_str_proof_gen(b: &mut Bencher) {
-    let digest = Sha3::sha3_256();
     let values = vec!["one", "two", "three", "four"];
     let tree   = MerkleTree::from_vec(digest, values.clone()).unwrap();
 
@@ -40,7 +42,6 @@ fn bench_small_str_proof_gen(b: &mut Bencher) {
 
 #[bench]
 fn bench_small_str_proof_check(b: &mut Bencher) {
-    let digest = Sha3::sha3_256();
     let values = vec!["one", "two", "three", "four"];
     let tree   = MerkleTree::from_vec(digest, values.clone()).unwrap();
     let proofs = values.iter().map(|v| tree.gen_proof(v).unwrap()).collect::<Vec<_>>();
@@ -54,7 +55,6 @@ fn bench_small_str_proof_check(b: &mut Bencher) {
 
 #[bench]
 fn bench_big_rnd_tree(b: &mut Bencher) {
-    let digest     = Sha3::sha3_256();
     let mut values = vec![vec![0u8; 256]; 160];
     let mut rng    = rand::IsaacRng::new_unseeded();
 
@@ -69,7 +69,6 @@ fn bench_big_rnd_tree(b: &mut Bencher) {
 
 #[bench]
 fn bench_big_rnd_proof_gen(b: &mut Bencher) {
-    let digest     = Sha3::sha3_256();
     let mut values = vec![vec![0u8; 256]; 160];
     let mut rng    = rand::IsaacRng::new_unseeded();
 
@@ -89,7 +88,6 @@ fn bench_big_rnd_proof_gen(b: &mut Bencher) {
 
 #[bench]
 fn bench_big_rnd_proof_check(b: &mut Bencher) {
-    let digest     = Sha3::sha3_256();
     let mut values = vec![vec![0u8; 256]; 160];
     let mut rng    = rand::IsaacRng::new_unseeded();
 

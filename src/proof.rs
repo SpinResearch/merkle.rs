@@ -1,16 +1,16 @@
 
-use crypto::digest::Digest;
+use ring::digest::Algorithm;
 
 use tree::Tree;
-use merkledigest::MerkleDigest;
+use hashutils::HashUtils;
 
 /// An inclusion proof represent the fact that a `value` is a member
 /// of a `MerkleTree` with root hash `root_hash`, and hash function `digest`.
 #[derive(Clone, Debug)]
-pub struct Proof<D, T> {
+pub struct Proof<T> {
 
-    /// The hash function used in the original `MerkleTree`
-    pub digest: D,
+    /// The hashing algorithm used in the original `MerkleTree`
+    pub algorithm: &'static Algorithm,
 
     /// The hash of the root of the original `MerkleTree`
     pub root_hash: Vec<u8>,
@@ -22,12 +22,12 @@ pub struct Proof<D, T> {
     pub value: T
 }
 
-impl <D, T> Proof<D, T> {
+impl <T> Proof<T> {
 
     /// Constructs a new `Proof`
-    pub fn new(digest: D, root_hash: Vec<u8>, lemma: Lemma, value: T) -> Self {
+    pub fn new(algo: &'static Algorithm, root_hash: Vec<u8>, lemma: Lemma, value: T) -> Self {
         Proof {
-            digest: digest,
+            algorithm: algo,
             root_hash: root_hash,
             lemma: lemma,
             value: value
@@ -36,15 +36,15 @@ impl <D, T> Proof<D, T> {
 
     /// Checks whether this inclusion proof is well-formed,
     /// and whether its root hash matches the given `root_hash`.
-    pub fn validate(&self, root_hash: &[u8]) -> bool where D: Digest + Clone {
+    pub fn validate(&self, root_hash: &[u8]) -> bool {
         if self.root_hash != root_hash || self.lemma.node_hash != root_hash {
             return false
         }
 
-        self.validate_lemma(&self.lemma, &mut self.digest.clone())
+        self.validate_lemma(&self.lemma)
     }
 
-    fn validate_lemma(&self, lemma: &Lemma, digest: &mut D) -> bool where D: Digest {
+    fn validate_lemma(&self, lemma: &Lemma) -> bool {
         match lemma.sub_lemma {
 
             None =>
@@ -56,13 +56,13 @@ impl <D, T> Proof<D, T> {
                         false,
 
                     Some(Positioned::Left(ref hash)) => {
-                        let hashes_match = digest.combine_hashes(hash, &sub.node_hash) == lemma.node_hash;
-                        hashes_match && self.validate_lemma(sub, digest)
+                        let hashes_match = self.algorithm.combine_hashes(hash, &sub.node_hash) == lemma.node_hash;
+                        hashes_match && self.validate_lemma(sub)
                     }
 
                     Some(Positioned::Right(ref hash)) => {
-                        let hashes_match = digest.combine_hashes(&sub.node_hash, hash) == lemma.node_hash;
-                        hashes_match && self.validate_lemma(sub, digest)
+                        let hashes_match = self.algorithm.combine_hashes(&sub.node_hash, hash) == lemma.node_hash;
+                        hashes_match && self.validate_lemma(sub)
                     }
 
                 }
@@ -85,7 +85,9 @@ pub struct Lemma {
 impl Lemma {
 
     /// Attempts to generate a proof that the a value with hash `needle` is a member of the given `tree`.
-    pub fn new<T>(tree: &Tree<T>, needle: &[u8]) -> Option<Lemma> where T: Into<Vec<u8>> + Clone {
+    pub fn new<T>(tree: &Tree<T>, needle: &[u8]) -> Option<Lemma>
+            where T: Into<Vec<u8>> + Clone {
+
         match *tree {
             Tree::Leaf { ref hash, .. } =>
                 Lemma::new_leaf_proof(hash, needle),
@@ -107,7 +109,9 @@ impl Lemma {
         }
     }
 
-    fn new_tree_proof<T>(hash: &[u8], needle: &[u8], left: &Tree<T>, right: &Tree<T>) -> Option<Lemma> where T: Into<Vec<u8>> + Clone {
+    fn new_tree_proof<T>(hash: &[u8], needle: &[u8], left: &Tree<T>, right: &Tree<T>) -> Option<Lemma>
+            where T: Into<Vec<u8>> + Clone {
+
         Lemma::new(left, needle)
             .map(|lemma| {
                 let right_hash = right.hash().clone();
