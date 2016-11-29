@@ -191,7 +191,6 @@
 <span id="147">147</span>
 <span id="148">148</span>
 <span id="149">149</span>
-<span id="150">150</span>
 </pre><pre class='rust '>
 
 <span class='kw'>use</span> <span class='ident'>ring</span>::<span class='ident'>digest</span>::<span class='ident'>Algorithm</span>;
@@ -200,7 +199,7 @@
 <span class='kw'>use</span> <span class='ident'>hashutils</span>::<span class='ident'>HashUtils</span>;
 
 <span class='doccomment'>/// An inclusion proof represent the fact that a `value` is a member</span>
-<span class='doccomment'>/// of a `MerkleTree` with root hash `root_hash`, and hash function `digest`.</span>
+<span class='doccomment'>/// of a `MerkleTree` with root hash `root_hash`, and hash function `algorithm`.</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Proof</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
 
@@ -342,7 +341,6 @@
     <span class='doccomment'>/// The value was found in the right branch</span>
     <span class='ident'>Right</span>(<span class='ident'>T</span>)
 }
-
 </pre>
 </section>
     <section id='search' class="content hidden"></section>

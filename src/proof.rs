@@ -5,7 +5,7 @@ use tree::Tree;
 use hashutils::HashUtils;
 
 /// An inclusion proof represent the fact that a `value` is a member
-/// of a `MerkleTree` with root hash `root_hash`, and hash function `digest`.
+/// of a `MerkleTree` with root hash `root_hash`, and hash function `algorithm`.
 #[derive(Clone, Debug)]
 pub struct Proof<T> {
 
@@ -147,4 +147,3 @@ pub enum Positioned<T> {
     /// The value was found in the right branch
     Right(T)
 }
-
