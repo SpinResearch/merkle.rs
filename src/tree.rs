@@ -1,6 +1,7 @@
-use crypto::digest::Digest;
 
-use merkledigest::MerkleDigest;
+use ring::digest::Algorithm;
+
+use hashutils::HashUtils;
 
 pub use proof::{
     Proof,
@@ -34,8 +35,8 @@ impl <T> Tree<T> where T: Into<Vec<u8>> + Clone {
     }
 
     /// Create a new leaf
-    pub fn make_leaf<D: Digest>(digest: &mut D, value: T) -> Tree<T> {
-        let hash = digest.hash_bytes(&value.clone().into());
+    pub fn make_leaf(algo: &'static Algorithm, value: T) -> Tree<T> {
+        let hash = algo.hash_bytes(&value.clone().into());
         Tree::new(hash, value)
     }
 

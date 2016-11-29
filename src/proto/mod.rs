@@ -1,6 +1,8 @@
 
 mod proof;
 
+use ring::digest::Algorithm;
+
 use proof::{ Proof, Lemma, Positioned };
 pub use self::proof::{ ProofProto, LemmaProto };
 
@@ -8,13 +10,13 @@ use protobuf::Message;
 use protobuf::error::ProtobufResult;
 use protobuf::core::parse_from_bytes;
 
-impl <D, T> Proof<D, T> {
+impl <T> Proof<T> {
 
     /// Constructs a `Proof` struct from its Protobuf representation.
-    pub fn from_protobuf(digest: D, proto: ProofProto) -> Option<Self>
+    pub fn from_protobuf(algorithm: &'static Algorithm, proto: ProofProto) -> Option<Self>
         where T: From<Vec<u8>>
     {
-        proto.into_proof(digest)
+        proto.into_proof(algorithm)
     }
 
     /// Encode this `Proof` to its Protobuf representation.
@@ -25,10 +27,10 @@ impl <D, T> Proof<D, T> {
     }
 
     /// Parse a `Proof` from its Protobuf binary representation.
-    pub fn parse_from_bytes(bytes: &[u8], digest: D) -> ProtobufResult<Option<Proof<D, T>>>
+    pub fn parse_from_bytes(bytes: &[u8], algorithm: &'static Algorithm) -> ProtobufResult<Option<Self>>
         where T: From<Vec<u8>>
     {
-        parse_from_bytes::<ProofProto>(bytes).map(|proto| proto.into_proof(digest))
+        parse_from_bytes::<ProofProto>(bytes).map(|proto| proto.into_proof(algorithm))
     }
 
     /// Serialize this `Proof` with Protobuf.
@@ -40,7 +42,7 @@ impl <D, T> Proof<D, T> {
 
 impl ProofProto {
 
-    pub fn from_proof<D, T>(proof: Proof<D, T>) -> Self
+    pub fn from_proof<T>(proof: Proof<T>) -> Self
         where T: Into<Vec<u8>>
     {
         let mut proto = Self::new();
@@ -56,7 +58,7 @@ impl ProofProto {
         proto
     }
 
-    pub fn into_proof<D, T>(mut self, digest: D) -> Option<Proof<D, T>>
+    pub fn into_proof<T>(mut self, algorithm: &'static Algorithm) -> Option<Proof<T>>
         where T: From<Vec<u8>>
     {
         if !self.has_root_hash() || !self.has_lemma() {
@@ -65,7 +67,7 @@ impl ProofProto {
 
         self.take_lemma().into_lemma().map(|lemma| {
             Proof::new(
-                digest,
+                algorithm,
                 self.take_root_hash(),
                 lemma,
                 self.take_value().into()
