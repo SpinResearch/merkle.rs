@@ -24,7 +24,7 @@ pub enum Tree<T> {
     }
 }
 
-impl <T> Tree<T> {
+impl<T: AsRef<[u8]>> Tree<T> {
 
     /// Create a new tree
     pub fn new(hash: Digest, value: T) -> Self {
@@ -35,10 +35,9 @@ impl <T> Tree<T> {
     }
 
     /// Create a new leaf
-    pub fn make_leaf(algo: &'static Algorithm, value: T) -> Tree<T>
-            where T: Into<Vec<u8>> + Clone {
+    pub fn make_leaf(algo: &'static Algorithm, value: T) -> Tree<T> {
 
-        let hash = algo.hash_bytes(&value.clone().into());
+        let hash = algo.hash_bytes(value.as_ref());
         Tree::new(hash, value)
     }
 

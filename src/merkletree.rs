@@ -24,11 +24,12 @@ pub struct MerkleTree<T> {
     count: usize
 }
 
-impl <T> MerkleTree<T> where T: Into<Vec<u8>> + Clone {
+impl <T> MerkleTree<T> where T: AsRef<[u8]> + Clone {
 
     /// Constructs a Merkle Tree from a vector of data blocks.
     /// Returns `None` if `values` is empty.
-    pub fn from_vec(algorithm: &'static Algorithm, values: Vec<T>) -> Option<Self> {
+    // XXX TODO: Rename since it doesn't take a `Vec` any more.
+    pub fn from_vec(algorithm: &'static Algorithm, values: &[T]) -> Option<Self> {
         if values.is_empty() {
             return None
         }
@@ -38,7 +39,7 @@ impl <T> MerkleTree<T> where T: Into<Vec<u8>> + Clone {
         let mut cur    = Vec::with_capacity(count);
 
         for v in values {
-            let leaf = Tree::make_leaf(algorithm, v);
+            let leaf = Tree::make_leaf(algorithm, v.clone());
             cur.push(leaf);
         }
 
@@ -103,7 +104,7 @@ impl <T> MerkleTree<T> where T: Into<Vec<u8>> + Clone {
     /// Returns `None` if the given value is not found in the tree.
     pub fn gen_proof(&self, value: T) -> Option<Proof<T>> {
         let root_hash  = self.root.hash();
-        let node_hash  = self.algorithm.hash_bytes(&value.clone().into());
+        let node_hash  = self.algorithm.hash_bytes(&value.as_ref());
 
         Lemma::new(&self.root, node_hash.as_ref()).map(|lemma|
             Proof::new(self.algorithm, root_hash, lemma, value)
@@ -130,7 +131,9 @@ impl <T> IntoIterator for MerkleTree<T> {
 
 }
 
-impl <'a, T> IntoIterator for &'a MerkleTree<T> {
+impl <'a, T> IntoIterator for &'a MerkleTree<T>
+    where T: AsRef<[u8]> + Clone 
+{
 
     type Item     = &'a T;
     type IntoIter = LeavesIterator<'a, T>;
