@@ -13,7 +13,7 @@ pub struct Proof<T> {
     pub algorithm: &'static Algorithm,
 
     /// The hash of the root of the original `MerkleTree`
-    pub root_hash: Vec<u8>,
+    pub root_hash: Digest,
 
     /// The first `Lemma` of the `Proof`
     pub lemma: Lemma,
@@ -28,7 +28,7 @@ impl <T> Proof<T> {
     pub fn new(algo: &'static Algorithm, root_hash: &Digest, lemma: Lemma, value: T) -> Self {
         Proof {
             algorithm: algo,
-            root_hash: root_hash.as_ref().into(),
+            root_hash: root_hash.clone(),
             lemma: lemma,
             value: value
         }
@@ -37,7 +37,7 @@ impl <T> Proof<T> {
     /// Checks whether this inclusion proof is well-formed,
     /// and whether its root hash matches the given `root_hash`.
     pub fn validate(&self, root_hash: &[u8]) -> bool {
-        if self.root_hash != root_hash || self.lemma.node_hash.as_ref() != root_hash {
+        if self.root_hash.as_ref() != root_hash || self.lemma.node_hash.as_ref() != root_hash {
             return false
         }
 
