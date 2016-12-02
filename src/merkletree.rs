@@ -8,7 +8,7 @@ use proof::{ Proof, Lemma };
 
 /// A Merkle tree is a binary tree, with values of type `T` at the leafs,
 /// and where every internal node holds the hash of the concatenation of the hashes of its children nodes.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct MerkleTree<T> {
 
     /// The hashing algorithm used by this Merkle tree
@@ -58,7 +58,7 @@ impl <T> MerkleTree<T> where T: Into<Vec<u8>> + Clone {
                     );
 
                     let node = Tree::Node {
-                       hash: combined_hash.as_ref().into(),
+                       hash: combined_hash,
                        left: Box::new(left),
                        right: Box::new(right)
                     };
@@ -85,8 +85,8 @@ impl <T> MerkleTree<T> where T: Into<Vec<u8>> + Clone {
     }
 
     /// Returns the root hash of Merkle tree
-    pub fn root_hash(&self) -> &Vec<u8> {
-        self.root.hash()
+    pub fn root_hash(&self) -> &[u8] {
+        self.root.hash().as_ref()
     }
 
     /// Returns the height of Merkle tree
@@ -102,7 +102,7 @@ impl <T> MerkleTree<T> where T: Into<Vec<u8>> + Clone {
     /// Generate an inclusion proof for the given value.
     /// Returns `None` if the given value is not found in the tree.
     pub fn gen_proof(&self, value: T) -> Option<Proof<T>> {
-        let root_hash  = self.root_hash().clone();
+        let root_hash  = self.root.hash();
         let node_hash  = self.algorithm.hash_bytes(&value.clone().into());
 
         Lemma::new(&self.root, node_hash.as_ref()).map(|lemma|

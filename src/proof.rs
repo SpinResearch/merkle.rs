@@ -1,12 +1,12 @@
 
-use ring::digest::Algorithm;
+use ring::digest::{Algorithm, Digest};
 
 use tree::Tree;
 use hashutils::HashUtils;
 
 /// An inclusion proof represent the fact that a `value` is a member
 /// of a `MerkleTree` with root hash `root_hash`, and hash function `algorithm`.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct Proof<T> {
 
     /// The hashing algorithm used in the original `MerkleTree`
@@ -25,10 +25,10 @@ pub struct Proof<T> {
 impl <T> Proof<T> {
 
     /// Constructs a new `Proof`
-    pub fn new(algo: &'static Algorithm, root_hash: Vec<u8>, lemma: Lemma, value: T) -> Self {
+    pub fn new(algo: &'static Algorithm, root_hash: &Digest, lemma: Lemma, value: T) -> Self {
         Proof {
             algorithm: algo,
-            root_hash: root_hash,
+            root_hash: root_hash.as_ref().into(),
             lemma: lemma,
             value: value
         }
@@ -37,7 +37,7 @@ impl <T> Proof<T> {
     /// Checks whether this inclusion proof is well-formed,
     /// and whether its root hash matches the given `root_hash`.
     pub fn validate(&self, root_hash: &[u8]) -> bool {
-        if self.root_hash != root_hash || self.lemma.node_hash != root_hash {
+        if self.root_hash != root_hash || self.lemma.node_hash.as_ref() != root_hash {
             return false
         }
 
@@ -57,13 +57,13 @@ impl <T> Proof<T> {
 
                     Some(Positioned::Left(ref hash)) => {
                         let combined = self.algorithm.combine_hashes(hash, &sub.node_hash);
-                        let hashes_match = combined.as_ref() == lemma.node_hash.as_slice();
+                        let hashes_match = combined.as_ref() == lemma.node_hash.as_ref();
                         hashes_match && self.validate_lemma(sub)
                     }
 
                     Some(Positioned::Right(ref hash)) => {
                         let combined = self.algorithm.combine_hashes(&sub.node_hash, hash);
-                        let hashes_match = combined.as_ref() == lemma.node_hash.as_slice();
+                        let hashes_match = combined.as_ref() == lemma.node_hash.as_ref();
                         hashes_match && self.validate_lemma(sub)
                     }
 
@@ -77,10 +77,10 @@ impl <T> Proof<T> {
 /// A `Lemma` holds the hash of a node, the hash of its sibling node,
 /// and a sub lemma, whose `node_hash`, when combined with this `sibling_hash`
 /// must be equal to this `node_hash`.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone)]
 pub struct Lemma {
-    pub node_hash: Vec<u8>,
-    pub sibling_hash: Option<Positioned<Vec<u8>>>,
+    pub node_hash: Digest,
+    pub sibling_hash: Option<Positioned<Digest>>,
     pub sub_lemma: Option<Box<Lemma>>
 }
 
@@ -92,17 +92,17 @@ impl Lemma {
 
         match *tree {
             Tree::Leaf { ref hash, .. } =>
-                Lemma::new_leaf_proof(hash, needle),
+                Lemma::new_leaf_proof(&hash, needle),
 
             Tree::Node { ref hash, ref left, ref right } =>
-                Lemma::new_tree_proof(hash, needle, left, right)
+                Lemma::new_tree_proof(&hash, needle, left, right)
         }
     }
 
-    fn new_leaf_proof(hash: &[u8], needle: &[u8]) -> Option<Lemma> {
-        if *hash == *needle {
+    fn new_leaf_proof(hash: &Digest, needle: &[u8]) -> Option<Lemma> {
+        if hash.as_ref() == needle {
             Some(Lemma {
-                node_hash: hash.into(),
+                node_hash: hash.clone(),
                 sibling_hash: None,
                 sub_lemma: None
             })
@@ -111,7 +111,7 @@ impl Lemma {
         }
     }
 
-    fn new_tree_proof<T>(hash: &[u8], needle: &[u8], left: &Tree<T>, right: &Tree<T>) -> Option<Lemma>
+    fn new_tree_proof<T>(hash: &Digest, needle: &[u8], left: &Tree<T>, right: &Tree<T>) -> Option<Lemma>
             where T: Into<Vec<u8>> + Clone {
 
         Lemma::new(left, needle)
@@ -130,7 +130,7 @@ impl Lemma {
             })
             .map(|(sub_lemma, sibling_hash)| {
                 Lemma {
-                    node_hash: hash.into(),
+                    node_hash: hash.clone(),
                     sibling_hash: sibling_hash,
                     sub_lemma: Some(Box::new(sub_lemma))
                 }
