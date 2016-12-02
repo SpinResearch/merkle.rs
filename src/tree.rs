@@ -1,5 +1,5 @@
 
-use ring::digest::Algorithm;
+use ring::digest::{Algorithm, Digest};
 
 use hashutils::HashUtils;
 
@@ -27,9 +27,9 @@ pub enum Tree<T> {
 impl <T> Tree<T> {
 
     /// Create a new tree
-    pub fn new(hash: Vec<u8>, value: T) -> Self {
+    pub fn new(hash: Digest, value: T) -> Self {
         Tree::Leaf {
-            hash: hash,
+            hash: hash.as_ref().into(),
             value: value
         }
     }

@@ -58,7 +58,7 @@ impl <T> MerkleTree<T> where T: Into<Vec<u8>> + Clone {
                     );
 
                     let node = Tree::Node {
-                       hash: combined_hash,
+                       hash: combined_hash.as_ref().into(),
                        left: Box::new(left),
                        right: Box::new(right)
                     };
@@ -105,7 +105,7 @@ impl <T> MerkleTree<T> where T: Into<Vec<u8>> + Clone {
         let root_hash  = self.root_hash().clone();
         let node_hash  = self.algorithm.hash_bytes(&value.clone().into());
 
-        Lemma::new(&self.root, &node_hash).map(|lemma|
+        Lemma::new(&self.root, node_hash.as_ref()).map(|lemma|
             Proof::new(self.algorithm, root_hash, lemma, value)
         )
     }
