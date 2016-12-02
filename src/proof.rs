@@ -56,12 +56,14 @@ impl <T> Proof<T> {
                         false,
 
                     Some(Positioned::Left(ref hash)) => {
-                        let hashes_match = self.algorithm.combine_hashes(hash, &sub.node_hash) == lemma.node_hash;
+                        let combined = self.algorithm.combine_hashes(hash, &sub.node_hash);
+                        let hashes_match = combined.as_ref() == lemma.node_hash.as_slice();
                         hashes_match && self.validate_lemma(sub)
                     }
 
                     Some(Positioned::Right(ref hash)) => {
-                        let hashes_match = self.algorithm.combine_hashes(&sub.node_hash, hash) == lemma.node_hash;
+                        let combined = self.algorithm.combine_hashes(&sub.node_hash, hash);
+                        let hashes_match = combined.as_ref() == lemma.node_hash.as_slice();
                         hashes_match && self.validate_lemma(sub)
                     }
 

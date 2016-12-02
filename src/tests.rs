@@ -31,7 +31,7 @@ fn test_from_str_vec() {
 
     assert_eq!(tree.count(), count);
     assert_eq!(tree.height(), 2);
-    assert_eq!(tree.root_hash(), &root_hash);
+    assert_eq!(tree.root_hash().as_slice(), root_hash.as_ref());
 }
 
 
@@ -51,7 +51,7 @@ fn test_from_vec1() {
 
     assert_eq!(tree.count(), 1);
     assert_eq!(tree.height(), 0);
-    assert_eq!(tree.root_hash().as_slice(), root_hash.as_slice());
+    assert_eq!(tree.root_hash().as_slice(), root_hash.as_ref());
 }
 
 
@@ -66,13 +66,13 @@ fn test_from_vec3() {
         digest.hash_bytes(&vec![3])
     ];
 
-    let h01       = &digest.combine_hashes(&hashes[0], &hashes[1]);
+    let h01       = digest.combine_hashes(&hashes[0], &hashes[1]);
     let h2        = &hashes[2];
-    let root_hash = &digest.combine_hashes(h01, h2);
+    let root_hash = &digest.combine_hashes(&h01, h2);
 
     assert_eq!(tree.count(), 3);
     assert_eq!(tree.height(), 2);
-    assert_eq!(tree.root_hash().as_slice(), root_hash.as_slice());
+    assert_eq!(tree.root_hash().as_slice(), root_hash.as_ref());
 }
 
 #[test]
@@ -91,11 +91,11 @@ fn test_from_vec9() {
     let h4567 = digest.combine_hashes(&h45, &h67);
     let h1to7 = digest.combine_hashes(&h0123, &h4567);
 
-    let root_hash = &digest.combine_hashes(&h1to7, &h8);
+    let root_hash = &digest.combine_hashes(&h1to7, h8);
 
     assert_eq!(tree.count(), 9);
     assert_eq!(tree.height(), 4);
-    assert_eq!(tree.root_hash().as_slice(), root_hash.as_slice());
+    assert_eq!(tree.root_hash().as_slice(), root_hash.as_ref());
 }
 
 #[test]
