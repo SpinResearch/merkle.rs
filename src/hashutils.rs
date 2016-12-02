@@ -1,5 +1,5 @@
 
-use ring::digest::{ Algorithm, digest };
+use ring::digest::{ Algorithm, Context, digest };
 
 /// The sole purpose of this trait is to extend the standard
 /// `ring::algo::Algorithm` type with a couple utility functions.
@@ -19,8 +19,10 @@ impl HashUtils for Algorithm {
     }
 
     fn combine_hashes(&'static self, left: &[u8], right: &[u8]) -> Vec<u8> {
-        let combined = [left, right].concat();
-        digest(self, &combined).as_ref().into()
+        let mut ctx = Context::new(self);
+        ctx.update(left);
+        ctx.update(right);
+        ctx.finish().as_ref().into()
     }
 }
 
