@@ -104,3 +104,22 @@ fn bench_big_rnd_proof_check(b: &mut Bencher) {
         }
     });
 }
+
+#[bench]
+fn bench_big_rnd_iter(b: &mut Bencher) {
+    let mut values = vec![vec![0u8; 256]; 160];
+    let mut rng    = rand::IsaacRng::new_unseeded();
+
+    for mut v in &mut values {
+        rng.fill_bytes(&mut v);
+    }
+
+    let tree = MerkleTree::from_vec(digest, values.clone()).unwrap();
+
+    b.iter(|| {
+        for value in &tree {
+            test::black_box(value);
+        }
+    });
+}
+

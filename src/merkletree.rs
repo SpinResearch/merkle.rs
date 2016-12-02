@@ -1,14 +1,13 @@
 
 use ring::digest::Algorithm;
 
-use tree::Tree;
+use tree::{ Tree, LeavesIterator, LeavesIntoIterator };
 use hashutils::HashUtils;
 
 use proof::{ Proof, Lemma };
 
 /// A Merkle tree is a binary tree, with values of type `T` at the leafs,
-/// and where every node holds the hash of the concatenation of the hashes of
-/// its children nodes.
+/// and where every internal node holds the hash of the concatenation of the hashes of its children nodes.
 #[derive(Clone, Debug)]
 pub struct MerkleTree<T> {
 
@@ -28,8 +27,8 @@ pub struct MerkleTree<T> {
 impl <T> MerkleTree<T> where T: Into<Vec<u8>> + Clone {
 
     /// Constructs a Merkle Tree from a vector of data blocks.
-    /// Returns None if `values` is empty.
-    pub fn from_vec(algo: &'static Algorithm, values: Vec<T>) -> Option<Self> {
+    /// Returns `None` if `values` is empty.
+    pub fn from_vec(algorithm: &'static Algorithm, values: Vec<T>) -> Option<Self> {
         if values.is_empty() {
             return None
         }
@@ -39,7 +38,7 @@ impl <T> MerkleTree<T> where T: Into<Vec<u8>> + Clone {
         let mut cur    = Vec::with_capacity(count);
 
         for v in values {
-            let leaf = Tree::make_leaf(algo, v);
+            let leaf = Tree::make_leaf(algorithm, v);
             cur.push(leaf);
         }
 
@@ -53,7 +52,7 @@ impl <T> MerkleTree<T> where T: Into<Vec<u8>> + Clone {
                     let left  = cur.remove(0);
                     let right = cur.remove(0);
 
-                    let combined_hash = algo.combine_hashes(
+                    let combined_hash = algorithm.combine_hashes(
                         left.hash(),
                         right.hash()
                     );
@@ -78,7 +77,7 @@ impl <T> MerkleTree<T> where T: Into<Vec<u8>> + Clone {
         let root = cur.remove(0);
 
         Some(MerkleTree {
-            algorithm: algo,
+            algorithm: algorithm,
             root: root,
             height: height,
             count: count
@@ -111,4 +110,35 @@ impl <T> MerkleTree<T> where T: Into<Vec<u8>> + Clone {
         )
     }
 
+    /// Creates an `Iterator` over the values contained in this Merkle tree.
+    pub fn iter(&self) -> LeavesIterator<T> {
+        self.root.iter()
+    }
+
 }
+
+impl <T> IntoIterator for MerkleTree<T> {
+
+    type Item     = T;
+    type IntoIter = LeavesIntoIterator<T>;
+
+    /// Creates a consuming iterator, that is, one that moves each value out of the Merkle tree.
+    /// The tree cannot be used after calling this.
+    fn into_iter(self) -> Self::IntoIter {
+        self.root.into_iter()
+    }
+
+}
+
+impl <'a, T> IntoIterator for &'a MerkleTree<T> {
+
+    type Item     = &'a T;
+    type IntoIter = LeavesIterator<'a, T>;
+
+    /// Creates a borrowing `Iterator` over the values contained in this Merkle tree.
+    fn into_iter(self) -> Self::IntoIter {
+        self.root.iter()
+    }
+
+}
+

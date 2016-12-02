@@ -22,6 +22,7 @@ pub use proof::Proof;
 mod hashutils;
 
 mod tree;
+pub use tree::{ LeavesIterator, LeavesIntoIterator };
 
 #[cfg(feature = "serialization-protobuf")]
 mod proto;

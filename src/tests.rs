@@ -173,3 +173,52 @@ fn test_mutate_proof_first_lemma() {
         i += 1;
     }
 }
+
+#[test]
+fn test_tree_iter() {
+    let values  = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
+    let tree    = MerkleTree::from_vec(digest, values.clone()).unwrap();
+    let iter    = tree.iter().map(|x| x.clone()).collect::<Vec<_>>();
+
+    assert_eq!(values, iter);
+}
+
+#[test]
+fn test_tree_into_iter() {
+    let values  = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
+    let tree    = MerkleTree::from_vec(digest, values.clone()).unwrap();
+    let iter    = tree.into_iter().map(|x| x.clone()).collect::<Vec<_>>();
+
+    assert_eq!(values, iter);
+}
+
+#[test]
+fn test_tree_into_iter_loop() {
+    let values  = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
+    let tree    = MerkleTree::from_vec(digest, values.clone()).unwrap();
+
+    let mut collected = Vec::new();
+
+    for value in tree {
+        collected.push(value);
+    }
+
+    assert_eq!(values, collected);
+}
+
+#[test]
+fn test_tree_into_iter_loop_borrow() {
+    let values  = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
+    let tree    = MerkleTree::from_vec(digest, values.clone()).unwrap();
+
+    let mut collected = Vec::new();
+
+    for value in &tree {
+        collected.push(value);
+    }
+
+    let refs = values.iter().collect::<Vec<_>>();
+
+    assert_eq!(refs, collected);
+}
+
