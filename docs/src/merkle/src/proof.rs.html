@@ -191,6 +191,8 @@
 <span id="147">147</span>
 <span id="148">148</span>
 <span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
 </pre><pre class='rust '>
 
 <span class='kw'>use</span> <span class='ident'>ring</span>::<span class='ident'>digest</span>::<span class='ident'>Algorithm</span>;
@@ -250,12 +252,14 @@
                         <span class='bool-val'>false</span>,
 
                     <span class='prelude-val'>Some</span>(<span class='ident'>Positioned</span>::<span class='ident'>Left</span>(<span class='kw-2'>ref</span> <span class='ident'>hash</span>)) <span class='op'>=&gt;</span> {
-                        <span class='kw'>let</span> <span class='ident'>hashes_match</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>algorithm</span>.<span class='ident'>combine_hashes</span>(<span class='ident'>hash</span>, <span class='kw-2'>&amp;</span><span class='ident'>sub</span>.<span class='ident'>node_hash</span>) <span class='op'>==</span> <span class='ident'>lemma</span>.<span class='ident'>node_hash</span>;
+                        <span class='kw'>let</span> <span class='ident'>combined</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>algorithm</span>.<span class='ident'>combine_hashes</span>(<span class='ident'>hash</span>, <span class='kw-2'>&amp;</span><span class='ident'>sub</span>.<span class='ident'>node_hash</span>);
+                        <span class='kw'>let</span> <span class='ident'>hashes_match</span> <span class='op'>=</span> <span class='ident'>combined</span>.<span class='ident'>as_ref</span>() <span class='op'>==</span> <span class='ident'>lemma</span>.<span class='ident'>node_hash</span>.<span class='ident'>as_slice</span>();
                         <span class='ident'>hashes_match</span> <span class='op'>&amp;&amp;</span> <span class='self'>self</span>.<span class='ident'>validate_lemma</span>(<span class='ident'>sub</span>)
                     }
 
                     <span class='prelude-val'>Some</span>(<span class='ident'>Positioned</span>::<span class='ident'>Right</span>(<span class='kw-2'>ref</span> <span class='ident'>hash</span>)) <span class='op'>=&gt;</span> {
-                        <span class='kw'>let</span> <span class='ident'>hashes_match</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>algorithm</span>.<span class='ident'>combine_hashes</span>(<span class='kw-2'>&amp;</span><span class='ident'>sub</span>.<span class='ident'>node_hash</span>, <span class='ident'>hash</span>) <span class='op'>==</span> <span class='ident'>lemma</span>.<span class='ident'>node_hash</span>;
+                        <span class='kw'>let</span> <span class='ident'>combined</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>algorithm</span>.<span class='ident'>combine_hashes</span>(<span class='kw-2'>&amp;</span><span class='ident'>sub</span>.<span class='ident'>node_hash</span>, <span class='ident'>hash</span>);
+                        <span class='kw'>let</span> <span class='ident'>hashes_match</span> <span class='op'>=</span> <span class='ident'>combined</span>.<span class='ident'>as_ref</span>() <span class='op'>==</span> <span class='ident'>lemma</span>.<span class='ident'>node_hash</span>.<span class='ident'>as_slice</span>();
                         <span class='ident'>hashes_match</span> <span class='op'>&amp;&amp;</span> <span class='self'>self</span>.<span class='ident'>validate_lemma</span>(<span class='ident'>sub</span>)
                     }
 

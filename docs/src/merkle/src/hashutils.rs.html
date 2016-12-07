@@ -74,32 +74,32 @@
 <span id="30">30</span>
 </pre><pre class='rust '>
 
-<span class='kw'>use</span> <span class='ident'>ring</span>::<span class='ident'>digest</span>::{ <span class='ident'>Algorithm</span>, <span class='ident'>Context</span> };
+<span class='kw'>use</span> <span class='ident'>ring</span>::<span class='ident'>digest</span>::{ <span class='ident'>Algorithm</span>, <span class='ident'>Context</span>, <span class='ident'>digest</span>, <span class='ident'>Digest</span> };
 
 <span class='doccomment'>/// The sole purpose of this trait is to extend the standard</span>
 <span class='doccomment'>/// `ring::algo::Algorithm` type with a couple utility functions.</span>
 <span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>HashUtils</span> {
 
     <span class='doccomment'>/// Compute the hash the given byte array</span>
-    <span class='kw'>fn</span> <span class='ident'>hash_bytes</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='self'>self</span>, <span class='ident'>bytes</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>;
+    <span class='kw'>fn</span> <span class='ident'>hash_bytes</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='self'>self</span>, <span class='ident'>bytes</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='ident'>Digest</span>;
 
-    <span class='doccomment'>/// Compute the hash of the concatenation of `left` and `right`</span>
-    <span class='kw'>fn</span> <span class='ident'>combine_hashes</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='self'>self</span>, <span class='ident'>left</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='ident'>right</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>;
+    <span class='doccomment'>/// Compute the hash of the concatenation of `left` and `right`.</span>
+    <span class='comment'>// XXX: This is overly generic temporarily to make refactoring easier.</span>
+    <span class='comment'>// TODO: Give `left` and `right` type &amp;Digest.</span>
+    <span class='kw'>fn</span> <span class='ident'>combine_hashes</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='self'>self</span>, <span class='ident'>left</span>: <span class='kw-2'>&amp;</span><span class='ident'>AsRef</span><span class='op'>&lt;</span>[<span class='ident'>u8</span>]<span class='op'>&gt;</span>, <span class='ident'>right</span>: <span class='kw-2'>&amp;</span><span class='ident'>AsRef</span><span class='op'>&lt;</span>[<span class='ident'>u8</span>]<span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Digest</span>;
 }
 
 <span class='kw'>impl</span> <span class='ident'>HashUtils</span> <span class='kw'>for</span> <span class='ident'>Algorithm</span> {
 
-    <span class='kw'>fn</span> <span class='ident'>hash_bytes</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='self'>self</span>, <span class='ident'>bytes</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>context</span> <span class='op'>=</span> <span class='ident'>Context</span>::<span class='ident'>new</span>(<span class='self'>self</span>);
-        <span class='ident'>context</span>.<span class='ident'>update</span>(<span class='ident'>bytes</span>);
-        <span class='ident'>context</span>.<span class='ident'>finish</span>().<span class='ident'>as_ref</span>().<span class='ident'>into</span>()
+    <span class='kw'>fn</span> <span class='ident'>hash_bytes</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='self'>self</span>, <span class='ident'>bytes</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='ident'>Digest</span> {
+        <span class='ident'>digest</span>(<span class='self'>self</span>, <span class='ident'>bytes</span>)
     }
 
-    <span class='kw'>fn</span> <span class='ident'>combine_hashes</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='self'>self</span>, <span class='ident'>left</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='ident'>right</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>context</span> <span class='op'>=</span> <span class='ident'>Context</span>::<span class='ident'>new</span>(<span class='self'>self</span>);
-        <span class='kw'>let</span> <span class='ident'>combined</span> <span class='op'>=</span> [<span class='ident'>left</span>, <span class='ident'>right</span>].<span class='ident'>concat</span>();
-        <span class='ident'>context</span>.<span class='ident'>update</span>(<span class='kw-2'>&amp;</span><span class='ident'>combined</span>);
-        <span class='ident'>context</span>.<span class='ident'>finish</span>().<span class='ident'>as_ref</span>().<span class='ident'>into</span>()
+    <span class='kw'>fn</span> <span class='ident'>combine_hashes</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='self'>self</span>, <span class='ident'>left</span>: <span class='kw-2'>&amp;</span><span class='ident'>AsRef</span><span class='op'>&lt;</span>[<span class='ident'>u8</span>]<span class='op'>&gt;</span>, <span class='ident'>right</span>: <span class='kw-2'>&amp;</span><span class='ident'>AsRef</span><span class='op'>&lt;</span>[<span class='ident'>u8</span>]<span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Digest</span> {
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ctx</span> <span class='op'>=</span> <span class='ident'>Context</span>::<span class='ident'>new</span>(<span class='self'>self</span>);
+        <span class='ident'>ctx</span>.<span class='ident'>update</span>(<span class='ident'>left</span>.<span class='ident'>as_ref</span>());
+        <span class='ident'>ctx</span>.<span class='ident'>update</span>(<span class='ident'>right</span>.<span class='ident'>as_ref</span>());
+        <span class='ident'>ctx</span>.<span class='ident'>finish</span>()
     }
 }
 

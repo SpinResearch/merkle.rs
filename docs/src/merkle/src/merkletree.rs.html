@@ -156,18 +156,47 @@
 <span id="112">112</span>
 <span id="113">113</span>
 <span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
 </pre><pre class='rust '>
 
 <span class='kw'>use</span> <span class='ident'>ring</span>::<span class='ident'>digest</span>::<span class='ident'>Algorithm</span>;
 
-<span class='kw'>use</span> <span class='ident'>tree</span>::<span class='ident'>Tree</span>;
+<span class='kw'>use</span> <span class='ident'>tree</span>::{ <span class='ident'>Tree</span>, <span class='ident'>LeavesIterator</span>, <span class='ident'>LeavesIntoIterator</span> };
 <span class='kw'>use</span> <span class='ident'>hashutils</span>::<span class='ident'>HashUtils</span>;
 
 <span class='kw'>use</span> <span class='ident'>proof</span>::{ <span class='ident'>Proof</span>, <span class='ident'>Lemma</span> };
 
 <span class='doccomment'>/// A Merkle tree is a binary tree, with values of type `T` at the leafs,</span>
-<span class='doccomment'>/// and where every node holds the hash of the concatenation of the hashes of</span>
-<span class='doccomment'>/// its children nodes.</span>
+<span class='doccomment'>/// and where every internal node holds the hash of the concatenation of the hashes of its children nodes.</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>MerkleTree</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
 
@@ -187,8 +216,8 @@
 <span class='kw'>impl</span> <span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>MerkleTree</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span> <span class='op'>+</span> <span class='ident'>Clone</span> {
 
     <span class='doccomment'>/// Constructs a Merkle Tree from a vector of data blocks.</span>
-    <span class='doccomment'>/// Returns None if `values` is empty.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>from_vec</span>(<span class='ident'>algo</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>Algorithm</span>, <span class='ident'>values</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='self'>Self</span><span class='op'>&gt;</span> {
+    <span class='doccomment'>/// Returns `None` if `values` is empty.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>from_vec</span>(<span class='ident'>algorithm</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>Algorithm</span>, <span class='ident'>values</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='self'>Self</span><span class='op'>&gt;</span> {
         <span class='kw'>if</span> <span class='ident'>values</span>.<span class='ident'>is_empty</span>() {
             <span class='kw'>return</span> <span class='prelude-val'>None</span>
         }
@@ -198,7 +227,7 @@
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>cur</span>    <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>count</span>);
 
         <span class='kw'>for</span> <span class='ident'>v</span> <span class='kw'>in</span> <span class='ident'>values</span> {
-            <span class='kw'>let</span> <span class='ident'>leaf</span> <span class='op'>=</span> <span class='ident'>Tree</span>::<span class='ident'>make_leaf</span>(<span class='ident'>algo</span>, <span class='ident'>v</span>);
+            <span class='kw'>let</span> <span class='ident'>leaf</span> <span class='op'>=</span> <span class='ident'>Tree</span>::<span class='ident'>make_leaf</span>(<span class='ident'>algorithm</span>, <span class='ident'>v</span>);
             <span class='ident'>cur</span>.<span class='ident'>push</span>(<span class='ident'>leaf</span>);
         }
 
@@ -212,13 +241,13 @@
                     <span class='kw'>let</span> <span class='ident'>left</span>  <span class='op'>=</span> <span class='ident'>cur</span>.<span class='ident'>remove</span>(<span class='number'>0</span>);
                     <span class='kw'>let</span> <span class='ident'>right</span> <span class='op'>=</span> <span class='ident'>cur</span>.<span class='ident'>remove</span>(<span class='number'>0</span>);
 
-                    <span class='kw'>let</span> <span class='ident'>combined_hash</span> <span class='op'>=</span> <span class='ident'>algo</span>.<span class='ident'>combine_hashes</span>(
+                    <span class='kw'>let</span> <span class='ident'>combined_hash</span> <span class='op'>=</span> <span class='ident'>algorithm</span>.<span class='ident'>combine_hashes</span>(
                         <span class='ident'>left</span>.<span class='ident'>hash</span>(),
                         <span class='ident'>right</span>.<span class='ident'>hash</span>()
                     );
 
                     <span class='kw'>let</span> <span class='ident'>node</span> <span class='op'>=</span> <span class='ident'>Tree</span>::<span class='ident'>Node</span> {
-                       <span class='ident'>hash</span>: <span class='ident'>combined_hash</span>,
+                       <span class='ident'>hash</span>: <span class='ident'>combined_hash</span>.<span class='ident'>as_ref</span>().<span class='ident'>into</span>(),
                        <span class='ident'>left</span>: <span class='ident'>Box</span>::<span class='ident'>new</span>(<span class='ident'>left</span>),
                        <span class='ident'>right</span>: <span class='ident'>Box</span>::<span class='ident'>new</span>(<span class='ident'>right</span>)
                     };
@@ -237,7 +266,7 @@
         <span class='kw'>let</span> <span class='ident'>root</span> <span class='op'>=</span> <span class='ident'>cur</span>.<span class='ident'>remove</span>(<span class='number'>0</span>);
 
         <span class='prelude-val'>Some</span>(<span class='ident'>MerkleTree</span> {
-            <span class='ident'>algorithm</span>: <span class='ident'>algo</span>,
+            <span class='ident'>algorithm</span>: <span class='ident'>algorithm</span>,
             <span class='ident'>root</span>: <span class='ident'>root</span>,
             <span class='ident'>height</span>: <span class='ident'>height</span>,
             <span class='ident'>count</span>: <span class='ident'>count</span>
@@ -265,12 +294,43 @@
         <span class='kw'>let</span> <span class='ident'>root_hash</span>  <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>root_hash</span>().<span class='ident'>clone</span>();
         <span class='kw'>let</span> <span class='ident'>node_hash</span>  <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>algorithm</span>.<span class='ident'>hash_bytes</span>(<span class='kw-2'>&amp;</span><span class='ident'>value</span>.<span class='ident'>clone</span>().<span class='ident'>into</span>());
 
-        <span class='ident'>Lemma</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>root</span>, <span class='kw-2'>&amp;</span><span class='ident'>node_hash</span>).<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>lemma</span><span class='op'>|</span>
+        <span class='ident'>Lemma</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>root</span>, <span class='ident'>node_hash</span>.<span class='ident'>as_ref</span>()).<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>lemma</span><span class='op'>|</span>
             <span class='ident'>Proof</span>::<span class='ident'>new</span>(<span class='self'>self</span>.<span class='ident'>algorithm</span>, <span class='ident'>root_hash</span>, <span class='ident'>lemma</span>, <span class='ident'>value</span>)
         )
     }
 
+    <span class='doccomment'>/// Creates an `Iterator` over the values contained in this Merkle tree.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>iter</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>LeavesIterator</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>root</span>.<span class='ident'>iter</span>()
+    }
+
 }
+
+<span class='kw'>impl</span> <span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>IntoIterator</span> <span class='kw'>for</span> <span class='ident'>MerkleTree</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+
+    <span class='kw'>type</span> <span class='ident'>Item</span>     <span class='op'>=</span> <span class='ident'>T</span>;
+    <span class='kw'>type</span> <span class='ident'>IntoIter</span> <span class='op'>=</span> <span class='ident'>LeavesIntoIterator</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
+
+    <span class='doccomment'>/// Creates a consuming iterator, that is, one that moves each value out of the Merkle tree.</span>
+    <span class='doccomment'>/// The tree cannot be used after calling this.</span>
+    <span class='kw'>fn</span> <span class='ident'>into_iter</span>(<span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span>::<span class='ident'>IntoIter</span> {
+        <span class='self'>self</span>.<span class='ident'>root</span>.<span class='ident'>into_iter</span>()
+    }
+
+}
+
+<span class='kw'>impl</span> <span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>IntoIterator</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>MerkleTree</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+
+    <span class='kw'>type</span> <span class='ident'>Item</span>     <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>T</span>;
+    <span class='kw'>type</span> <span class='ident'>IntoIter</span> <span class='op'>=</span> <span class='ident'>LeavesIterator</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span>;
+
+    <span class='doccomment'>/// Creates a borrowing `Iterator` over the values contained in this Merkle tree.</span>
+    <span class='kw'>fn</span> <span class='ident'>into_iter</span>(<span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span>::<span class='ident'>IntoIter</span> {
+        <span class='self'>self</span>.<span class='ident'>root</span>.<span class='ident'>iter</span>()
+    }
+
+}
+
 </pre>
 </section>
     <section id='search' class="content hidden"></section>
