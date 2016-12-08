@@ -8,7 +8,7 @@ use proof::{ Proof, Lemma };
 
 /// A Merkle tree is a binary tree, with values of type `T` at the leafs,
 /// and where every internal node holds the hash of the concatenation of the hashes of its children nodes.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct MerkleTree<T> {
 
     /// The hashing algorithm used by this Merkle tree
@@ -24,11 +24,12 @@ pub struct MerkleTree<T> {
     count: usize
 }
 
-impl <T> MerkleTree<T> where T: Into<Vec<u8>> + Clone {
+impl <T> MerkleTree<T> where T: AsRef<[u8]> + Clone {
 
     /// Constructs a Merkle Tree from a vector of data blocks.
     /// Returns `None` if `values` is empty.
-    pub fn from_vec(algorithm: &'static Algorithm, values: Vec<T>) -> Option<Self> {
+    // XXX TODO: Rename since it doesn't take a `Vec` any more.
+    pub fn from_vec(algorithm: &'static Algorithm, values: &[T]) -> Option<Self> {
         if values.is_empty() {
             return None
         }
@@ -38,7 +39,7 @@ impl <T> MerkleTree<T> where T: Into<Vec<u8>> + Clone {
         let mut cur    = Vec::with_capacity(count);
 
         for v in values {
-            let leaf = Tree::make_leaf(algorithm, v);
+            let leaf = Tree::make_leaf(algorithm, v.clone());
             cur.push(leaf);
         }
 
@@ -58,7 +59,7 @@ impl <T> MerkleTree<T> where T: Into<Vec<u8>> + Clone {
                     );
 
                     let node = Tree::Node {
-                       hash: combined_hash.as_ref().into(),
+                       hash: combined_hash,
                        left: Box::new(left),
                        right: Box::new(right)
                     };
@@ -85,8 +86,8 @@ impl <T> MerkleTree<T> where T: Into<Vec<u8>> + Clone {
     }
 
     /// Returns the root hash of Merkle tree
-    pub fn root_hash(&self) -> &Vec<u8> {
-        self.root.hash()
+    pub fn root_hash(&self) -> &[u8] {
+        self.root.hash().as_ref()
     }
 
     /// Returns the height of Merkle tree
@@ -102,8 +103,8 @@ impl <T> MerkleTree<T> where T: Into<Vec<u8>> + Clone {
     /// Generate an inclusion proof for the given value.
     /// Returns `None` if the given value is not found in the tree.
     pub fn gen_proof(&self, value: T) -> Option<Proof<T>> {
-        let root_hash  = self.root_hash().clone();
-        let node_hash  = self.algorithm.hash_bytes(&value.clone().into());
+        let root_hash  = self.root.hash();
+        let node_hash  = self.algorithm.hash_bytes(&value.as_ref());
 
         Lemma::new(&self.root, node_hash.as_ref()).map(|lemma|
             Proof::new(self.algorithm, root_hash, lemma, value)
@@ -130,7 +131,9 @@ impl <T> IntoIterator for MerkleTree<T> {
 
 }
 
-impl <'a, T> IntoIterator for &'a MerkleTree<T> {
+impl <'a, T> IntoIterator for &'a MerkleTree<T>
+    where T: AsRef<[u8]> + Clone 
+{
 
     type Item     = &'a T;
     type IntoIter = LeavesIterator<'a, T>;

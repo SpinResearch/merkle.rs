@@ -9,9 +9,12 @@ pub trait HashUtils {
     fn hash_bytes(&'static self, bytes: &[u8]) -> Digest;
 
     /// Compute the hash of the concatenation of `left` and `right`.
-    // XXX: This is overly generic temporarily to make refactoring easier.
-    // TODO: Give `left` and `right` type &Digest.
-    fn combine_hashes(&'static self, left: &AsRef<[u8]>, right: &AsRef<[u8]>) -> Digest;
+    //
+    // XXX: We don't verify that `self` and `left.algorithm()` and
+    // `right.algorithm()` are the same algorithm.
+    // XXX: We really don't need `self` here because we can get the algorithm
+    // from either `left` or `right`.
+    fn combine_hashes(&'static self, left: &Digest, right: &Digest) -> Digest;
 }
 
 impl HashUtils for Algorithm {
@@ -20,7 +23,7 @@ impl HashUtils for Algorithm {
         digest(self, bytes)
     }
 
-    fn combine_hashes(&'static self, left: &AsRef<[u8]>, right: &AsRef<[u8]>) -> Digest {
+    fn combine_hashes(&'static self, left: &Digest, right: &Digest) -> Digest {
         let mut ctx = Context::new(self);
         ctx.update(left.as_ref());
         ctx.update(right.as_ref());
