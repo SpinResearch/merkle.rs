@@ -61,8 +61,8 @@ impl ProofProto {
     }
 
     pub fn into_proof<T>(mut self, algorithm: &'static Algorithm) -> Option<Proof<T>>
-        where T: From<Vec<u8>>
-    {
+        where T: From<Vec<u8>> {
+
         if !self.has_root_hash() || !self.has_lemma() {
             return None;
         }
