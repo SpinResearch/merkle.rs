@@ -88,7 +88,7 @@ impl Lemma {
 
     /// Attempts to generate a proof that the a value with hash `needle` is a member of the given `tree`.
     pub fn new<T>(tree: &Tree<T>, needle: &[u8]) -> Option<Lemma>
-            where T: Into<Vec<u8>> + Clone {
+            where T: AsRef<[u8]> {
 
         match *tree {
             Tree::Leaf { ref hash, .. } =>
@@ -112,7 +112,7 @@ impl Lemma {
     }
 
     fn new_tree_proof<T>(hash: &[u8], needle: &[u8], left: &Tree<T>, right: &Tree<T>) -> Option<Lemma>
-            where T: Into<Vec<u8>> + Clone {
+            where T: AsRef<[u8]> {
 
         Lemma::new(left, needle)
             .map(|lemma| {

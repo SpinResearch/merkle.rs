@@ -6,7 +6,7 @@ use ring::digest::{ Algorithm, Context, digest, Digest };
 pub trait HashUtils {
 
     /// Compute the hash the given byte array
-    fn hash_bytes(&'static self, bytes: &[u8]) -> Digest;
+    fn hash_bytes(&'static self, bytes: &AsRef<[u8]>) -> Digest;
 
     /// Compute the hash of the concatenation of `left` and `right`.
     // XXX: This is overly generic temporarily to make refactoring easier.
@@ -16,8 +16,8 @@ pub trait HashUtils {
 
 impl HashUtils for Algorithm {
 
-    fn hash_bytes(&'static self, bytes: &[u8]) -> Digest {
-        digest(self, bytes)
+    fn hash_bytes(&'static self, bytes: &AsRef<[u8]>) -> Digest {
+        digest(self, bytes.as_ref())
     }
 
     fn combine_hashes(&'static self, left: &AsRef<[u8]>, right: &AsRef<[u8]>) -> Digest {
