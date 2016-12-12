@@ -15,19 +15,19 @@ fn test_from_str_vec() {
     let values = vec!["one", "two", "three", "four"];
 
     let hashes = vec![
-        digest.hash_bytes(&values[0].as_bytes()),
-        digest.hash_bytes(&values[1].as_bytes()),
-        digest.hash_bytes(&values[2].as_bytes()),
-        digest.hash_bytes(&values[3].as_bytes())
+        digest.hash_leaf(&values[0].as_bytes()),
+        digest.hash_leaf(&values[1].as_bytes()),
+        digest.hash_leaf(&values[2].as_bytes()),
+        digest.hash_leaf(&values[3].as_bytes())
     ];
 
     let count = values.len();
     let tree  = MerkleTree::from_vec(digest, values).unwrap();
 
-    let h01 = digest.combine_hashes(&hashes[0], &hashes[1]);
-    let h23 = digest.combine_hashes(&hashes[2], &hashes[3]);
+    let h01 = digest.hash_nodes(&hashes[0], &hashes[1]);
+    let h23 = digest.hash_nodes(&hashes[2], &hashes[3]);
 
-    let root_hash = digest.combine_hashes(&h01, &h23);
+    let root_hash = digest.hash_nodes(&h01, &h23);
 
     assert_eq!(tree.count(), count);
     assert_eq!(tree.height(), 2);
@@ -47,7 +47,7 @@ fn test_from_vec1() {
     let values = vec!["hello, world".to_string()];
     let tree   = MerkleTree::from_vec(digest, values).unwrap();
 
-    let root_hash = &digest.hash_bytes(&"hello, world".as_bytes());
+    let root_hash = &digest.hash_leaf(&"hello, world".as_bytes());
 
     assert_eq!(tree.count(), 1);
     assert_eq!(tree.height(), 0);
@@ -61,14 +61,14 @@ fn test_from_vec3() {
     let tree   = MerkleTree::from_vec(digest, values).unwrap();
 
     let hashes = vec![
-        digest.hash_bytes(&vec![1]),
-        digest.hash_bytes(&vec![2]),
-        digest.hash_bytes(&vec![3])
+        digest.hash_leaf(&vec![1]),
+        digest.hash_leaf(&vec![2]),
+        digest.hash_leaf(&vec![3])
     ];
 
-    let h01       = digest.combine_hashes(&hashes[0], &hashes[1]);
+    let h01       = digest.hash_nodes(&hashes[0], &hashes[1]);
     let h2        = &hashes[2];
-    let root_hash = &digest.combine_hashes(&h01, h2);
+    let root_hash = &digest.hash_nodes(&h01, h2);
 
     assert_eq!(tree.count(), 3);
     assert_eq!(tree.height(), 2);
@@ -80,18 +80,18 @@ fn test_from_vec9() {
     let values = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
     let tree   = MerkleTree::from_vec(digest, values.clone()).unwrap();
 
-    let hashes = values.iter().map(|v| digest.hash_bytes(v)).collect::<Vec<_>>();
+    let hashes = values.iter().map(|v| digest.hash_leaf(v)).collect::<Vec<_>>();
 
-    let h01   = digest.combine_hashes(&hashes[0], &hashes[1]);
-    let h23   = digest.combine_hashes(&hashes[2], &hashes[3]);
-    let h45   = digest.combine_hashes(&hashes[4], &hashes[5]);
-    let h67   = digest.combine_hashes(&hashes[6], &hashes[7]);
+    let h01   = digest.hash_nodes(&hashes[0], &hashes[1]);
+    let h23   = digest.hash_nodes(&hashes[2], &hashes[3]);
+    let h45   = digest.hash_nodes(&hashes[4], &hashes[5]);
+    let h67   = digest.hash_nodes(&hashes[6], &hashes[7]);
     let h8    = &hashes[8];
-    let h0123 = digest.combine_hashes(&h01, &h23);
-    let h4567 = digest.combine_hashes(&h45, &h67);
-    let h1to7 = digest.combine_hashes(&h0123, &h4567);
+    let h0123 = digest.hash_nodes(&h01, &h23);
+    let h4567 = digest.hash_nodes(&h45, &h67);
+    let h1to7 = digest.hash_nodes(&h0123, &h4567);
 
-    let root_hash = &digest.combine_hashes(&h1to7, h8);
+    let root_hash = &digest.hash_nodes(&h1to7, h8);
 
     assert_eq!(tree.count(), 9);
     assert_eq!(tree.height(), 4);
