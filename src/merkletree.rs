@@ -24,7 +24,7 @@ pub struct MerkleTree<T> {
     count: usize
 }
 
-impl <T> MerkleTree<T> where T: Into<Vec<u8>> + Clone {
+impl <T> MerkleTree<T> where T: AsRef<[u8]> + Clone {
 
     /// Constructs a Merkle Tree from a vector of data blocks.
     /// Returns `None` if `values` is empty.
@@ -103,7 +103,7 @@ impl <T> MerkleTree<T> where T: Into<Vec<u8>> + Clone {
     /// Returns `None` if the given value is not found in the tree.
     pub fn gen_proof(&self, value: T) -> Option<Proof<T>> {
         let root_hash  = self.root_hash().clone();
-        let node_hash  = self.algorithm.hash_bytes(&value.clone().into());
+        let node_hash  = self.algorithm.hash_bytes(&value.clone());
 
         Lemma::new(&self.root, node_hash.as_ref()).map(|lemma|
             Proof::new(self.algorithm, root_hash, lemma, value)

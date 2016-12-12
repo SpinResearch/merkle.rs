@@ -21,7 +21,7 @@ impl <T> Proof<T> {
 
     /// Encode this `Proof` to its Protobuf representation.
     pub fn into_protobuf(self) -> ProofProto
-        where T: Into<Vec<u8>>
+        where T: AsRef<[u8]>
     {
         ProofProto::from_proof(self)
     }
@@ -34,7 +34,9 @@ impl <T> Proof<T> {
     }
 
     /// Serialize this `Proof` with Protobuf.
-    pub fn write_to_bytes(self) -> ProtobufResult<Vec<u8>> where T: Into<Vec<u8>>  {
+    pub fn write_to_bytes(self) -> ProtobufResult<Vec<u8>>
+            where T: AsRef<[u8]> {
+
         self.into_protobuf().write_to_bytes()
     }
 
@@ -43,15 +45,15 @@ impl <T> Proof<T> {
 impl ProofProto {
 
     pub fn from_proof<T>(proof: Proof<T>) -> Self
-        where T: Into<Vec<u8>>
-    {
+        where T: AsRef<[u8]> {
+
         let mut proto = Self::new();
 
         match proof {
             Proof { root_hash, lemma, value, .. } => {
                 proto.set_root_hash(root_hash);
                 proto.set_lemma(LemmaProto::from_lemma(lemma));
-                proto.set_value(value.into());
+                proto.set_value(value.as_ref().into());
             }
         }
 

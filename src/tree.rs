@@ -36,9 +36,9 @@ impl <T> Tree<T> {
 
     /// Create a new leaf
     pub fn make_leaf(algo: &'static Algorithm, value: T) -> Tree<T>
-            where T: Into<Vec<u8>> + Clone {
+            where T: AsRef<[u8]> + Clone {
 
-        let hash = algo.hash_bytes(&value.clone().into());
+        let hash = algo.hash_bytes(&value.clone());
         Tree::new(hash, value)
     }
 
