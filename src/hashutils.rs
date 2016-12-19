@@ -1,9 +1,12 @@
 
-use ring::digest::{ Algorithm, Context, Digest };
+use ring::digest::{ Algorithm, Context, Digest, digest };
 
 /// The sole purpose of this trait is to extend the standard
 /// `ring::algo::Algorithm` type with a couple utility functions.
 pub trait HashUtils {
+
+    /// Compute the hash of the empty string
+    fn hash_empty(&'static self) -> Digest;
 
     /// Compute the hash of the given leaf
     fn hash_leaf(&'static self, bytes: &AsRef<[u8]>) -> Digest;
@@ -15,6 +18,10 @@ pub trait HashUtils {
 }
 
 impl HashUtils for Algorithm {
+
+    fn hash_empty(&'static self) -> Digest {
+        digest(self, &[])
+    }
 
     fn hash_leaf(&'static self, leaf: &AsRef<[u8]>) -> Digest {
         let mut ctx = Context::new(self);

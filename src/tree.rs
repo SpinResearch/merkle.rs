@@ -12,6 +12,10 @@ pub use proof::{
 /// Binary Tree where leaves hold a stand-alone value.
 #[derive(Clone, Debug, PartialEq)]
 pub enum Tree<T> {
+    Empty {
+        hash: Vec<u8>
+    },
+
     Leaf {
         hash: Vec<u8>,
         value: T
@@ -25,6 +29,13 @@ pub enum Tree<T> {
 }
 
 impl <T> Tree<T> {
+
+    /// Create an empty tree
+    pub fn empty(hash: Digest) -> Self {
+        Tree::Empty {
+            hash: hash.as_ref().into()
+        }
+    }
 
     /// Create a new tree
     pub fn new(hash: Digest, value: T) -> Self {
@@ -45,8 +56,9 @@ impl <T> Tree<T> {
     /// Returns a hash from the tree.
     pub fn hash(&self) -> &Vec<u8> {
         match *self {
-            Tree::Leaf { ref hash, .. } | Tree::Node { ref hash, .. } =>
-                hash
+            Tree::Empty { ref hash }    => hash,
+            Tree::Leaf { ref hash, .. } => hash,
+            Tree::Node { ref hash, .. } => hash
         }
     }
 
@@ -81,6 +93,11 @@ impl <'a, T> LeavesIterator<'a, T> {
     fn add_left(&mut self, mut tree: &'a Tree<T>) {
         loop {
             match *tree {
+                Tree::Empty { .. } => {
+                    self.current_value = None;
+                    break;
+                },
+
                 Tree::Node { ref left, ref right, .. } => {
                     self.right_nodes.push(right);
                     tree = left;
@@ -135,6 +152,11 @@ impl <T> LeavesIntoIterator<T> {
     fn add_left(&mut self, mut tree: Tree<T>) {
         loop {
             match tree {
+                Tree::Empty { .. } => {
+                    self.current_value = None;
+                    break;
+                },
+
                 Tree::Node { left, right, .. } => {
                     self.right_nodes.push(*right);
                     tree = *left;

@@ -28,11 +28,16 @@ impl <T> MerkleTree<T> {
 
     /// Constructs a Merkle Tree from a vector of data blocks.
     /// Returns `None` if `values` is empty.
-    pub fn from_vec(algorithm: &'static Algorithm, values: Vec<T>) -> Option<Self>
+    pub fn from_vec(algorithm: &'static Algorithm, values: Vec<T>) -> Self
             where T: AsRef<[u8]> {
 
         if values.is_empty() {
-            return None
+            return MerkleTree {
+                algorithm: algorithm,
+                root: Tree::empty(algorithm.hash_empty()),
+                height: 0,
+                count: 0
+            };
         }
 
         let count      = values.len();
@@ -74,16 +79,16 @@ impl <T> MerkleTree<T> {
             cur = next;
         }
 
-        assert!(cur.len() == 1);
+        debug_assert!(cur.len() == 1);
 
         let root = cur.remove(0);
 
-        Some(MerkleTree {
+        MerkleTree {
             algorithm: algorithm,
             root: root,
             height: height,
             count: count
-        })
+        }
     }
 
     /// Returns the root hash of Merkle tree

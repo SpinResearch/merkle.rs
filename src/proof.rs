@@ -91,6 +91,9 @@ impl Lemma {
             where T: AsRef<[u8]> {
 
         match *tree {
+            Tree::Empty {.. } =>
+                None,
+
             Tree::Leaf { ref hash, .. } =>
                 Lemma::new_leaf_proof(hash, needle),
 
