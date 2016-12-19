@@ -9,12 +9,12 @@
 
     <title>lib.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../main.css">
-    
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
 
-    
-    
+
+
+
 </head>
 <body class="rustdoc">
     <!--[if lte IE 8]>
@@ -24,11 +24,11 @@
     </div>
     <![endif]-->
 
-    
+
 
     <nav class="sidebar">
-        
-        
+
+
     </nav>
 
     <nav class="sub">
@@ -74,6 +74,8 @@
 <span id="30">30</span>
 <span id="31">31</span>
 <span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>deny</span>(
     <span class='ident'>missing_docs</span>,
@@ -97,11 +99,13 @@
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>proof</span>::<span class='ident'>Proof</span>;
 
 <span class='kw'>mod</span> <span class='ident'>hashutils</span>;
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>hashutils</span>::<span class='ident'>Hashable</span>;
 
 <span class='kw'>mod</span> <span class='ident'>tree</span>;
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>tree</span>::{ <span class='ident'>LeavesIterator</span>, <span class='ident'>LeavesIntoIterator</span> };
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;serialization-protobuf&quot;</span>)]</span>
+<span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>unused_qualifications</span>)]</span>
 <span class='kw'>mod</span> <span class='ident'>proto</span>;
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
@@ -159,14 +163,14 @@
         </div>
     </aside>
 
-    
+
 
     <script>
-        window.rootPath = "../../../";
+        window.rootPath = "../../";
         window.currentCrate = "merkle";
     </script>
-    <script src="../../../jquery.js"></script>
-    <script src="../../../main.js"></script>
-    <script defer src="../../../search-index.js"></script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    <script defer src="../../search-index.js"></script>
 </body>
 </html>
