@@ -9,12 +9,12 @@
 
     <title>tree.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../main.css">
-    
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
 
-    
-    
+
+
+
 </head>
 <body class="rustdoc">
     <!--[if lte IE 8]>
@@ -24,11 +24,11 @@
     </div>
     <![endif]-->
 
-    
+
 
     <nav class="sidebar">
-        
-        
+
+
     </nav>
 
     <nav class="sub">
@@ -221,11 +221,33 @@
 <span id="177">177</span>
 <span id="178">178</span>
 <span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
 </pre><pre class='rust '>
 
-<span class='kw'>use</span> <span class='ident'>ring</span>::<span class='ident'>digest</span>::{<span class='ident'>Algorithm</span>, <span class='ident'>Digest</span>};
+<span class='kw'>use</span> <span class='ident'>ring</span>::<span class='ident'>digest</span>::{ <span class='ident'>Algorithm</span>, <span class='ident'>Digest</span> };
 
-<span class='kw'>use</span> <span class='ident'>hashutils</span>::<span class='ident'>HashUtils</span>;
+<span class='kw'>use</span> <span class='ident'>hashutils</span>::{ <span class='ident'>Hashable</span>, <span class='ident'>HashUtils</span> };
 
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>proof</span>::{
     <span class='ident'>Proof</span>,
@@ -236,6 +258,10 @@
 <span class='doccomment'>/// Binary Tree where leaves hold a stand-alone value.</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Debug</span>, <span class='ident'>PartialEq</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>Tree</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+    <span class='ident'>Empty</span> {
+        <span class='ident'>hash</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>
+    },
+
     <span class='ident'>Leaf</span> {
         <span class='ident'>hash</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>,
         <span class='ident'>value</span>: <span class='ident'>T</span>
@@ -250,6 +276,13 @@
 
 <span class='kw'>impl</span> <span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>Tree</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
 
+    <span class='doccomment'>/// Create an empty tree</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>empty</span>(<span class='ident'>hash</span>: <span class='ident'>Digest</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
+        <span class='ident'>Tree</span>::<span class='ident'>Empty</span> {
+            <span class='ident'>hash</span>: <span class='ident'>hash</span>.<span class='ident'>as_ref</span>().<span class='ident'>into</span>()
+        }
+    }
+
     <span class='doccomment'>/// Create a new tree</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>hash</span>: <span class='ident'>Digest</span>, <span class='ident'>value</span>: <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
         <span class='ident'>Tree</span>::<span class='ident'>Leaf</span> {
@@ -259,18 +292,19 @@
     }
 
     <span class='doccomment'>/// Create a new leaf</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>make_leaf</span>(<span class='ident'>algo</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>Algorithm</span>, <span class='ident'>value</span>: <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Tree</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>
-            <span class='kw'>where</span> <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span> <span class='op'>+</span> <span class='ident'>Clone</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new_leaf</span>(<span class='ident'>algo</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>Algorithm</span>, <span class='ident'>value</span>: <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Tree</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>
+            <span class='kw'>where</span> <span class='ident'>T</span>: <span class='ident'>Hashable</span> {
 
-        <span class='kw'>let</span> <span class='ident'>hash</span> <span class='op'>=</span> <span class='ident'>algo</span>.<span class='ident'>hash_bytes</span>(<span class='kw-2'>&amp;</span><span class='ident'>value</span>.<span class='ident'>clone</span>().<span class='ident'>into</span>());
+        <span class='kw'>let</span> <span class='ident'>hash</span> <span class='op'>=</span> <span class='ident'>algo</span>.<span class='ident'>hash_leaf</span>(<span class='kw-2'>&amp;</span><span class='ident'>value</span>);
         <span class='ident'>Tree</span>::<span class='ident'>new</span>(<span class='ident'>hash</span>, <span class='ident'>value</span>)
     }
 
     <span class='doccomment'>/// Returns a hash from the tree.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>hash</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> {
         <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
-            <span class='ident'>Tree</span>::<span class='ident'>Leaf</span> { <span class='kw-2'>ref</span> <span class='ident'>hash</span>, .. } <span class='op'>|</span> <span class='ident'>Tree</span>::<span class='ident'>Node</span> { <span class='kw-2'>ref</span> <span class='ident'>hash</span>, .. } <span class='op'>=&gt;</span>
-                <span class='ident'>hash</span>
+            <span class='ident'>Tree</span>::<span class='ident'>Empty</span> { <span class='kw-2'>ref</span> <span class='ident'>hash</span> }    <span class='op'>=&gt;</span> <span class='ident'>hash</span>,
+            <span class='ident'>Tree</span>::<span class='ident'>Leaf</span> { <span class='kw-2'>ref</span> <span class='ident'>hash</span>, .. } <span class='op'>=&gt;</span> <span class='ident'>hash</span>,
+            <span class='ident'>Tree</span>::<span class='ident'>Node</span> { <span class='kw-2'>ref</span> <span class='ident'>hash</span>, .. } <span class='op'>=&gt;</span> <span class='ident'>hash</span>
         }
     }
 
@@ -305,6 +339,11 @@
     <span class='kw'>fn</span> <span class='ident'>add_left</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='kw-2'>mut</span> <span class='ident'>tree</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Tree</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) {
         <span class='kw'>loop</span> {
             <span class='kw'>match</span> <span class='op'>*</span><span class='ident'>tree</span> {
+                <span class='ident'>Tree</span>::<span class='ident'>Empty</span> { .. } <span class='op'>=&gt;</span> {
+                    <span class='self'>self</span>.<span class='ident'>current_value</span> <span class='op'>=</span> <span class='prelude-val'>None</span>;
+                    <span class='kw'>break</span>;
+                },
+
                 <span class='ident'>Tree</span>::<span class='ident'>Node</span> { <span class='kw-2'>ref</span> <span class='ident'>left</span>, <span class='kw-2'>ref</span> <span class='ident'>right</span>, .. } <span class='op'>=&gt;</span> {
                     <span class='self'>self</span>.<span class='ident'>right_nodes</span>.<span class='ident'>push</span>(<span class='ident'>right</span>);
                     <span class='ident'>tree</span> <span class='op'>=</span> <span class='ident'>left</span>;
@@ -359,6 +398,11 @@
     <span class='kw'>fn</span> <span class='ident'>add_left</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='kw-2'>mut</span> <span class='ident'>tree</span>: <span class='ident'>Tree</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) {
         <span class='kw'>loop</span> {
             <span class='kw'>match</span> <span class='ident'>tree</span> {
+                <span class='ident'>Tree</span>::<span class='ident'>Empty</span> { .. } <span class='op'>=&gt;</span> {
+                    <span class='self'>self</span>.<span class='ident'>current_value</span> <span class='op'>=</span> <span class='prelude-val'>None</span>;
+                    <span class='kw'>break</span>;
+                },
+
                 <span class='ident'>Tree</span>::<span class='ident'>Node</span> { <span class='ident'>left</span>, <span class='ident'>right</span>, .. } <span class='op'>=&gt;</span> {
                     <span class='self'>self</span>.<span class='ident'>right_nodes</span>.<span class='ident'>push</span>(<span class='op'>*</span><span class='ident'>right</span>);
                     <span class='ident'>tree</span> <span class='op'>=</span> <span class='op'>*</span><span class='ident'>left</span>;
@@ -453,14 +497,14 @@
         </div>
     </aside>
 
-    
+
 
     <script>
-        window.rootPath = "../../../";
+        window.rootPath = "../../";
         window.currentCrate = "merkle";
     </script>
-    <script src="../../../jquery.js"></script>
-    <script src="../../../main.js"></script>
-    <script defer src="../../../search-index.js"></script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    <script defer src="../../search-index.js"></script>
 </body>
 </html>
