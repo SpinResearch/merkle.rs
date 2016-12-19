@@ -20,6 +20,7 @@ mod proof;
 pub use proof::Proof;
 
 mod hashutils;
+pub use hashutils::Hashable;
 
 mod tree;
 pub use tree::{ LeavesIterator, LeavesIntoIterator };
