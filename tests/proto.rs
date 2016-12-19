@@ -16,7 +16,7 @@ static digest: &'static Algorithm = &SHA512;
 fn test_protobuf_inverse() {
     let values = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
 
-    let tree = MerkleTree::from_vec(digest, values.clone()).unwrap();
+    let tree = MerkleTree::from_vec(digest, values.clone());
 
     for value in values {
         let proof = tree.gen_proof(value).unwrap();

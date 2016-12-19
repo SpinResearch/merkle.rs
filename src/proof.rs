@@ -56,13 +56,13 @@ impl <T> Proof<T> {
                         false,
 
                     Some(Positioned::Left(ref hash)) => {
-                        let combined = self.algorithm.combine_hashes(hash, &sub.node_hash);
+                        let combined = self.algorithm.hash_nodes(hash, &sub.node_hash);
                         let hashes_match = combined.as_ref() == lemma.node_hash.as_slice();
                         hashes_match && self.validate_lemma(sub)
                     }
 
                     Some(Positioned::Right(ref hash)) => {
-                        let combined = self.algorithm.combine_hashes(&sub.node_hash, hash);
+                        let combined = self.algorithm.hash_nodes(&sub.node_hash, hash);
                         let hashes_match = combined.as_ref() == lemma.node_hash.as_slice();
                         hashes_match && self.validate_lemma(sub)
                     }
@@ -91,6 +91,9 @@ impl Lemma {
             where T: AsRef<[u8]> {
 
         match *tree {
+            Tree::Empty {.. } =>
+                None,
+
             Tree::Leaf { ref hash, .. } =>
                 Lemma::new_leaf_proof(hash, needle),
 
