@@ -30,7 +30,7 @@ fn bench_small_str_tree(b: &mut Bencher) {
 #[bench]
 fn bench_small_str_proof_gen(b: &mut Bencher) {
     let values = vec!["one", "two", "three", "four"];
-    let tree   = MerkleTree::from_vec(digest, values.clone()).unwrap();
+    let tree   = MerkleTree::from_vec(digest, values.clone());
 
     b.iter(|| {
         for value in &values {
@@ -43,7 +43,7 @@ fn bench_small_str_proof_gen(b: &mut Bencher) {
 #[bench]
 fn bench_small_str_proof_check(b: &mut Bencher) {
     let values = vec!["one", "two", "three", "four"];
-    let tree   = MerkleTree::from_vec(digest, values.clone()).unwrap();
+    let tree   = MerkleTree::from_vec(digest, values.clone());
     let proofs = values.iter().map(|v| tree.gen_proof(v).unwrap()).collect::<Vec<_>>();
 
     b.iter(|| {
@@ -63,7 +63,8 @@ fn bench_big_rnd_tree(b: &mut Bencher) {
     }
 
     b.iter(|| {
-        MerkleTree::from_vec(digest, values.clone()).unwrap()
+        let tree = MerkleTree::from_vec(digest, values.clone());
+        test::black_box(tree)
     });
 }
 
@@ -76,7 +77,7 @@ fn bench_big_rnd_proof_gen(b: &mut Bencher) {
         rng.fill_bytes(&mut v);
     }
 
-    let tree = MerkleTree::from_vec(digest, values.clone()).unwrap();
+    let tree = MerkleTree::from_vec(digest, values.clone());
 
     b.iter(|| {
         for value in &values {
@@ -95,8 +96,10 @@ fn bench_big_rnd_proof_check(b: &mut Bencher) {
         rng.fill_bytes(&mut v);
     }
 
-    let tree   = MerkleTree::from_vec(digest, values.clone()).unwrap();
-    let proofs = values.into_iter().map(|v| tree.gen_proof(v).unwrap()).collect::<Vec<_>>();
+    let tree   = MerkleTree::from_vec(digest, values.clone());
+    let proofs = values.into_iter()
+        .map(|v| tree.gen_proof(v).unwrap())
+        .collect::<Vec<_>>();
 
     b.iter(|| {
         for proof in &proofs {
@@ -114,7 +117,7 @@ fn bench_big_rnd_iter(b: &mut Bencher) {
         rng.fill_bytes(&mut v);
     }
 
-    let tree = MerkleTree::from_vec(digest, values.clone()).unwrap();
+    let tree = MerkleTree::from_vec(digest, values.clone());
 
     b.iter(|| {
         for value in &tree {

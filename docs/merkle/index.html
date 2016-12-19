@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-0' class='srclink' href='../src/merkle/src/lib.rs.html#1-31' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../src/merkle/lib.rs.html#1-33' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p><em>merkle</em> implements a Merkle Tree in Rust.</p>
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
@@ -80,6 +80,16 @@ and where every internal node holds the hash of the concatenation of the hashes 
                            <td class='docblock-short'>
                                 <p>An inclusion proof represent the fact that a <code>value</code> is a member
 of a <code>MerkleTree</code> with root hash <code>root_hash</code>, and hash function <code>algorithm</code>.</p>
+                           </td>
+                       </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='trait' href='trait.Hashable.html'
+                                  title='merkle::Hashable'>Hashable</a></td>
+                           <td class='docblock-short'>
+                                <p>The type of values stored in a <code>MerkleTree</code> must implement
+this trait, in order for them to be able to be fed
+to a Ring <code>Context</code> when computing the hash of a leaf.</p>
                            </td>
                        </tr></table></section>
     <section id='search' class="content hidden"></section>

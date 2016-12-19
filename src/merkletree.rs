@@ -2,7 +2,7 @@
 use ring::digest::Algorithm;
 
 use tree::{ Tree, LeavesIterator, LeavesIntoIterator };
-use hashutils::HashUtils;
+use hashutils::{ Hashable, HashUtils };
 
 use proof::{ Proof, Lemma };
 
@@ -28,11 +28,16 @@ impl <T> MerkleTree<T> {
 
     /// Constructs a Merkle Tree from a vector of data blocks.
     /// Returns `None` if `values` is empty.
-    pub fn from_vec(algorithm: &'static Algorithm, values: Vec<T>) -> Option<Self>
-            where T: AsRef<[u8]> {
+    pub fn from_vec(algorithm: &'static Algorithm, values: Vec<T>) -> Self
+            where T: Hashable {
 
         if values.is_empty() {
-            return None
+            return MerkleTree {
+                algorithm: algorithm,
+                root: Tree::empty(algorithm.hash_empty()),
+                height: 0,
+                count: 0
+            };
         }
 
         let count      = values.len();
@@ -40,7 +45,7 @@ impl <T> MerkleTree<T> {
         let mut cur    = Vec::with_capacity(count);
 
         for v in values {
-            let leaf = Tree::make_leaf(algorithm, v);
+            let leaf = Tree::new_leaf(algorithm, v);
             cur.push(leaf);
         }
 
@@ -54,7 +59,7 @@ impl <T> MerkleTree<T> {
                     let left  = cur.remove(0);
                     let right = cur.remove(0);
 
-                    let combined_hash = algorithm.combine_hashes(
+                    let combined_hash = algorithm.hash_nodes(
                         left.hash(),
                         right.hash()
                     );
@@ -74,16 +79,16 @@ impl <T> MerkleTree<T> {
             cur = next;
         }
 
-        assert!(cur.len() == 1);
+        debug_assert!(cur.len() == 1);
 
         let root = cur.remove(0);
 
-        Some(MerkleTree {
+        MerkleTree {
             algorithm: algorithm,
             root: root,
             height: height,
             count: count
-        })
+        }
     }
 
     /// Returns the root hash of Merkle tree
@@ -101,15 +106,20 @@ impl <T> MerkleTree<T> {
         self.count
     }
 
+    /// Returns whether the Merkle tree is empty or not
+    pub fn is_empty(&self) -> bool {
+        self.count() == 0
+    }
+
     /// Generate an inclusion proof for the given value.
     /// Returns `None` if the given value is not found in the tree.
     pub fn gen_proof(&self, value: T) -> Option<Proof<T>>
-            where T: AsRef<[u8]> {
+            where T: Hashable {
 
         let root_hash  = self.root_hash().clone();
-        let node_hash  = self.algorithm.hash_bytes(&value.as_ref());
+        let leaf_hash  = self.algorithm.hash_leaf(&value);
 
-        Lemma::new(&self.root, node_hash.as_ref()).map(|lemma|
+        Lemma::new(&self.root, leaf_hash.as_ref()).map(|lemma|
             Proof::new(self.algorithm, root_hash, lemma, value)
         )
     }
