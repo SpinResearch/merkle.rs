@@ -1,7 +1,7 @@
 
-use ring::digest::{Algorithm, Digest};
+use ring::digest::{ Algorithm, Digest };
 
-use hashutils::HashUtils;
+use hashutils::{ Hashable, HashUtils };
 
 pub use proof::{
     Proof,
@@ -47,9 +47,9 @@ impl <T> Tree<T> {
 
     /// Create a new leaf
     pub fn new_leaf(algo: &'static Algorithm, value: T) -> Tree<T>
-            where T: AsRef<[u8]> {
+            where T: Hashable {
 
-        let hash = algo.hash_leaf(&value.as_ref());
+        let hash = algo.hash_leaf(&value);
         Tree::new(hash, value)
     }
 

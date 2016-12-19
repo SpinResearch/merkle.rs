@@ -1,10 +1,10 @@
 
 #![cfg(test)]
 
-use ring::digest::{ Algorithm, SHA512 };
+use ring::digest::{ Algorithm, Context, SHA512 };
 
 use merkletree::MerkleTree;
-use hashutils::HashUtils;
+use hashutils::{ Hashable, HashUtils };
 use proof::Positioned;
 
 #[allow(non_upper_case_globals)]
@@ -118,7 +118,7 @@ fn test_valid_proof() {
 #[test]
 fn test_valid_proof_str() {
     let values    = vec!["Hello", "my", "name", "is", "Rusty"];
-    let tree      = MerkleTree::from_vec(digest, values.clone());
+    let tree      = MerkleTree::from_vec(digest, values);
     let root_hash = tree.root_hash();
 
     let value = "Rusty";
@@ -225,3 +225,49 @@ fn test_tree_into_iter_loop_borrow() {
     assert_eq!(refs, collected);
 }
 
+
+pub struct PublicKey {
+    zero_values: Vec<Vec<u8>>,
+    one_values: Vec<Vec<u8>>
+}
+
+impl PublicKey {
+
+    pub fn new(zero_values: Vec<Vec<u8>>, one_values: Vec<Vec<u8>>) -> Self {
+        PublicKey {
+            zero_values: zero_values,
+            one_values: one_values
+        }
+    }
+
+    pub fn to_bytes(&self) -> Vec<u8> {
+        self.zero_values.iter().chain(self.one_values.iter())
+            .fold(Vec::new(), |mut acc, i| {
+                acc.append(&mut i.clone());
+                acc
+            })
+    }
+}
+
+impl Hashable for PublicKey {
+
+    fn update_context(&self, context: &mut Context) {
+        context.update(&self.to_bytes());
+    }
+
+}
+
+#[test]
+fn test_custom_hashable_impl() {
+    let keys = (0..10).map(|i| {
+        let zero_values = vec![vec![i], vec![i + 1], vec![i + 2]];
+        let one_values  = vec![vec![i + 3], vec![i + 4], vec![i + 5]];
+
+        PublicKey::new(zero_values, one_values)
+    }).collect::<Vec<_>>();
+
+    let tree = MerkleTree::from_vec(digest, keys);
+
+    assert_eq!(tree.count(), 10);
+    assert_eq!(tree.height(), 4);
+}

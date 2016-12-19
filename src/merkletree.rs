@@ -2,7 +2,7 @@
 use ring::digest::Algorithm;
 
 use tree::{ Tree, LeavesIterator, LeavesIntoIterator };
-use hashutils::HashUtils;
+use hashutils::{ Hashable, HashUtils };
 
 use proof::{ Proof, Lemma };
 
@@ -29,7 +29,7 @@ impl <T> MerkleTree<T> {
     /// Constructs a Merkle Tree from a vector of data blocks.
     /// Returns `None` if `values` is empty.
     pub fn from_vec(algorithm: &'static Algorithm, values: Vec<T>) -> Self
-            where T: AsRef<[u8]> {
+            where T: Hashable {
 
         if values.is_empty() {
             return MerkleTree {
@@ -106,13 +106,18 @@ impl <T> MerkleTree<T> {
         self.count
     }
 
+    /// Returns whether the Merkle tree is empty or not
+    pub fn is_empty(&self) -> bool {
+        self.count() == 0
+    }
+
     /// Generate an inclusion proof for the given value.
     /// Returns `None` if the given value is not found in the tree.
     pub fn gen_proof(&self, value: T) -> Option<Proof<T>>
-            where T: AsRef<[u8]> {
+            where T: Hashable {
 
         let root_hash  = self.root_hash().clone();
-        let leaf_hash  = self.algorithm.hash_leaf(&value.as_ref());
+        let leaf_hash  = self.algorithm.hash_leaf(&value);
 
         Lemma::new(&self.root, leaf_hash.as_ref()).map(|lemma|
             Proof::new(self.algorithm, root_hash, lemma, value)
