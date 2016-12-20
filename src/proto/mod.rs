@@ -14,28 +14,28 @@ impl <T> Proof<T> {
 
     /// Constructs a `Proof` struct from its Protobuf representation.
     pub fn from_protobuf(algorithm: &'static Algorithm, proto: ProofProto) -> Option<Self>
-        where T: From<Vec<u8>>
-    {
+            where T: From<Vec<u8>> {
+
         proto.into_proof(algorithm)
     }
 
     /// Encode this `Proof` to its Protobuf representation.
     pub fn into_protobuf(self) -> ProofProto
-        where T: AsRef<[u8]>
-    {
+            where T: Into<Vec<u8>> {
+
         ProofProto::from_proof(self)
     }
 
     /// Parse a `Proof` from its Protobuf binary representation.
     pub fn parse_from_bytes(bytes: &[u8], algorithm: &'static Algorithm) -> ProtobufResult<Option<Self>>
-        where T: From<Vec<u8>>
-    {
+        where T: From<Vec<u8>> {
+
         parse_from_bytes::<ProofProto>(bytes).map(|proto| proto.into_proof(algorithm))
     }
 
     /// Serialize this `Proof` with Protobuf.
     pub fn write_to_bytes(self) -> ProtobufResult<Vec<u8>>
-            where T: AsRef<[u8]> {
+            where T: Into<Vec<u8>> {
 
         self.into_protobuf().write_to_bytes()
     }
@@ -45,7 +45,7 @@ impl <T> Proof<T> {
 impl ProofProto {
 
     pub fn from_proof<T>(proof: Proof<T>) -> Self
-        where T: AsRef<[u8]> {
+            where T: Into<Vec<u8>> {
 
         let mut proto = Self::new();
 
@@ -53,7 +53,7 @@ impl ProofProto {
             Proof { root_hash, lemma, value, .. } => {
                 proto.set_root_hash(root_hash);
                 proto.set_lemma(LemmaProto::from_lemma(lemma));
-                proto.set_value(value.as_ref().into());
+                proto.set_value(value.into());
             }
         }
 
@@ -61,7 +61,7 @@ impl ProofProto {
     }
 
     pub fn into_proof<T>(mut self, algorithm: &'static Algorithm) -> Option<Proof<T>>
-        where T: From<Vec<u8>> {
+            where T: From<Vec<u8>> {
 
         if !self.has_root_hash() || !self.has_lemma() {
             return None;
