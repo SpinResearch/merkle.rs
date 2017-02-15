@@ -1,7 +1,11 @@
 
 # Changelog
 
-## [Unreleased](https://github.com/SpinResearch/merkle.rs/compare/1.0.0...master)
+## [Unreleased](https://github.com/SpinResearch/merkle.rs/compare/1.1.0...master)
+
+> Nothing yet.
+
+## [1.1.0](https://github.com/SpinResearch/merkle.rs/compare/1.0.0...1.1.0) - 2017-02-15
 
 ## Added
 - Implement `Iterator` and `IntoIterator` for `MerkleTree` ([@romac](https://github.com/romac))
@@ -13,5 +17,5 @@
 
 ## [1.0.0](https://github.com/SpinResearch/merkle.rs/releases/tag/1.0.0) - 2016-11-29
 
-## Added
-- Initial release
+> Initial release
+
