@@ -14,7 +14,7 @@ homepage      = "https://github.com/SpinResearch/merkle.rs"
 repository    = "https://github.com/SpinResearch/merkle.rs"
 
 [dependencies]
-ring = "^0.6.0"
+ring = "^0.9"
 protobuf = { version = "^1.2.0", optional = true }
 
 [features]
