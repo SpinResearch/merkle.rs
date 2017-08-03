@@ -1,9 +1,14 @@
 
 # Changelog
 
-## [Unreleased](https://github.com/SpinResearch/merkle.rs/compare/1.1.0...master)
+## [Unreleased](https://github.com/SpinResearch/merkle.rs/compare/1.3.0...master)
 
 > Nothing yet.
+
+## [1.3.0](https://github.com/SpinResearch/merkle.rs/compare/1.2.0...1.3.0) - 2017-08-03
+
+## Changed
+- Upgrade to *ring* 0.11 ([@romac](https://github.com/romac))
 
 ## [1.2.0](https://github.com/SpinResearch/merkle.rs/compare/1.1.0...1.2.0) - 2017-05-07
 
