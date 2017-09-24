@@ -1,6 +1,6 @@
 [package]
 name    = "merkle"
-version = "1.4.1"
+version = "1.4.2-pre"
 authors = [
   "Frederic Jacobs <me@fredericjacobs.com>",
   "Dylan Bourgeois <dtsbourg@gmail.com>",
