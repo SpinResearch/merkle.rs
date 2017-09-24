@@ -5,6 +5,11 @@
 
 > Nothing yet.
 
+## [1.5.0](https://github.com/SpinResearch/merkle.rs/compare/1.4.1...1.5.0) - 2017-09-24
+
+### Changed
+- Update `ring` to v0.12.x. ([@romac](https://github.com/romac))
+
 ## [1.4.1](https://github.com/SpinResearch/merkle.rs/compare/1.4.0...1.4.1) - 2017-09-24
 
 ### Changed
