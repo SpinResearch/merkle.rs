@@ -1,4 +1,7 @@
 
+use std::hash::{Hash, Hasher};
+use std::cmp::Ordering;
+
 use ring::digest::Algorithm;
 
 use tree::Tree;
@@ -19,6 +22,37 @@ pub struct Proof<T> {
 
     /// The value concerned by this `Proof`
     pub value: T,
+}
+
+impl<T: PartialEq> PartialEq for Proof<T> {
+    fn eq(&self, other: &Proof<T>) -> bool {
+        self.root_hash == other.root_hash && self.lemma == other.lemma && self.value == other.value
+    }
+}
+
+impl<T: Eq> Eq for Proof<T> {}
+
+impl<T: Ord> PartialOrd for Proof<T> {
+    fn partial_cmp(&self, other: &Proof<T>) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl<T: Ord> Ord for Proof<T> {
+    fn cmp(&self, other: &Proof<T>) -> Ordering {
+        self.root_hash
+            .cmp(&other.root_hash)
+            .then(self.value.cmp(&other.value))
+            .then_with(|| self.lemma.cmp(&other.lemma))
+    }
+}
+
+impl<T: Hash> Hash for Proof<T> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.root_hash.hash(state);
+        self.lemma.hash(state);
+        self.value.hash(state);
+    }
 }
 
 impl<T> Proof<T> {
@@ -73,7 +107,7 @@ impl<T> Proof<T> {
 /// A `Lemma` holds the hash of a node, the hash of its sibling node,
 /// and a sub lemma, whose `node_hash`, when combined with this `sibling_hash`
 /// must be equal to this `node_hash`.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Lemma {
     pub node_hash: Vec<u8>,
     pub sibling_hash: Option<Positioned<Vec<u8>>>,
@@ -139,7 +173,7 @@ impl Lemma {
 }
 
 /// Tags a value so that we know from which branch of a `Tree` (if any) it was found.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Positioned<T> {
     /// The value was found in the left branch
     Left(T),

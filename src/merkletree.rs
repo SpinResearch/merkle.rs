@@ -1,4 +1,7 @@
 
+use std::hash::{Hash, Hasher};
+use std::cmp::Ordering;
+
 use ring::digest::Algorithm;
 
 use tree::{Tree, LeavesIterator, LeavesIntoIterator};
@@ -21,6 +24,37 @@ pub struct MerkleTree<T> {
 
     /// The number of leaf nodes in the tree
     count: usize,
+}
+
+impl<T: PartialEq> PartialEq for MerkleTree<T> {
+    fn eq(&self, other: &MerkleTree<T>) -> bool {
+        self.root == other.root && self.height == other.height && self.count == other.count
+    }
+}
+
+impl<T: Eq> Eq for MerkleTree<T> {}
+
+impl<T: Ord> PartialOrd for MerkleTree<T> {
+    fn partial_cmp(&self, other: &MerkleTree<T>) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl<T: Ord> Ord for MerkleTree<T> {
+    fn cmp(&self, other: &MerkleTree<T>) -> Ordering {
+        self.height
+            .cmp(&other.height)
+            .then(self.count.cmp(&other.count))
+            .then_with(|| self.root.cmp(&other.root))
+    }
+}
+
+impl<T: Hash> Hash for MerkleTree<T> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        <Tree<T> as Hash>::hash(&self.root, state);
+        self.height.hash(state);
+        self.count.hash(state);
+    }
 }
 
 impl<T> MerkleTree<T> {

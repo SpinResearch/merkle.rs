@@ -6,7 +6,7 @@ use hashutils::{Hashable, HashUtils};
 pub use proof::{Proof, Lemma, Positioned};
 
 /// Binary Tree where leaves hold a stand-alone value.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Tree<T> {
     Empty { hash: Vec<u8> },
 
