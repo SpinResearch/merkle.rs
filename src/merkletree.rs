@@ -27,8 +27,10 @@ pub struct MerkleTree<T> {
 }
 
 impl<T: PartialEq> PartialEq for MerkleTree<T> {
+    #[allow(trivial_casts)]
     fn eq(&self, other: &MerkleTree<T>) -> bool {
-        self.root == other.root && self.height == other.height && self.count == other.count
+        self.root == other.root && self.height == other.height && self.count == other.count &&
+            (self.algorithm as *const Algorithm) == (other.algorithm as *const Algorithm)
     }
 }
 
@@ -41,19 +43,26 @@ impl<T: Ord> PartialOrd for MerkleTree<T> {
 }
 
 impl<T: Ord> Ord for MerkleTree<T> {
+    #[allow(trivial_casts)]
     fn cmp(&self, other: &MerkleTree<T>) -> Ordering {
         self.height
             .cmp(&other.height)
             .then(self.count.cmp(&other.count))
+            .then((self.algorithm as *const Algorithm).cmp(
+                &(other.algorithm as
+                      *const Algorithm),
+            ))
             .then_with(|| self.root.cmp(&other.root))
     }
 }
 
 impl<T: Hash> Hash for MerkleTree<T> {
+    #[allow(trivial_casts)]
     fn hash<H: Hasher>(&self, state: &mut H) {
         <Tree<T> as Hash>::hash(&self.root, state);
         self.height.hash(state);
         self.count.hash(state);
+        (self.algorithm as *const Algorithm).hash(state);
     }
 }
 
