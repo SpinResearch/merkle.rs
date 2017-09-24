@@ -1,10 +1,10 @@
 
 #![cfg(test)]
 
-use ring::digest::{ Algorithm, Context, SHA512 };
+use ring::digest::{Algorithm, Context, SHA512};
 
 use merkletree::MerkleTree;
-use hashutils::{ Hashable, HashUtils };
+use hashutils::{Hashable, HashUtils};
 use proof::Positioned;
 
 #[allow(non_upper_case_globals)]
@@ -18,11 +18,11 @@ fn test_from_str_vec() {
         digest.hash_leaf(&values[0].as_bytes()),
         digest.hash_leaf(&values[1].as_bytes()),
         digest.hash_leaf(&values[2].as_bytes()),
-        digest.hash_leaf(&values[3].as_bytes())
+        digest.hash_leaf(&values[3].as_bytes()),
     ];
 
     let count = values.len();
-    let tree  = MerkleTree::from_vec(digest, values);
+    let tree = MerkleTree::from_vec(digest, values);
 
     let h01 = digest.hash_nodes(&hashes[0], &hashes[1]);
     let h23 = digest.hash_nodes(&hashes[2], &hashes[3]);
@@ -40,7 +40,7 @@ fn test_from_vec_empty() {
     let values: Vec<Vec<u8>> = vec![];
     let tree = MerkleTree::from_vec(digest, values);
     let empty_hash: Vec<u8> = digest.hash_empty().as_ref().into();
-    let root_hash= tree.root_hash().clone();
+    let root_hash = tree.root_hash().clone();
 
     assert_eq!(root_hash, empty_hash);
 }
@@ -48,7 +48,7 @@ fn test_from_vec_empty() {
 #[test]
 fn test_from_vec1() {
     let values = vec!["hello, world".to_string()];
-    let tree   = MerkleTree::from_vec(digest, values);
+    let tree = MerkleTree::from_vec(digest, values);
 
     let root_hash = &digest.hash_leaf(&"hello, world".as_bytes());
 
@@ -61,16 +61,16 @@ fn test_from_vec1() {
 #[test]
 fn test_from_vec3() {
     let values = vec![vec![1], vec![2], vec![3]];
-    let tree   = MerkleTree::from_vec(digest, values);
+    let tree = MerkleTree::from_vec(digest, values);
 
     let hashes = vec![
         digest.hash_leaf(&vec![1]),
         digest.hash_leaf(&vec![2]),
-        digest.hash_leaf(&vec![3])
+        digest.hash_leaf(&vec![3]),
     ];
 
-    let h01       = digest.hash_nodes(&hashes[0], &hashes[1]);
-    let h2        = &hashes[2];
+    let h01 = digest.hash_nodes(&hashes[0], &hashes[1]);
+    let h2 = &hashes[2];
     let root_hash = &digest.hash_nodes(&h01, h2);
 
     assert_eq!(tree.count(), 3);
@@ -81,15 +81,18 @@ fn test_from_vec3() {
 #[test]
 fn test_from_vec9() {
     let values = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
-    let tree   = MerkleTree::from_vec(digest, values.clone());
+    let tree = MerkleTree::from_vec(digest, values.clone());
 
-    let hashes = values.iter().map(|v| digest.hash_leaf(v)).collect::<Vec<_>>();
+    let hashes = values
+        .iter()
+        .map(|v| digest.hash_leaf(v))
+        .collect::<Vec<_>>();
 
-    let h01   = digest.hash_nodes(&hashes[0], &hashes[1]);
-    let h23   = digest.hash_nodes(&hashes[2], &hashes[3]);
-    let h45   = digest.hash_nodes(&hashes[4], &hashes[5]);
-    let h67   = digest.hash_nodes(&hashes[6], &hashes[7]);
-    let h8    = &hashes[8];
+    let h01 = digest.hash_nodes(&hashes[0], &hashes[1]);
+    let h23 = digest.hash_nodes(&hashes[2], &hashes[3]);
+    let h45 = digest.hash_nodes(&hashes[4], &hashes[5]);
+    let h67 = digest.hash_nodes(&hashes[6], &hashes[7]);
+    let h8 = &hashes[8];
     let h0123 = digest.hash_nodes(&h01, &h23);
     let h4567 = digest.hash_nodes(&h45, &h67);
     let h1to7 = digest.hash_nodes(&h0123, &h4567);
@@ -103,12 +106,12 @@ fn test_from_vec9() {
 
 #[test]
 fn test_valid_proof() {
-    let values    = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
-    let tree      = MerkleTree::from_vec(digest, values.clone());
+    let values = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
+    let tree = MerkleTree::from_vec(digest, values.clone());
     let root_hash = tree.root_hash();
 
     for value in values {
-        let proof    = tree.gen_proof(value);
+        let proof = tree.gen_proof(value);
         let is_valid = proof.map(|p| p.validate(&root_hash)).unwrap_or(false);
 
         assert!(is_valid);
@@ -117,13 +120,13 @@ fn test_valid_proof() {
 
 #[test]
 fn test_valid_proof_str() {
-    let values    = vec!["Hello", "my", "name", "is", "Rusty"];
-    let tree      = MerkleTree::from_vec(digest, values);
+    let values = vec!["Hello", "my", "name", "is", "Rusty"];
+    let tree = MerkleTree::from_vec(digest, values);
     let root_hash = tree.root_hash();
 
     let value = "Rusty";
 
-    let proof    = tree.gen_proof(&value);
+    let proof = tree.gen_proof(&value);
     let is_valid = proof.map(|p| p.validate(&root_hash)).unwrap_or(false);
 
     assert!(is_valid);
@@ -131,16 +134,16 @@ fn test_valid_proof_str() {
 
 #[test]
 fn test_wrong_proof() {
-    let values1   = vec![vec![1], vec![2], vec![3], vec![4]];
-    let tree1     = MerkleTree::from_vec(digest, values1.clone());
+    let values1 = vec![vec![1], vec![2], vec![3], vec![4]];
+    let tree1 = MerkleTree::from_vec(digest, values1.clone());
 
-    let values2   = vec![vec![4], vec![5], vec![6], vec![7]];
-    let tree2     = MerkleTree::from_vec(digest, values2.clone());
+    let values2 = vec![vec![4], vec![5], vec![6], vec![7]];
+    let tree2 = MerkleTree::from_vec(digest, values2.clone());
 
     let root_hash = tree2.root_hash();
 
     for value in values1 {
-        let proof    = tree1.gen_proof(value);
+        let proof = tree1.gen_proof(value);
         let is_valid = proof.map(|p| p.validate(root_hash)).unwrap_or(false);
 
         assert_eq!(is_valid, false);
@@ -149,8 +152,8 @@ fn test_wrong_proof() {
 
 #[test]
 fn test_mutate_proof_first_lemma() {
-    let values    = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
-    let tree      = MerkleTree::from_vec(digest, values.clone());
+    let values = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
+    let tree = MerkleTree::from_vec(digest, values.clone());
     let root_hash = tree.root_hash();
 
     let mut i = 0;
@@ -161,10 +164,10 @@ fn test_mutate_proof_first_lemma() {
         match i % 3 {
             0 => {
                 proof.lemma.node_hash = vec![1, 2, 3];
-            },
+            }
             1 => {
                 proof.lemma.sibling_hash = Some(Positioned::Left(vec![1, 2, 3]));
-            },
+            }
             _ => {
                 proof.lemma.sibling_hash = Some(Positioned::Right(vec![1, 2, 3]));
             }
@@ -179,26 +182,26 @@ fn test_mutate_proof_first_lemma() {
 
 #[test]
 fn test_tree_iter() {
-    let values  = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
-    let tree    = MerkleTree::from_vec(digest, values.clone());
-    let iter    = tree.iter().map(|x| x.clone()).collect::<Vec<_>>();
+    let values = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
+    let tree = MerkleTree::from_vec(digest, values.clone());
+    let iter = tree.iter().map(|x| x.clone()).collect::<Vec<_>>();
 
     assert_eq!(values, iter);
 }
 
 #[test]
 fn test_tree_into_iter() {
-    let values  = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
-    let tree    = MerkleTree::from_vec(digest, values.clone());
-    let iter    = tree.into_iter().map(|x| x.clone()).collect::<Vec<_>>();
+    let values = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
+    let tree = MerkleTree::from_vec(digest, values.clone());
+    let iter = tree.into_iter().map(|x| x.clone()).collect::<Vec<_>>();
 
     assert_eq!(values, iter);
 }
 
 #[test]
 fn test_tree_into_iter_loop() {
-    let values  = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
-    let tree    = MerkleTree::from_vec(digest, values.clone());
+    let values = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
+    let tree = MerkleTree::from_vec(digest, values.clone());
 
     let mut collected = Vec::new();
 
@@ -211,8 +214,8 @@ fn test_tree_into_iter_loop() {
 
 #[test]
 fn test_tree_into_iter_loop_borrow() {
-    let values  = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
-    let tree    = MerkleTree::from_vec(digest, values.clone());
+    let values = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
+    let tree = MerkleTree::from_vec(digest, values.clone());
 
     let mut collected = Vec::new();
 
@@ -228,43 +231,44 @@ fn test_tree_into_iter_loop_borrow() {
 
 pub struct PublicKey {
     zero_values: Vec<Vec<u8>>,
-    one_values: Vec<Vec<u8>>
+    one_values: Vec<Vec<u8>>,
 }
 
 impl PublicKey {
-
     pub fn new(zero_values: Vec<Vec<u8>>, one_values: Vec<Vec<u8>>) -> Self {
         PublicKey {
             zero_values: zero_values,
-            one_values: one_values
+            one_values: one_values,
         }
     }
 
     pub fn to_bytes(&self) -> Vec<u8> {
-        self.zero_values.iter().chain(self.one_values.iter())
-            .fold(Vec::new(), |mut acc, i| {
+        self.zero_values.iter().chain(self.one_values.iter()).fold(
+            Vec::new(),
+            |mut acc, i| {
                 acc.append(&mut i.clone());
                 acc
-            })
+            },
+        )
     }
 }
 
 impl Hashable for PublicKey {
-
     fn update_context(&self, context: &mut Context) {
         context.update(&self.to_bytes());
     }
-
 }
 
 #[test]
 fn test_custom_hashable_impl() {
-    let keys = (0..10).map(|i| {
-        let zero_values = vec![vec![i], vec![i + 1], vec![i + 2]];
-        let one_values  = vec![vec![i + 3], vec![i + 4], vec![i + 5]];
+    let keys = (0..10)
+        .map(|i| {
+            let zero_values = vec![vec![i], vec![i + 1], vec![i + 2]];
+            let one_values = vec![vec![i + 3], vec![i + 4], vec![i + 5]];
 
-        PublicKey::new(zero_values, one_values)
-    }).collect::<Vec<_>>();
+            PublicKey::new(zero_values, one_values)
+        })
+        .collect::<Vec<_>>();
 
     let tree = MerkleTree::from_vec(digest, keys);
 

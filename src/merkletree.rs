@@ -1,16 +1,15 @@
 
 use ring::digest::Algorithm;
 
-use tree::{ Tree, LeavesIterator, LeavesIntoIterator };
-use hashutils::{ Hashable, HashUtils };
+use tree::{Tree, LeavesIterator, LeavesIntoIterator};
+use hashutils::{Hashable, HashUtils};
 
-use proof::{ Proof, Lemma };
+use proof::{Proof, Lemma};
 
 /// A Merkle tree is a binary tree, with values of type `T` at the leafs,
 /// and where every internal node holds the hash of the concatenation of the hashes of its children nodes.
 #[derive(Clone, Debug)]
 pub struct MerkleTree<T> {
-
     /// The hashing algorithm used by this Merkle tree
     pub algorithm: &'static Algorithm,
 
@@ -21,28 +20,29 @@ pub struct MerkleTree<T> {
     height: usize,
 
     /// The number of leaf nodes in the tree
-    count: usize
+    count: usize,
 }
 
-impl <T> MerkleTree<T> {
-
+impl<T> MerkleTree<T> {
     /// Constructs a Merkle Tree from a vector of data blocks.
     /// Returns `None` if `values` is empty.
     pub fn from_vec(algorithm: &'static Algorithm, values: Vec<T>) -> Self
-            where T: Hashable {
+    where
+        T: Hashable,
+    {
 
         if values.is_empty() {
             return MerkleTree {
                 algorithm: algorithm,
                 root: Tree::empty(algorithm.hash_empty()),
                 height: 0,
-                count: 0
+                count: 0,
             };
         }
 
-        let count      = values.len();
+        let count = values.len();
         let mut height = 0;
-        let mut cur    = Vec::with_capacity(count);
+        let mut cur = Vec::with_capacity(count);
 
         for v in values {
             let leaf = Tree::new_leaf(algorithm, v);
@@ -54,20 +54,16 @@ impl <T> MerkleTree<T> {
             while !cur.is_empty() {
                 if cur.len() == 1 {
                     next.push(cur.remove(0));
-                }
-                else {
-                    let left  = cur.remove(0);
+                } else {
+                    let left = cur.remove(0);
                     let right = cur.remove(0);
 
-                    let combined_hash = algorithm.hash_nodes(
-                        left.hash(),
-                        right.hash()
-                    );
+                    let combined_hash = algorithm.hash_nodes(left.hash(), right.hash());
 
                     let node = Tree::Node {
-                       hash: combined_hash.as_ref().into(),
-                       left: Box::new(left),
-                       right: Box::new(right)
+                        hash: combined_hash.as_ref().into(),
+                        left: Box::new(left),
+                        right: Box::new(right),
                     };
 
                     next.push(node);
@@ -87,7 +83,7 @@ impl <T> MerkleTree<T> {
             algorithm: algorithm,
             root: root,
             height: height,
-            count: count
+            count: count,
         }
     }
 
@@ -114,26 +110,26 @@ impl <T> MerkleTree<T> {
     /// Generate an inclusion proof for the given value.
     /// Returns `None` if the given value is not found in the tree.
     pub fn gen_proof(&self, value: T) -> Option<Proof<T>>
-            where T: Hashable {
+    where
+        T: Hashable,
+    {
 
-        let root_hash  = self.root_hash().clone();
-        let leaf_hash  = self.algorithm.hash_leaf(&value);
+        let root_hash = self.root_hash().clone();
+        let leaf_hash = self.algorithm.hash_leaf(&value);
 
-        Lemma::new(&self.root, leaf_hash.as_ref()).map(|lemma|
+        Lemma::new(&self.root, leaf_hash.as_ref()).map(|lemma| {
             Proof::new(self.algorithm, root_hash, lemma, value)
-        )
+        })
     }
 
     /// Creates an `Iterator` over the values contained in this Merkle tree.
     pub fn iter(&self) -> LeavesIterator<T> {
         self.root.iter()
     }
-
 }
 
-impl <T> IntoIterator for MerkleTree<T> {
-
-    type Item     = T;
+impl<T> IntoIterator for MerkleTree<T> {
+    type Item = T;
     type IntoIter = LeavesIntoIterator<T>;
 
     /// Creates a consuming iterator, that is, one that moves each value out of the Merkle tree.
@@ -141,18 +137,14 @@ impl <T> IntoIterator for MerkleTree<T> {
     fn into_iter(self) -> Self::IntoIter {
         self.root.into_iter()
     }
-
 }
 
-impl <'a, T> IntoIterator for &'a MerkleTree<T> {
-
-    type Item     = &'a T;
+impl<'a, T> IntoIterator for &'a MerkleTree<T> {
+    type Item = &'a T;
     type IntoIter = LeavesIterator<'a, T>;
 
     /// Creates a borrowing `Iterator` over the values contained in this Merkle tree.
     fn into_iter(self) -> Self::IntoIter {
         self.root.iter()
     }
-
 }
-

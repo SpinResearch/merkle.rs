@@ -22,41 +22,38 @@ static digest: &'static Algorithm = &SHA512;
 fn bench_small_str_tree(b: &mut Bencher) {
     let values = vec!["one", "two", "three", "four"];
 
-    b.iter(|| {
-        MerkleTree::from_vec(digest, values.clone())
-    });
+    b.iter(|| MerkleTree::from_vec(digest, values.clone()));
 }
 
 #[bench]
 fn bench_small_str_proof_gen(b: &mut Bencher) {
     let values = vec!["one", "two", "three", "four"];
-    let tree   = MerkleTree::from_vec(digest, values.clone());
+    let tree = MerkleTree::from_vec(digest, values.clone());
 
-    b.iter(|| {
-        for value in &values {
-            let proof = tree.gen_proof(value);
-            test::black_box(proof);
-        }
+    b.iter(|| for value in &values {
+        let proof = tree.gen_proof(value);
+        test::black_box(proof);
     });
 }
 
 #[bench]
 fn bench_small_str_proof_check(b: &mut Bencher) {
     let values = vec!["one", "two", "three", "four"];
-    let tree   = MerkleTree::from_vec(digest, values.clone());
-    let proofs = values.iter().map(|v| tree.gen_proof(v).unwrap()).collect::<Vec<_>>();
+    let tree = MerkleTree::from_vec(digest, values.clone());
+    let proofs = values
+        .iter()
+        .map(|v| tree.gen_proof(v).unwrap())
+        .collect::<Vec<_>>();
 
-    b.iter(|| {
-        for proof in &proofs {
-            test::black_box(proof.validate(tree.root_hash()));
-        }
+    b.iter(|| for proof in &proofs {
+        test::black_box(proof.validate(tree.root_hash()));
     });
 }
 
 #[bench]
 fn bench_big_rnd_tree(b: &mut Bencher) {
     let mut values = vec![vec![0u8; 256]; 160];
-    let mut rng    = rand::IsaacRng::new_unseeded();
+    let mut rng = rand::IsaacRng::new_unseeded();
 
     for mut v in &mut values {
         rng.fill_bytes(&mut v);
@@ -71,7 +68,7 @@ fn bench_big_rnd_tree(b: &mut Bencher) {
 #[bench]
 fn bench_big_rnd_proof_gen(b: &mut Bencher) {
     let mut values = vec![vec![0u8; 256]; 160];
-    let mut rng    = rand::IsaacRng::new_unseeded();
+    let mut rng = rand::IsaacRng::new_unseeded();
 
     for mut v in &mut values {
         rng.fill_bytes(&mut v);
@@ -79,39 +76,36 @@ fn bench_big_rnd_proof_gen(b: &mut Bencher) {
 
     let tree = MerkleTree::from_vec(digest, values.clone());
 
-    b.iter(|| {
-        for value in &values {
-            let proof = tree.gen_proof(value.clone());
-            test::black_box(proof);
-        }
+    b.iter(|| for value in &values {
+        let proof = tree.gen_proof(value.clone());
+        test::black_box(proof);
     });
 }
 
 #[bench]
 fn bench_big_rnd_proof_check(b: &mut Bencher) {
     let mut values = vec![vec![0u8; 256]; 160];
-    let mut rng    = rand::IsaacRng::new_unseeded();
+    let mut rng = rand::IsaacRng::new_unseeded();
 
     for mut v in &mut values {
         rng.fill_bytes(&mut v);
     }
 
-    let tree   = MerkleTree::from_vec(digest, values.clone());
-    let proofs = values.into_iter()
+    let tree = MerkleTree::from_vec(digest, values.clone());
+    let proofs = values
+        .into_iter()
         .map(|v| tree.gen_proof(v).unwrap())
         .collect::<Vec<_>>();
 
-    b.iter(|| {
-        for proof in &proofs {
-            test::black_box(proof.validate(tree.root_hash()));
-        }
+    b.iter(|| for proof in &proofs {
+        test::black_box(proof.validate(tree.root_hash()));
     });
 }
 
 #[bench]
 fn bench_big_rnd_iter(b: &mut Bencher) {
     let mut values = vec![vec![0u8; 256]; 160];
-    let mut rng    = rand::IsaacRng::new_unseeded();
+    let mut rng = rand::IsaacRng::new_unseeded();
 
     for mut v in &mut values {
         rng.fill_bytes(&mut v);
@@ -119,10 +113,7 @@ fn bench_big_rnd_iter(b: &mut Bencher) {
 
     let tree = MerkleTree::from_vec(digest, values.clone());
 
-    b.iter(|| {
-        for value in &tree {
-            test::black_box(value);
-        }
+    b.iter(|| for value in &tree {
+        test::black_box(value);
     });
 }
-

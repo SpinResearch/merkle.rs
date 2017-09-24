@@ -8,7 +8,6 @@ use hashutils::HashUtils;
 /// of a `MerkleTree` with root hash `root_hash`, and hash function `algorithm`.
 #[derive(Clone, Debug)]
 pub struct Proof<T> {
-
     /// The hashing algorithm used in the original `MerkleTree`
     pub algorithm: &'static Algorithm,
 
@@ -19,18 +18,17 @@ pub struct Proof<T> {
     pub lemma: Lemma,
 
     /// The value concerned by this `Proof`
-    pub value: T
+    pub value: T,
 }
 
-impl <T> Proof<T> {
-
+impl<T> Proof<T> {
     /// Constructs a new `Proof`
     pub fn new(algo: &'static Algorithm, root_hash: Vec<u8>, lemma: Lemma, value: T) -> Self {
         Proof {
             algorithm: algo,
             root_hash: root_hash,
             lemma: lemma,
-            value: value
+            value: value,
         }
     }
 
@@ -38,7 +36,7 @@ impl <T> Proof<T> {
     /// and whether its root hash matches the given `root_hash`.
     pub fn validate(&self, root_hash: &[u8]) -> bool {
         if self.root_hash != root_hash || self.lemma.node_hash != root_hash {
-            return false
+            return false;
         }
 
         self.validate_lemma(&self.lemma)
@@ -47,13 +45,11 @@ impl <T> Proof<T> {
     fn validate_lemma(&self, lemma: &Lemma) -> bool {
         match lemma.sub_lemma {
 
-            None =>
-                lemma.sibling_hash.is_none(),
+            None => lemma.sibling_hash.is_none(),
 
-            Some(ref sub) =>
+            Some(ref sub) => {
                 match lemma.sibling_hash {
-                    None =>
-                        false,
+                    None => false,
 
                     Some(Positioned::Left(ref hash)) => {
                         let combined = self.algorithm.hash_nodes(hash, &sub.node_hash);
@@ -68,9 +64,9 @@ impl <T> Proof<T> {
                     }
 
                 }
+            }
         }
     }
-
 }
 
 
@@ -81,22 +77,22 @@ impl <T> Proof<T> {
 pub struct Lemma {
     pub node_hash: Vec<u8>,
     pub sibling_hash: Option<Positioned<Vec<u8>>>,
-    pub sub_lemma: Option<Box<Lemma>>
+    pub sub_lemma: Option<Box<Lemma>>,
 }
 
 impl Lemma {
-
     /// Attempts to generate a proof that the a value with hash `needle` is a member of the given `tree`.
     pub fn new<T>(tree: &Tree<T>, needle: &[u8]) -> Option<Lemma> {
         match *tree {
-            Tree::Empty {.. } =>
-                None,
+            Tree::Empty { .. } => None,
 
-            Tree::Leaf { ref hash, .. } =>
-                Lemma::new_leaf_proof(hash, needle),
+            Tree::Leaf { ref hash, .. } => Lemma::new_leaf_proof(hash, needle),
 
-            Tree::Node { ref hash, ref left, ref right } =>
-                Lemma::new_tree_proof(hash, needle, left, right)
+            Tree::Node {
+                ref hash,
+                ref left,
+                ref right,
+            } => Lemma::new_tree_proof(hash, needle, left, right),
         }
     }
 
@@ -105,14 +101,19 @@ impl Lemma {
             Some(Lemma {
                 node_hash: hash.into(),
                 sibling_hash: None,
-                sub_lemma: None
+                sub_lemma: None,
             })
         } else {
             None
         }
     }
 
-    fn new_tree_proof<T>(hash: &[u8], needle: &[u8], left: &Tree<T>, right: &Tree<T>) -> Option<Lemma> {
+    fn new_tree_proof<T>(
+        hash: &[u8],
+        needle: &[u8],
+        left: &Tree<T>,
+        right: &Tree<T>,
+    ) -> Option<Lemma> {
         Lemma::new(left, needle)
             .map(|lemma| {
                 let right_hash = right.hash().clone();
@@ -131,20 +132,18 @@ impl Lemma {
                 Lemma {
                     node_hash: hash.into(),
                     sibling_hash: sibling_hash,
-                    sub_lemma: Some(Box::new(sub_lemma))
+                    sub_lemma: Some(Box::new(sub_lemma)),
                 }
             })
     }
-
 }
 
 /// Tags a value so that we know from which branch of a `Tree` (if any) it was found.
 #[derive(Clone, Debug, PartialEq)]
 pub enum Positioned<T> {
-
     /// The value was found in the left branch
     Left(T),
 
     /// The value was found in the right branch
-    Right(T)
+    Right(T),
 }
