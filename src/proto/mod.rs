@@ -8,7 +8,7 @@ pub use self::proof::{ProofProto, LemmaProto};
 
 use protobuf::Message;
 use protobuf::error::ProtobufResult;
-use protobuf::core::parse_from_bytes;
+use protobuf::parse_from_bytes;
 
 impl<T> Proof<T> {
     /// Constructs a `Proof` struct from its Protobuf representation.
@@ -80,7 +80,7 @@ impl ProofProto {
         T: From<Vec<u8>>,
     {
 
-        if !self.has_root_hash() || !self.has_lemma() {
+        if self.root_hash.is_empty() || !self.has_lemma() {
             return None;
         }
 
@@ -125,7 +125,7 @@ impl LemmaProto {
     }
 
     pub fn into_lemma(mut self) -> Option<Lemma> {
-        if !self.has_node_hash() {
+        if self.node_hash.is_empty() {
             return None;
         }
 
