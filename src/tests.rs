@@ -1,10 +1,9 @@
-
 #![cfg(test)]
 
 use ring::digest::{Algorithm, Context, SHA512};
 
+use hashutils::{HashUtils, Hashable};
 use merkletree::MerkleTree;
-use hashutils::{Hashable, HashUtils};
 use proof::Positioned;
 
 #[allow(non_upper_case_globals)]
@@ -34,7 +33,6 @@ fn test_from_str_vec() {
     assert_eq!(tree.root_hash().as_slice(), root_hash.as_ref());
 }
 
-
 #[test]
 fn test_from_vec_empty() {
     let values: Vec<Vec<u8>> = vec![];
@@ -56,7 +54,6 @@ fn test_from_vec1() {
     assert_eq!(tree.height(), 0);
     assert_eq!(tree.root_hash().as_slice(), root_hash.as_ref());
 }
-
 
 #[test]
 fn test_from_vec3() {
@@ -228,7 +225,6 @@ fn test_tree_into_iter_loop_borrow() {
     assert_eq!(refs, collected);
 }
 
-
 pub struct PublicKey {
     zero_values: Vec<Vec<u8>>,
     one_values: Vec<Vec<u8>>,
@@ -243,13 +239,13 @@ impl PublicKey {
     }
 
     pub fn to_bytes(&self) -> Vec<u8> {
-        self.zero_values.iter().chain(self.one_values.iter()).fold(
-            Vec::new(),
-            |mut acc, i| {
+        self.zero_values
+            .iter()
+            .chain(self.one_values.iter())
+            .fold(Vec::new(), |mut acc, i| {
                 acc.append(&mut i.clone());
                 acc
-            },
-        )
+            })
     }
 }
 
@@ -285,5 +281,8 @@ fn test_serialize_proof_with_serde() {
     let tree = MerkleTree::from_vec(digest, values);
     let proof = tree.gen_proof(vec![5]);
     let serialized = serde_json::to_string(&proof).expect("serialize proof");
-    assert_eq!(proof, serde_json::from_str(&serialized).expect("deserialize proof"));
+    assert_eq!(
+        proof,
+        serde_json::from_str(&serialized).expect("deserialize proof")
+    );
 }

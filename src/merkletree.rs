@@ -1,13 +1,12 @@
-
-use std::hash::{Hash, Hasher};
 use std::cmp::Ordering;
+use std::hash::{Hash, Hasher};
 
 use ring::digest::Algorithm;
 
-use tree::{Tree, LeavesIterator, LeavesIntoIterator};
-use hashutils::{Hashable, HashUtils};
+use hashutils::{HashUtils, Hashable};
+use tree::{LeavesIntoIterator, LeavesIterator, Tree};
 
-use proof::{Proof, Lemma};
+use proof::{Lemma, Proof};
 
 /// A Merkle tree is a binary tree, with values of type `T` at the leafs,
 /// and where every internal node holds the hash of the concatenation of the hashes of its children nodes.
@@ -29,8 +28,8 @@ pub struct MerkleTree<T> {
 impl<T: PartialEq> PartialEq for MerkleTree<T> {
     #[allow(trivial_casts)]
     fn eq(&self, other: &MerkleTree<T>) -> bool {
-        self.root == other.root && self.height == other.height && self.count == other.count &&
-            (self.algorithm as *const Algorithm) == (other.algorithm as *const Algorithm)
+        self.root == other.root && self.height == other.height && self.count == other.count
+            && (self.algorithm as *const Algorithm) == (other.algorithm as *const Algorithm)
     }
 }
 
@@ -48,10 +47,7 @@ impl<T: Ord> Ord for MerkleTree<T> {
         self.height
             .cmp(&other.height)
             .then(self.count.cmp(&other.count))
-            .then((self.algorithm as *const Algorithm).cmp(
-                &(other.algorithm as
-                      *const Algorithm),
-            ))
+            .then((self.algorithm as *const Algorithm).cmp(&(other.algorithm as *const Algorithm)))
             .then_with(|| self.root.cmp(&other.root))
     }
 }
@@ -73,7 +69,6 @@ impl<T> MerkleTree<T> {
     where
         T: Hashable,
     {
-
         if values.is_empty() {
             return MerkleTree {
                 algorithm: algorithm,
@@ -156,13 +151,11 @@ impl<T> MerkleTree<T> {
     where
         T: Hashable,
     {
-
         let root_hash = self.root_hash().clone();
         let leaf_hash = self.algorithm.hash_leaf(&value);
 
-        Lemma::new(&self.root, leaf_hash.as_ref()).map(|lemma| {
-            Proof::new(self.algorithm, root_hash, lemma, value)
-        })
+        Lemma::new(&self.root, leaf_hash.as_ref())
+            .map(|lemma| Proof::new(self.algorithm, root_hash, lemma, value))
     }
 
     /// Creates an `Iterator` over the values contained in this Merkle tree.

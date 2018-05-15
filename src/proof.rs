@@ -1,11 +1,10 @@
-
-use std::hash::{Hash, Hasher};
 use std::cmp::Ordering;
+use std::hash::{Hash, Hasher};
 
 use ring::digest::Algorithm;
 
-use tree::Tree;
 use hashutils::HashUtils;
+use tree::Tree;
 
 /// An inclusion proof represent the fact that a `value` is a member
 /// of a `MerkleTree` with root hash `root_hash`, and hash function `algorithm`.
@@ -29,11 +28,13 @@ pub struct Proof<T> {
 #[cfg(feature = "serialization-serde")]
 mod algorithm_serde {
     use ring::digest::{self, Algorithm};
-    use serde::{Deserialize, Deserializer, Serialize, Serializer};
     use serde::de::Error;
+    use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-    pub fn serialize<S: Serializer>(algorithm: &&'static Algorithm, se: S)
-        -> Result<S::Ok, S::Error> {
+    pub fn serialize<S: Serializer>(
+        algorithm: &&'static Algorithm,
+        se: S,
+    ) -> Result<S::Ok, S::Error> {
         // The `Debug` implementation of `Algorithm` prints its ID.
         format!("{:?}", algorithm).serialize(se)
     }
@@ -104,31 +105,26 @@ impl<T> Proof<T> {
 
     fn validate_lemma(&self, lemma: &Lemma) -> bool {
         match lemma.sub_lemma {
-
             None => lemma.sibling_hash.is_none(),
 
-            Some(ref sub) => {
-                match lemma.sibling_hash {
-                    None => false,
+            Some(ref sub) => match lemma.sibling_hash {
+                None => false,
 
-                    Some(Positioned::Left(ref hash)) => {
-                        let combined = self.algorithm.hash_nodes(hash, &sub.node_hash);
-                        let hashes_match = combined.as_ref() == lemma.node_hash.as_slice();
-                        hashes_match && self.validate_lemma(sub)
-                    }
-
-                    Some(Positioned::Right(ref hash)) => {
-                        let combined = self.algorithm.hash_nodes(&sub.node_hash, hash);
-                        let hashes_match = combined.as_ref() == lemma.node_hash.as_slice();
-                        hashes_match && self.validate_lemma(sub)
-                    }
-
+                Some(Positioned::Left(ref hash)) => {
+                    let combined = self.algorithm.hash_nodes(hash, &sub.node_hash);
+                    let hashes_match = combined.as_ref() == lemma.node_hash.as_slice();
+                    hashes_match && self.validate_lemma(sub)
                 }
-            }
+
+                Some(Positioned::Right(ref hash)) => {
+                    let combined = self.algorithm.hash_nodes(&sub.node_hash, hash);
+                    let hashes_match = combined.as_ref() == lemma.node_hash.as_slice();
+                    hashes_match && self.validate_lemma(sub)
+                }
+            },
         }
     }
 }
-
 
 /// A `Lemma` holds the hash of a node, the hash of its sibling node,
 /// and a sub lemma, whose `node_hash`, when combined with this `sibling_hash`
@@ -189,12 +185,10 @@ impl Lemma {
                     (lemma, sub_lemma)
                 })
             })
-            .map(|(sub_lemma, sibling_hash)| {
-                Lemma {
-                    node_hash: hash.into(),
-                    sibling_hash: sibling_hash,
-                    sub_lemma: Some(Box::new(sub_lemma)),
-                }
+            .map(|(sub_lemma, sibling_hash)| Lemma {
+                node_hash: hash.into(),
+                sibling_hash: sibling_hash,
+                sub_lemma: Some(Box::new(sub_lemma)),
             })
     }
 }

@@ -1,5 +1,4 @@
-
-use ring::digest::{Algorithm, Context, Digest, digest};
+use ring::digest::{digest, Algorithm, Context, Digest};
 
 /// The type of values stored in a `MerkleTree` must implement
 /// this trait, in order for them to be able to be fed

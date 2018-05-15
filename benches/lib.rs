@@ -1,15 +1,14 @@
-
 #![feature(test)]
 #![feature(rand)]
 
-extern crate test;
 extern crate rand;
+extern crate test;
 
 extern crate merkle;
 extern crate ring;
 
-use test::Bencher;
 use rand::Rng;
+use test::Bencher;
 
 use ring::digest::{Algorithm, SHA512};
 
@@ -30,9 +29,11 @@ fn bench_small_str_proof_gen(b: &mut Bencher) {
     let values = vec!["one", "two", "three", "four"];
     let tree = MerkleTree::from_vec(digest, values.clone());
 
-    b.iter(|| for value in &values {
-        let proof = tree.gen_proof(value);
-        test::black_box(proof);
+    b.iter(|| {
+        for value in &values {
+            let proof = tree.gen_proof(value);
+            test::black_box(proof);
+        }
     });
 }
 
@@ -45,8 +46,10 @@ fn bench_small_str_proof_check(b: &mut Bencher) {
         .map(|v| tree.gen_proof(v).unwrap())
         .collect::<Vec<_>>();
 
-    b.iter(|| for proof in &proofs {
-        test::black_box(proof.validate(tree.root_hash()));
+    b.iter(|| {
+        for proof in &proofs {
+            test::black_box(proof.validate(tree.root_hash()));
+        }
     });
 }
 
@@ -76,9 +79,11 @@ fn bench_big_rnd_proof_gen(b: &mut Bencher) {
 
     let tree = MerkleTree::from_vec(digest, values.clone());
 
-    b.iter(|| for value in &values {
-        let proof = tree.gen_proof(value.clone());
-        test::black_box(proof);
+    b.iter(|| {
+        for value in &values {
+            let proof = tree.gen_proof(value.clone());
+            test::black_box(proof);
+        }
     });
 }
 
@@ -97,8 +102,10 @@ fn bench_big_rnd_proof_check(b: &mut Bencher) {
         .map(|v| tree.gen_proof(v).unwrap())
         .collect::<Vec<_>>();
 
-    b.iter(|| for proof in &proofs {
-        test::black_box(proof.validate(tree.root_hash()));
+    b.iter(|| {
+        for proof in &proofs {
+            test::black_box(proof.validate(tree.root_hash()));
+        }
     });
 }
 
@@ -113,7 +120,9 @@ fn bench_big_rnd_iter(b: &mut Bencher) {
 
     let tree = MerkleTree::from_vec(digest, values.clone());
 
-    b.iter(|| for value in &tree {
-        test::black_box(value);
+    b.iter(|| {
+        for value in &tree {
+            test::black_box(value);
+        }
     });
 }

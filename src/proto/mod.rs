@@ -1,10 +1,9 @@
-
 mod proof;
 
 use ring::digest::Algorithm;
 
-use proof::{Proof, Lemma, Positioned};
-pub use self::proof::{ProofProto, LemmaProto};
+pub use self::proof::{LemmaProto, ProofProto};
+use proof::{Lemma, Positioned, Proof};
 
 use protobuf::Message;
 use protobuf::error::ProtobufResult;
@@ -16,7 +15,6 @@ impl<T> Proof<T> {
     where
         T: From<Vec<u8>>,
     {
-
         proto.into_proof(algorithm)
     }
 
@@ -25,7 +23,6 @@ impl<T> Proof<T> {
     where
         T: Into<Vec<u8>>,
     {
-
         ProofProto::from_proof(self)
     }
 
@@ -37,7 +34,6 @@ impl<T> Proof<T> {
     where
         T: From<Vec<u8>>,
     {
-
         parse_from_bytes::<ProofProto>(bytes).map(|proto| proto.into_proof(algorithm))
     }
 
@@ -46,7 +42,6 @@ impl<T> Proof<T> {
     where
         T: Into<Vec<u8>>,
     {
-
         self.into_protobuf().write_to_bytes()
     }
 }
@@ -56,7 +51,6 @@ impl ProofProto {
     where
         T: Into<Vec<u8>>,
     {
-
         let mut proto = Self::new();
 
         match proof {
@@ -79,7 +73,6 @@ impl ProofProto {
     where
         T: From<Vec<u8>>,
     {
-
         if self.root_hash.is_empty() || !self.has_lemma() {
             return None;
         }
@@ -143,12 +136,10 @@ impl LemmaProto {
             // If a `sub_lemma` is present is the Protobuf,
             // then we expect it to unserialize to a valid `Lemma`,
             // otherwise we return `None`
-            self.take_sub_lemma().into_lemma().map(|sub_lemma| {
-                Lemma {
-                    node_hash: node_hash,
-                    sibling_hash: sibling_hash,
-                    sub_lemma: Some(Box::new(sub_lemma)),
-                }
+            self.take_sub_lemma().into_lemma().map(|sub_lemma| Lemma {
+                node_hash: node_hash,
+                sibling_hash: sibling_hash,
+                sub_lemma: Some(Box::new(sub_lemma)),
             })
         } else {
             // We might very well not have a sub_lemma,

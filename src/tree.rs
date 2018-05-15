@@ -1,16 +1,20 @@
-
 use ring::digest::{Algorithm, Digest};
 
-use hashutils::{Hashable, HashUtils};
+use hashutils::{HashUtils, Hashable};
 
-pub use proof::{Proof, Lemma, Positioned};
+pub use proof::{Lemma, Positioned, Proof};
 
 /// Binary Tree where leaves hold a stand-alone value.
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Tree<T> {
-    Empty { hash: Vec<u8> },
+    Empty {
+        hash: Vec<u8>,
+    },
 
-    Leaf { hash: Vec<u8>, value: T },
+    Leaf {
+        hash: Vec<u8>,
+        value: T,
+    },
 
     Node {
         hash: Vec<u8>,
@@ -22,7 +26,9 @@ pub enum Tree<T> {
 impl<T> Tree<T> {
     /// Create an empty tree
     pub fn empty(hash: Digest) -> Self {
-        Tree::Empty { hash: hash.as_ref().into() }
+        Tree::Empty {
+            hash: hash.as_ref().into(),
+        }
     }
 
     /// Create a new tree
@@ -38,7 +44,6 @@ impl<T> Tree<T> {
     where
         T: Hashable,
     {
-
         let hash = algo.hash_leaf(&value);
         Tree::new(hash, value)
     }

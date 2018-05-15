@@ -1,10 +1,6 @@
-#![deny(
-    missing_docs, unused_qualifications,
-    missing_debug_implementations, missing_copy_implementations,
-    trivial_casts, trivial_numeric_casts,
-    unsafe_code, unstable_features,
-    unused_import_braces
-)]
+#![deny(missing_docs, unused_qualifications, missing_debug_implementations,
+        missing_copy_implementations, trivial_casts, trivial_numeric_casts, unsafe_code,
+        unstable_features, unused_import_braces)]
 
 //! *merkle* implements a Merkle Tree in Rust.
 
@@ -29,7 +25,7 @@ mod hashutils;
 pub use hashutils::Hashable;
 
 mod tree;
-pub use tree::{LeavesIterator, LeavesIntoIterator};
+pub use tree::{LeavesIntoIterator, LeavesIterator};
 
 #[cfg(feature = "serialization-protobuf")]
 #[allow(unused_qualifications)]
