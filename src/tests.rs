@@ -1,5 +1,8 @@
 #![cfg(test)]
 
+#[cfg(feature = "serialization-serde")]
+extern crate serde_json;
+
 use ring::digest::{Algorithm, Context, SHA512};
 
 use hashutils::{HashUtils, Hashable};
@@ -275,12 +278,12 @@ fn test_custom_hashable_impl() {
 #[cfg(feature = "serialization-serde")]
 #[test]
 fn test_serialize_proof_with_serde() {
-    extern crate serde_json;
-
     let values = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
     let tree = MerkleTree::from_vec(digest, values);
     let proof = tree.gen_proof(vec![5]);
+
     let serialized = serde_json::to_string(&proof).expect("serialize proof");
+
     assert_eq!(
         proof,
         serde_json::from_str(&serialized).expect("deserialize proof")
