@@ -1,9 +1,14 @@
 
 # Changelog
 
-## [Unreleased](https://github.com/SpinResearch/merkle.rs/compare/1.4.1...master)
+## [Unreleased](https://github.com/SpinResearch/merkle.rs/compare/1.6.0...master)
 
 > Nothing yet.
+
+## [1.6.0](https://github.com/SpinResearch/merkle.rs/compare/1.5.0...1.6.0) - 2018-05-15
+
+### Changed
+- Update to support rust-protobuf v1.6.0 ([@nvesely](https://github.com/nvesely))
 
 ## [1.5.0](https://github.com/SpinResearch/merkle.rs/compare/1.4.1...1.5.0) - 2017-09-24
 
