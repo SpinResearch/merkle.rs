@@ -20,9 +20,15 @@ categories    = ["data-structures", "cryptography"]
 [dependencies]
 ring = "^0.12.0"
 protobuf = { version = "^1.6.0", optional = true }
+serde = { version = "^1.0.55", optional = true }
+serde_derive = { version = "^1.0.55", optional = true }
+
+[dev-dependencies]
+serde_json = "1.0.17"
 
 [features]
 serialization-protobuf = [ "protobuf" ]
+serialization-serde = [ "serde", "serde_derive" ]
 
 [package.metadata.release]
 sign-commit = true

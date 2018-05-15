@@ -3,6 +3,8 @@
 
 ## [Unreleased](https://github.com/SpinResearch/merkle.rs/compare/1.6.0...master)
 
+- Support serde with the feature flag `serialization-serde`.
+
 > Nothing yet.
 
 ## [1.6.0](https://github.com/SpinResearch/merkle.rs/compare/1.5.0...1.6.0) - 2018-05-15
