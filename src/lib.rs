@@ -13,6 +13,12 @@ extern crate ring;
 #[cfg(feature = "serialization-protobuf")]
 extern crate protobuf;
 
+#[cfg(feature = "serialization-serde")]
+extern crate serde;
+#[cfg(feature = "serialization-serde")]
+#[macro_use]
+extern crate serde_derive;
+
 mod merkletree;
 pub use merkletree::MerkleTree;
 

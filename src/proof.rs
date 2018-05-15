@@ -9,9 +9,11 @@ use hashutils::HashUtils;
 
 /// An inclusion proof represent the fact that a `value` is a member
 /// of a `MerkleTree` with root hash `root_hash`, and hash function `algorithm`.
+#[cfg_attr(feature = "serialization-serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Debug)]
 pub struct Proof<T> {
     /// The hashing algorithm used in the original `MerkleTree`
+    #[cfg_attr(feature = "serialization-serde", serde(with = "algorithm_serde"))]
     pub algorithm: &'static Algorithm,
 
     /// The hash of the root of the original `MerkleTree`
@@ -22,6 +24,30 @@ pub struct Proof<T> {
 
     /// The value concerned by this `Proof`
     pub value: T,
+}
+
+#[cfg(feature = "serialization-serde")]
+mod algorithm_serde {
+    use ring::digest::{self, Algorithm};
+    use serde::{Deserialize, Deserializer, Serialize, Serializer};
+    use serde::de::Error;
+
+    pub fn serialize<S: Serializer>(algorithm: &&'static Algorithm, se: S)
+        -> Result<S::Ok, S::Error> {
+        // The `Debug` implementation of `Algorithm` prints its ID.
+        format!("{:?}", algorithm).serialize(se)
+    }
+
+    pub fn deserialize<'de, D: Deserializer<'de>>(de: D) -> Result<&'static Algorithm, D::Error> {
+        match Deserialize::deserialize(de)? {
+            "SHA1" => Ok(&digest::SHA1),
+            "SHA256" => Ok(&digest::SHA256),
+            "SHA384" => Ok(&digest::SHA384),
+            "SHA512" => Ok(&digest::SHA512),
+            "SHA512_256" => Ok(&digest::SHA512_256),
+            _ => Err(D::Error::custom("unknown hash algorithm")),
+        }
+    }
 }
 
 impl<T: PartialEq> PartialEq for Proof<T> {
@@ -107,6 +133,7 @@ impl<T> Proof<T> {
 /// A `Lemma` holds the hash of a node, the hash of its sibling node,
 /// and a sub lemma, whose `node_hash`, when combined with this `sibling_hash`
 /// must be equal to this `node_hash`.
+#[cfg_attr(feature = "serialization-serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Lemma {
     pub node_hash: Vec<u8>,
@@ -173,6 +200,7 @@ impl Lemma {
 }
 
 /// Tags a value so that we know from which branch of a `Tree` (if any) it was found.
+#[cfg_attr(feature = "serialization-serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Positioned<T> {
     /// The value was found in the left branch
