@@ -137,8 +137,8 @@ impl LemmaProto {
             // then we expect it to unserialize to a valid `Lemma`,
             // otherwise we return `None`
             self.take_sub_lemma().into_lemma().map(|sub_lemma| Lemma {
-                node_hash: node_hash,
-                sibling_hash: sibling_hash,
+                node_hash,
+                sibling_hash,
                 sub_lemma: Some(Box::new(sub_lemma)),
             })
         } else {
@@ -146,8 +146,8 @@ impl LemmaProto {
             // in which case we just set it to `None`,
             // but still return a potentially valid `Lemma`.
             Some(Lemma {
-                node_hash: node_hash,
-                sibling_hash: sibling_hash,
+                node_hash,
+                sibling_hash,
                 sub_lemma: None,
             })
         }
