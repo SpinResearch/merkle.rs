@@ -47,7 +47,7 @@ matrix:
       before_script:
         - cargo install clippy --version $CLIPPY_VERSION || echo "clippy already installed"
       script:
-        - cargo clippy -- -D clippy
+        - cargo clippy --all -- -D clippy
 
 env:
   global:
