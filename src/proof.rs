@@ -32,7 +32,7 @@ mod algorithm_serde {
     use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
     pub fn serialize<S: Serializer>(
-        algorithm: &&'static Algorithm,
+        algorithm: &'static Algorithm,
         se: S,
     ) -> Result<S::Ok, S::Error> {
         // The `Debug` implementation of `Algorithm` prints its ID.
@@ -47,6 +47,50 @@ mod algorithm_serde {
             "SHA512" => Ok(&digest::SHA512),
             "SHA512_256" => Ok(&digest::SHA512_256),
             _ => Err(D::Error::custom("unknown hash algorithm")),
+        }
+    }
+
+    mod test {
+        use super::*;
+        use ring::digest::{
+            SHA1 as sha1, SHA256 as sha256, SHA384 as sha384, SHA512 as sha512,
+            SHA512_256 as sha512_256,
+        };
+
+        static SHA1: &Algorithm = &sha1;
+        static SHA256: &Algorithm = &sha256;
+        static SHA384: &Algorithm = &sha384;
+        static SHA512: &Algorithm = &sha512;
+        static SHA512_256: &Algorithm = &sha512_256;
+
+        #[test]
+        fn test_serialize_known_algorithms() {
+            extern crate serde_json;
+
+            for alg in [SHA1, SHA256, SHA384, SHA512, SHA512_256].iter() {
+                let mut serializer = serde_json::Serializer::with_formatter(
+                    vec![],
+                    serde_json::ser::PrettyFormatter::new(),
+                );
+
+                let _ = serialize(alg, &mut serializer).expect(&format!("{:?}", alg));
+                let alg_ = deserialize(&mut serde_json::Deserializer::from_slice(
+                    &serializer.into_inner()[..],
+                )).expect(&format!("{:?}", alg));
+
+                assert_eq!(*alg, alg_);
+            }
+        }
+
+        #[test]
+        #[should_panic(expected = "unknown hash algorithm")]
+        fn test_serialize_unknown_algorithm() {
+            extern crate serde_json;
+            {
+                let alg_str = "\"BLAKE2b\"";
+                let mut deserializer = serde_json::Deserializer::from_str(alg_str);
+                let _ = deserialize(&mut deserializer).expect(&format!("{:?}", alg_str));
+            }
         }
     }
 }
