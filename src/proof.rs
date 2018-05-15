@@ -84,12 +84,12 @@ impl<T: Hash> Hash for Proof<T> {
 
 impl<T> Proof<T> {
     /// Constructs a new `Proof`
-    pub fn new(algo: &'static Algorithm, root_hash: Vec<u8>, lemma: Lemma, value: T) -> Self {
+    pub fn new(algorithm: &'static Algorithm, root_hash: Vec<u8>, lemma: Lemma, value: T) -> Self {
         Proof {
-            algorithm: algo,
-            root_hash: root_hash,
-            lemma: lemma,
-            value: value,
+            algorithm,
+            root_hash,
+            lemma,
+            value,
         }
     }
 
@@ -187,7 +187,7 @@ impl Lemma {
             })
             .map(|(sub_lemma, sibling_hash)| Lemma {
                 node_hash: hash.into(),
-                sibling_hash: sibling_hash,
+                sibling_hash,
                 sub_lemma: Some(Box::new(sub_lemma)),
             })
     }

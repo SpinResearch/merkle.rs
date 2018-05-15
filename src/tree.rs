@@ -35,7 +35,7 @@ impl<T> Tree<T> {
     pub fn new(hash: Digest, value: T) -> Self {
         Tree::Leaf {
             hash: hash.as_ref().into(),
-            value: value,
+            value,
         }
     }
 

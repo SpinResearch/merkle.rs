@@ -71,7 +71,7 @@ impl<T> MerkleTree<T> {
     {
         if values.is_empty() {
             return MerkleTree {
-                algorithm: algorithm,
+                algorithm,
                 root: Tree::empty(algorithm.hash_empty()),
                 height: 0,
                 count: 0,
@@ -118,10 +118,10 @@ impl<T> MerkleTree<T> {
         let root = cur.remove(0);
 
         MerkleTree {
-            algorithm: algorithm,
-            root: root,
-            height: height,
-            count: count,
+            algorithm,
+            root,
+            height,
+            count,
         }
     }
 
