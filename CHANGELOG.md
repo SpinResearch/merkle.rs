@@ -1,16 +1,19 @@
 
 # Changelog
 
-## [Unreleased](https://github.com/SpinResearch/merkle.rs/compare/1.6.0...master)
-
-- Support serde with the feature flag `serialization-serde`.
+## [Unreleased](https://github.com/SpinResearch/merkle.rs/compare/1.7.0...master)
 
 > Nothing yet.
+
+## [1.7.0](https://github.com/SpinResearch/merkle.rs/compare/1.6.0...1.7.0) - 2018-05-15
+
+## Added
+- Add optional `serde` support with the feature flag `serialization-serde`. ([@afck](https://github.com/afck))
 
 ## [1.6.0](https://github.com/SpinResearch/merkle.rs/compare/1.5.0...1.6.0) - 2018-05-15
 
 ### Changed
-- Update to support rust-protobuf v1.6.0 ([@nvesely](https://github.com/nvesely))
+- Update to support rust-protobuf v1.6.0. ([@nvesely](https://github.com/nvesely))
 
 ## [1.5.0](https://github.com/SpinResearch/merkle.rs/compare/1.4.1...1.5.0) - 2017-09-24
 
