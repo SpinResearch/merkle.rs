@@ -21,24 +21,6 @@ matrix:
         - rustup component add rustfmt-preview
       script:
         - cargo fmt --all -- --write-mode=diff
-    - env: NAME='kcov'
-      sudo: required # travis-ci/travis-ci#9061
-      before_script:
-        - cargo install cargo-update || echo "cargo-update already installed"
-        - cargo install cargo-kcov || echo "cargo-kcov already installed"
-        - cargo install-update -a
-      script:
-        - cargo kcov --print-install-kcov-sh | sh
-        - cargo update # Creates `Cargo.lock` needed by next command
-        - cargo kcov --verbose --features dss --coveralls -- --verify --exclude-pattern=/.cargo,/usr/lib,src/proto
-      addons:
-        apt:
-          packages:
-            - libcurl4-openssl-dev
-            - libdw-dev
-            - binutils-dev
-            - libiberty-dev
-            - zlib1g-dev 
     - env:
         - NAME='clippy'
         # use env so updating versions causes cache invalidation
@@ -48,7 +30,24 @@ matrix:
         - cargo install clippy --version $CLIPPY_VERSION || echo "clippy already installed"
       script:
         - cargo clippy --all -- -D clippy
-
+    - env: NAME='kcov'
+      sudo: required # travis-ci/travis-ci#9061
+      before_script:
+        - cargo install cargo-update || echo "cargo-update already installed"
+        - cargo install cargo-kcov || echo "cargo-kcov already installed"
+        - cargo install-update -a
+      script:
+        - cargo kcov --print-install-kcov-sh | sh
+        - cargo update # Creates `Cargo.lock` needed by next command
+        - cargo kcov --verbose --features 'serialization-serde serialization-protobuf' --coveralls -- --verify --exclude-pattern=/.cargo,/usr/lib,src/proto
+      addons:
+        apt:
+          packages:
+            - libcurl4-openssl-dev
+            - libdw-dev
+            - binutils-dev
+            - libiberty-dev
+            - zlib1g-dev
 env:
   global:
   - RUSTFLAGS="-C link-dead-code"
