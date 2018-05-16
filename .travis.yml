@@ -30,9 +30,7 @@ matrix:
         - cargo install clippy --version $CLIPPY_VERSION || echo "clippy already installed"
       script:
         - cargo clippy --all -- -D clippy
-    - env:
-        - NAME='kcov'
-        - FEATURES='serialization-serde serialization-protobuf'
+    - env: NAME='kcov'
       sudo: required # travis-ci/travis-ci#9061
       before_script:
         - cargo install cargo-update || echo "cargo-update already installed"
@@ -41,7 +39,7 @@ matrix:
       script:
         - cargo kcov --print-install-kcov-sh | sh
         - cargo update # Creates `Cargo.lock` needed by next command
-        - cargo kcov --verbose --features '$FEATURES' --coveralls -- --verify --exclude-pattern=/.cargo,/usr/lib,src/proto
+        - cargo kcov --verbose --features 'serialization-serde serialization-protobuf' --coveralls -- --verify --exclude-pattern=/.cargo,/usr/lib,src/proto
       addons:
         apt:
           packages:
