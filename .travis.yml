@@ -21,7 +21,17 @@ matrix:
         - rustup component add rustfmt-preview
       script:
         - cargo fmt --all -- --write-mode=diff
-    - env: NAME='kcov'
+    - env:
+        - NAME='clippy'
+        # use env so updating versions causes cache invalidation
+        - CLIPPY_VERSION=0.0.200
+      rust: nightly-2018-05-14
+      before_script:
+        - cargo install clippy --version $CLIPPY_VERSION || echo "clippy already installed"
+      script:
+        - cargo clippy --all -- -D clippy
+    - env:
+        - NAME='kcov'
       sudo: required # travis-ci/travis-ci#9061
       before_script:
         - cargo install cargo-update || echo "cargo-update already installed"
@@ -38,17 +48,7 @@ matrix:
             - libdw-dev
             - binutils-dev
             - libiberty-dev
-            - zlib1g-dev 
-    - env:
-        - NAME='clippy'
-        # use env so updating versions causes cache invalidation
-        - CLIPPY_VERSION=0.0.200
-      rust: nightly-2018-05-14
-      before_script:
-        - cargo install clippy --version $CLIPPY_VERSION || echo "clippy already installed"
-      script:
-        - cargo clippy --all -- -D clippy
-
+            - zlib1g-dev
 env:
   global:
   - RUSTFLAGS="-C link-dead-code"
