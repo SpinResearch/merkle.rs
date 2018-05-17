@@ -160,6 +160,22 @@ impl<T> MerkleTree<T> {
             .map(|lemma| Proof::new(self.algorithm, root_hash, lemma, value))
     }
 
+    /// Generate an inclusion proof for the `n`-th leaf value.
+    pub fn gen_nth_proof(&self, n: usize) -> Option<Proof<T>>
+    where
+        T: Hashable + Clone
+    {
+        let root_hash = self.root_hash().clone();
+        let value = if let Some(value) = self.root.nth_leaf(n, self.count) {
+            value
+        } else {
+            return None;
+        };
+
+        Lemma::new_by_index(&self.root, n, self.count)
+            .map(|lemma| Proof::new(self.algorithm, root_hash, lemma, value.clone()))
+    }
+
     /// Creates an `Iterator` over the values contained in this Merkle tree.
     pub fn iter(&self) -> LeavesIterator<T> {
         self.root.iter()
