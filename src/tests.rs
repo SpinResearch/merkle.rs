@@ -153,7 +153,7 @@ fn test_wrong_proof() {
 #[test]
 fn test_nth_proof() {
     // Calculation depends on the total count. Try a few numbers: odd, even, powers of two...
-    for &count in [1, 2, 3, 10, 15, 16, 17, 22].iter() {
+    for &count in &[1, 2, 3, 10, 15, 16, 17, 22] {
         let values = (1..(count + 1)).map(|x| vec![x as u8]).collect::<Vec<_>>();
         let tree = MerkleTree::from_vec(digest, values.clone());
         let root_hash = tree.root_hash();
@@ -206,7 +206,7 @@ fn test_tree_iter() {
 fn test_tree_into_iter() {
     let values = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
     let tree = MerkleTree::from_vec(digest, values.clone());
-    let iter = tree.iter().cloned().collect::<Vec<_>>();
+    let iter = tree.into_iter().collect::<Vec<_>>();
 
     assert_eq!(values, iter);
 }

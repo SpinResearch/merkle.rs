@@ -57,6 +57,7 @@ mod algorithm_serde {
         }
     }
 
+    #[cfg(test)]
     mod test {
         use super::*;
         use ring::digest::{
@@ -74,13 +75,13 @@ mod algorithm_serde {
         fn test_serialize_known_algorithms() {
             extern crate serde_json;
 
-            for alg in [SHA1, SHA256, SHA384, SHA512, SHA512_256].iter() {
+            for alg in &[SHA1, SHA256, SHA384, SHA512, SHA512_256] {
                 let mut serializer = serde_json::Serializer::with_formatter(
                     vec![],
                     serde_json::ser::PrettyFormatter::new(),
                 );
 
-                let _ = serialize(alg, &mut serializer).expect(&format!("{:?}", alg));
+                serialize(alg, &mut serializer).expect(&format!("{:?}", alg));
                 let alg_ = deserialize(&mut serde_json::Deserializer::from_slice(
                     &serializer.into_inner()[..],
                 )).expect(&format!("{:?}", alg));

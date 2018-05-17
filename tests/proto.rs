@@ -39,8 +39,8 @@ pub struct PublicKey {
 impl PublicKey {
     pub fn new(zero_values: Vec<u8>, one_values: Vec<u8>) -> Self {
         PublicKey {
-            zero_values: zero_values,
-            one_values: one_values,
+            zero_values,
+            one_values,
         }
     }
 

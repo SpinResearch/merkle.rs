@@ -77,7 +77,11 @@ impl<T> Tree<T> {
                     None
                 }
             }
-            Tree::Node { ref left, ref right, .. } => {
+            Tree::Node {
+                ref left,
+                ref right,
+                ..
+            } => {
                 if n < left_count {
                     left.nth_leaf(n, left_count)
                 } else {

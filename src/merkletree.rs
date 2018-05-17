@@ -163,7 +163,7 @@ impl<T> MerkleTree<T> {
     /// Generate an inclusion proof for the `n`-th leaf value.
     pub fn gen_nth_proof(&self, n: usize) -> Option<Proof<T>>
     where
-        T: Hashable + Clone
+        T: Hashable + Clone,
     {
         let root_hash = self.root_hash().clone();
         let value = if let Some(value) = self.root.nth_leaf(n, self.count) {
