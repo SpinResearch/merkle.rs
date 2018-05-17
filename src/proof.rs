@@ -153,6 +153,11 @@ impl<T> Proof<T> {
 
         self.lemma.validate(self.algorithm)
     }
+
+    /// Returns the index of this proof's value, given the total number of items in the tree.
+    pub fn index(&self, count: usize) -> usize {
+        self.lemma.index(count)
+    }
 }
 
 /// A `Lemma` holds the hash of a node, the hash of its sibling node,
@@ -170,7 +175,8 @@ pub struct Lemma {
 }
 
 impl Lemma {
-    /// Attempts to generate a proof that the a value with hash `needle` is a member of the given `tree`.
+    /// Attempts to generate a proof that the a value with hash `needle` is a
+    /// member of the given `tree`.
     pub fn new<T>(tree: &Tree<T>, needle: &[u8]) -> Option<Lemma> {
         match *tree {
             Tree::Empty { .. } => None,
@@ -182,6 +188,47 @@ impl Lemma {
                 ref left,
                 ref right,
             } => Lemma::new_tree_proof(hash, needle, left, right),
+        }
+    }
+
+    /// Attempts to generate a proof that the `idx`-th leaf is a member of
+    /// the given tree. The `count` must equal the number of leaves in the
+    /// `tree`. If `idx >= count`, `None` is returned.
+    pub fn new_by_index<T>(tree: &Tree<T>, idx: usize, count: usize) -> Option<Lemma> {
+        if idx >= count {
+            return None;
+        }
+        match *tree {
+            Tree::Empty { .. } => None,
+
+            Tree::Leaf { ref hash, .. } => {
+                if count != 1 {
+                    return None;
+                }
+                Some(Lemma {
+                    node_hash: hash.clone(),
+                    sibling_hash: None,
+                    sub_lemma: None,
+                })
+            }
+
+            Tree::Node {
+                ref hash,
+                ref left,
+                ref right,
+            } => Lemma::new_tree_proof_by_index(hash, idx, count, left, right),
+        }
+    }
+
+    /// Returns the index of this lemma's value, given the total number of items in the tree.
+    pub fn index(&self, count: usize) -> usize {
+        let left_count = count.next_power_of_two() / 2;
+        match (self.sub_lemma.as_ref(), self.sibling_hash.as_ref()) {
+            (None, Some(&Positioned::Right(_))) | (None, None) => 0,
+            (None, Some(&Positioned::Left(_))) => 1,
+            (Some(l), None) => l.index(count),
+            (Some(l), Some(&Positioned::Left(_))) => left_count + l.index(count - left_count),
+            (Some(l), Some(&Positioned::Right(_))) => l.index(left_count),
         }
     }
 
@@ -244,6 +291,35 @@ impl Lemma {
                 }
             },
         }
+    }
+
+    fn new_tree_proof_by_index<T>(
+        hash: &[u8],
+        idx: usize,
+        count: usize,
+        left: &Tree<T>,
+        right: &Tree<T>,
+    ) -> Option<Lemma> {
+        let left_count = count.next_power_of_two() / 2;
+        Lemma::new_by_index(left, idx, left_count)
+            .map(|lemma| {
+                let right_hash = right.hash().clone();
+                let sub_lemma = Some(Positioned::Right(right_hash));
+                (lemma, sub_lemma)
+            })
+            .or_else(|| {
+                let sub_lemma = Lemma::new_by_index(right, idx - left_count, count - left_count);
+                sub_lemma.map(|lemma| {
+                    let left_hash = left.hash().clone();
+                    let sub_lemma = Some(Positioned::Left(left_hash));
+                    (lemma, sub_lemma)
+                })
+            })
+            .map(|(sub_lemma, sibling_hash)| Lemma {
+                node_hash: hash.into(),
+                sibling_hash,
+                sub_lemma: Some(Box::new(sub_lemma)),
+            })
     }
 }
 
