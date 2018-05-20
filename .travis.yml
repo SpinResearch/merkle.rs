@@ -1,5 +1,9 @@
 language: rust
-cache: cargo # https://docs.travis-ci.com/user/caching/#Rust-Cargo-cache
+cache:
+  directories:
+    - $HOME/protobuf
+    - $HOME/.cargo
+    - $TRAVIS_BUILD_DIR/target
 
 rust:
   - stable
@@ -20,7 +24,7 @@ matrix:
       before_script:
         - rustup component add rustfmt-preview
       script:
-        - cargo fmt --all -- --write-mode=diff
+        - cargo fmt --all -- --check
     - env: NAME='kcov'
       sudo: required # travis-ci/travis-ci#9061
       before_script:
@@ -57,3 +61,7 @@ script:
   - cargo build --verbose --all-features
   - cargo test --verbose --all-features
   - cargo doc --verbose --all-features --no-deps
+
+before_install:
+  - export PATH=$PATH:$HOME/protobuf/bin
+  - bash install_protobuf.sh
