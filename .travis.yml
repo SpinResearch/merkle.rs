@@ -16,6 +16,7 @@ matrix:
   allow_failures:
     - env: NAME='nightly'
     - env: NAME='kcov'
+    - env: NAME='rustfmt' # temporarily allow rustfmt to fail until it can recognise conditional cfgs properly
   include:
     - env: NAME='nightly'
       rust: nightly
