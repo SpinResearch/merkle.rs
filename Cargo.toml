@@ -24,13 +24,13 @@ serde = { version = "^1.0.55", optional = true }
 serde_derive = { version = "^1.0.55", optional = true }
 
 [build-dependencies]
-protoc-rust = "1.7.1"
+protoc-rust = { version = "1.7.1", optional = true }
 
 [dev-dependencies]
 serde_json = "1.0.17"
 
 [features]
-serialization-protobuf = [ "protobuf" ]
+serialization-protobuf = [ "protobuf", "protoc-rust" ]
 serialization-serde = [ "serde", "serde_derive" ]
 
 [package.metadata.release]
