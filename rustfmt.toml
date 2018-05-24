@@ -1,0 +1,3 @@
+ignore = [
+    "src/proto/proof.rs",
+]
