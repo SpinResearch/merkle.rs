@@ -52,8 +52,10 @@ mod algorithm_serde {
 
     mod test {
         use super::*;
-        use ring::digest::{SHA1 as sha1, SHA256 as sha256, SHA384 as sha384, SHA512 as sha512,
-                           SHA512_256 as sha512_256};
+        use ring::digest::{
+            SHA1 as sha1, SHA256 as sha256, SHA384 as sha384, SHA512 as sha512,
+            SHA512_256 as sha512_256,
+        };
 
         static SHA1: &Algorithm = &sha1;
         static SHA256: &Algorithm = &sha256;
