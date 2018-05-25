@@ -24,6 +24,7 @@ matrix:
       before_script:
         - rustup component add rustfmt-preview
       script:
+        - protoc --rust-out src/proto/ protobuf/proof.proto
         - cargo fmt --all -- --check
     - env: NAME='kcov'
       sudo: required # travis-ci/travis-ci#9061
