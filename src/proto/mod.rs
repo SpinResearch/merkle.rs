@@ -1,8 +1,4 @@
-cfg_if! {
-    if #[cfg(not(rustfmt))] {
-        mod proof;
-    }
-}
+mod proof;
 
 use ring::digest::Algorithm;
 
