@@ -19,12 +19,21 @@ matrix:
   include:
     - env: NAME='nightly'
       rust: nightly
-    - env: NAME='rustfmt'
+    - env:
+        - NAME='rustfmt'
+        - PROTOBUF_CODEGEN_VERSION=2.0.0
+        - PATH=$PATH:$HOME/.cargo/bin
       rust: nightly
       before_script:
         - rustup component add rustfmt-preview
-      script:
+        # Protoc plugin needed to generate proof.rs from proof.proto
+        - cargo install protobuf-codegen --version $PROTOBUF_CODEGEN_VERSION || echo "protobuf-codegen already installed"
+        # TODO: see if we can avoid installing protobuf-codegen and generating
+        # proof.rs in this build by using rustfmt options (see
+        # https://github.com/SpinResearch/merkle.rs/pull/38#issuecomment-391336829,
+        # paragraph 2).
         - protoc --rust_out src/proto/ protobuf/proof.proto
+      script:
         - cargo fmt --all -- --check
     - env: NAME='kcov'
       sudo: required # travis-ci/travis-ci#9061
