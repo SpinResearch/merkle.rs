@@ -19,7 +19,7 @@ categories    = ["data-structures", "cryptography"]
 
 [dependencies]
 ring = "^0.12.0"
-protobuf = { version = "1.7.1", optional = true }
+protobuf = { version = "^2.0.2", optional = true }
 serde = { version = "^1.0.55", optional = true }
 serde_derive = { version = "^1.0.55", optional = true }
 
