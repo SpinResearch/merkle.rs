@@ -61,35 +61,6 @@ impl<T> Tree<T> {
     pub fn iter(&self) -> LeavesIterator<T> {
         LeavesIterator::new(self)
     }
-
-    /// Returns the `n`-th leaf value, given the total `count`.
-    pub fn nth_leaf(&self, n: usize, count: usize) -> Option<&T> {
-        if n >= count {
-            return None;
-        }
-        let left_count = count.next_power_of_two() >> 1;
-        match *self {
-            Tree::Empty { .. } => None,
-            Tree::Leaf { ref value, .. } => {
-                if n == 0 {
-                    Some(value)
-                } else {
-                    None
-                }
-            }
-            Tree::Node {
-                ref left,
-                ref right,
-                ..
-            } => {
-                if n < left_count {
-                    left.nth_leaf(n, left_count)
-                } else {
-                    right.nth_leaf(n - left_count, count - left_count)
-                }
-            }
-        }
-    }
 }
 
 /// An borrowing iterator over the leaves of a `Tree`.
