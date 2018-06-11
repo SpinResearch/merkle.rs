@@ -166,14 +166,8 @@ impl<T> MerkleTree<T> {
         T: Hashable + Clone,
     {
         let root_hash = self.root_hash().clone();
-        let value = if let Some(value) = self.root.nth_leaf(n, self.count) {
-            value
-        } else {
-            return None;
-        };
-
         Lemma::new_by_index(&self.root, n, self.count)
-            .map(|lemma| Proof::new(self.algorithm, root_hash, lemma, value.clone()))
+            .map(|(lemma, value)| Proof::new(self.algorithm, root_hash, lemma, value.clone()))
     }
 
     /// Creates an `Iterator` over the values contained in this Merkle tree.

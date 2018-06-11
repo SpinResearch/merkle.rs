@@ -164,6 +164,9 @@ fn test_nth_proof() {
             assert!(proof.validate(&root_hash));
             assert_eq!(i, proof.index(tree.count()));
         }
+
+        assert!(tree.gen_nth_proof(count).is_none());
+        assert!(tree.gen_nth_proof(count + 1000).is_none());
     }
 }
 
