@@ -144,30 +144,9 @@ impl<T> Proof<T> {
             return false;
         }
 
-        self.validate_lemma(&self.lemma)
+        self.lemma.validate(self.algorithm)
     }
 
-    fn validate_lemma(&self, lemma: &Lemma) -> bool {
-        match lemma.sub_lemma {
-            None => lemma.sibling_hash.is_none(),
-
-            Some(ref sub) => match lemma.sibling_hash {
-                None => false,
-
-                Some(Positioned::Left(ref hash)) => {
-                    let combined = self.algorithm.hash_nodes(hash, &sub.node_hash);
-                    let hashes_match = combined.as_ref() == lemma.node_hash.as_slice();
-                    hashes_match && self.validate_lemma(sub)
-                }
-
-                Some(Positioned::Right(ref hash)) => {
-                    let combined = self.algorithm.hash_nodes(&sub.node_hash, hash);
-                    let hashes_match = combined.as_ref() == lemma.node_hash.as_slice();
-                    hashes_match && self.validate_lemma(sub)
-                }
-            },
-        }
-    }
 }
 
 /// A `Lemma` holds the hash of a node, the hash of its sibling node,
@@ -234,6 +213,28 @@ impl Lemma {
                 sibling_hash,
                 sub_lemma: Some(Box::new(sub_lemma)),
             })
+    }
+
+    fn validate(&self, algorithm: &'static Algorithm) -> bool {
+        match self.sub_lemma {
+            None => self.sibling_hash.is_none(),
+
+            Some(ref sub) => match self.sibling_hash {
+                None => false,
+
+                Some(Positioned::Left(ref hash)) => {
+                    let combined = algorithm.hash_nodes(hash, &sub.node_hash);
+                    let hashes_match = combined.as_ref() == self.node_hash.as_slice();
+                    hashes_match && sub.validate(algorithm)
+                }
+
+                Some(Positioned::Right(ref hash)) => {
+                    let combined = algorithm.hash_nodes(&sub.node_hash, hash);
+                    let hashes_match = combined.as_ref() == self.node_hash.as_slice();
+                    hashes_match && sub.validate(algorithm)
+                }
+            },
+        }
     }
 }
 
