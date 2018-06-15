@@ -156,6 +156,10 @@ impl<T> Proof<T> {
     }
 
     /// Returns the index of this proof's value, given the total number of items in the tree.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the proof is malformed. Call `validate` first.
     pub fn index(&self, count: usize) -> usize {
         self.lemma.index(count)
     }
@@ -246,14 +250,17 @@ impl Lemma {
     }
 
     /// Returns the index of this lemma's value, given the total number of items in the tree.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the lemma is malformed. Call `validate_lemma` first.
     pub fn index(&self, count: usize) -> usize {
         let left_count = count.next_power_of_two() / 2;
         match (self.sub_lemma.as_ref(), self.sibling_hash.as_ref()) {
-            (None, Some(&Positioned::Right(_))) | (None, None) => 0,
-            (None, Some(&Positioned::Left(_))) => 1,
-            (Some(l), None) => l.index(count),
+            (None, None) => 0,
             (Some(l), Some(&Positioned::Left(_))) => left_count + l.index(count - left_count),
             (Some(l), Some(&Positioned::Right(_))) => l.index(left_count),
+            (None, Some(_)) | (Some(_), None) => panic!("malformed lemma"),
         }
     }
 
