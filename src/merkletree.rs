@@ -28,7 +28,9 @@ pub struct MerkleTree<T> {
 impl<T: PartialEq> PartialEq for MerkleTree<T> {
     #[allow(trivial_casts)]
     fn eq(&self, other: &MerkleTree<T>) -> bool {
-        self.root == other.root && self.height == other.height && self.count == other.count
+        self.root == other.root
+            && self.height == other.height
+            && self.count == other.count
             && (self.algorithm as *const Algorithm) == (other.algorithm as *const Algorithm)
     }
 }
