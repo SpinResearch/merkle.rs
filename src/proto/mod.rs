@@ -1,3 +1,4 @@
+#[allow(missing_debug_implementations)]
 mod proof;
 
 use ring::digest::Algorithm;

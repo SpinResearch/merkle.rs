@@ -26,6 +26,7 @@ fn build_protobuf(out_dir: &str, input: &[&str], includes: &[&str]) {
         out_dir,
         input,
         includes,
+        customize: Default::default(),
     }).expect("protoc");
 }
 
