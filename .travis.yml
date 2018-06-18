@@ -22,7 +22,7 @@ matrix:
     - env:
         - NAME='rustfmt'
         - PROTOBUF_CODEGEN_VERSION=2.0.0
-        - PATH=$PATH:$HOME/.cargo/bin
+        - PATH=$PATH:$HOME/.cargo/bin:$HOME/protobuf/bin
       rust: nightly
       before_script:
         - rustup component add rustfmt-preview
@@ -32,6 +32,7 @@ matrix:
         # proof.rs in this build by using rustfmt options (see
         # https://github.com/SpinResearch/merkle.rs/pull/38#issuecomment-391336829,
         # paragraph 2).
+        - protoc --version
         - protoc --rust_out src/proto/ protobuf/proof.proto
       script:
         - cargo fmt --all -- --check
