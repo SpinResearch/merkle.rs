@@ -37,7 +37,9 @@ fn build_protobuf_schemata() {
     let mut version_string = String::new();
     let mut version_pin =
         File::open("PROTOC_VERSION").expect("protoc version pin `PROTOC_VERSION` file is missing");
-    version_pin.read_to_string(&mut version_string).expect("cannot read protoc pin file");
+    version_pin
+        .read_to_string(&mut version_string)
+        .expect("cannot read protoc pin file");
     assert_protobuf_version(version_string);
     build_protobuf("src/proto", &["protobuf/proof.proto"], &[]);
 }
