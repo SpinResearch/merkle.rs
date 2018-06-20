@@ -15,7 +15,8 @@ fn assert_protobuf_version(version: &str) {
     assert!(version_output.status.success());
     assert_eq!(
         String::from_utf8(version_output.stdout).unwrap().trim(),
-        version
+        version.to_string().trim(),
+        "protoc version must be 3.5.1"
     );
 }
 
@@ -32,7 +33,7 @@ fn build_protobuf(out_dir: &str, input: &[&str], includes: &[&str]) {
 
 #[cfg(feature = "serialization-protobuf")]
 fn build_protobuf_schemata() {
-    assert_protobuf_version("libprotoc 3.5.1");
+    assert_protobuf_version(env!("PROTOC_VERSION"));
     build_protobuf("src/proto", &["protobuf/proof.proto"], &[]);
 }
 

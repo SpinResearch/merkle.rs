@@ -75,4 +75,5 @@ script:
 
 before_install:
   - export PATH=$PATH:$HOME/protobuf/bin
+  - export PROTOC_VERSION=$(cat PROTOC_VERSION)
   - bash install_protobuf.sh
