@@ -2,7 +2,6 @@ language: rust
 cache:
   directories:
     - $HOME/protobuf
-    - $HOME/.cargo
     - $TRAVIS_BUILD_DIR/target
 
 rust:
