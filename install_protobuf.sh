@@ -1,19 +1,15 @@
 #!/usr/bin/bash
 set -e
 
+PROTOC_VERSION=$(cat PROTOC_VERSION)
+
 check_protoc_version () {
-    PROTOC_VERSION=$(cat PROTOC_VERSION)
-    PROTOC="protoc"
-    if [ -f $PROTOC ]; then
-        this_version=`$PROTOC --version`
-        return `[ "$PROTOC_VERSION" = "$this_version" ]`
-    else
-        return 1
-    fi
+    this_version=`protoc --version`
+    return `[ "$PROTOC_VERSION" = "$this_version" ]`
 }
 
-if check_protoc_version '3.5.1'; then
-    echo protoc version 3.5.1 detected.
+if check_protoc_version; then
+    echo $PROTOC_VERSION detected.
     exit
 fi
 
