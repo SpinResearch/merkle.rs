@@ -1,6 +1,7 @@
 language: rust
 cache:
   directories:
+    - $HOME/.cargo
     - $HOME/protobuf
     - $TRAVIS_BUILD_DIR/target
 
@@ -68,6 +69,7 @@ env:
   - RUSTFLAGS="-C link-dead-code"
 
 script:
+  - cargo update
   - cargo build --verbose --all-features
   - cargo test --verbose --all-features
   - cargo doc --verbose --all-features --no-deps
