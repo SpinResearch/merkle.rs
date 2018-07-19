@@ -2,7 +2,7 @@
 extern crate protoc_rust;
 
 #[cfg(feature = "serialization-protobuf")]
-fn assert_protobuf_version(version: String) {
+fn has_right_protoc_version(version: &str) -> bool {
     use std::process::{Command, Stdio};
     let protoc = Command::new("protoc")
         .stdin(Stdio::null())
@@ -11,12 +11,11 @@ fn assert_protobuf_version(version: String) {
         .args(&["--version"])
         .spawn()
         .unwrap();
+
     let version_output = protoc.wait_with_output().unwrap();
     assert!(version_output.status.success());
-    assert_eq!(
-        String::from_utf8(version_output.stdout).unwrap().trim(),
-        version.trim()
-    );
+
+    String::from_utf8(version_output.stdout).unwrap().trim() == version.trim()
 }
 
 #[cfg(feature = "serialization-protobuf")]
@@ -40,7 +39,16 @@ fn build_protobuf_schemata() {
     version_pin
         .read_to_string(&mut version_string)
         .expect("cannot read protoc pin file");
-    assert_protobuf_version(version_string);
+
+    if !has_right_protoc_version(&version_string) {
+        eprintln!(
+            "Build failed because merkle.rs could not find: {}",
+            version_string
+        );
+
+        std::process::exit(1);
+    }
+
     build_protobuf("src/proto", &["protobuf/proof.proto"], &[]);
 }
 

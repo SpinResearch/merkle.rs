@@ -1,3 +1,4 @@
 ignore = [
+    "src/proto/mod.rs",
     "src/proto/proof.rs",
 ]

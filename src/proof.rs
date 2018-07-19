@@ -146,7 +146,6 @@ impl<T> Proof<T> {
 
         self.lemma.validate(self.algorithm)
     }
-
 }
 
 /// A `Lemma` holds the hash of a node, the hash of its sibling node,
