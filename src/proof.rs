@@ -46,7 +46,8 @@ mod algorithm_serde {
     }
 
     pub fn deserialize<'de, D: Deserializer<'de>>(de: D) -> Result<&'static Algorithm, D::Error> {
-        match Deserialize::deserialize(de)? {
+        let alg_str: String = Deserialize::deserialize(de)?;
+        match &*alg_str {
             "SHA1" => Ok(&digest::SHA1),
             "SHA256" => Ok(&digest::SHA256),
             "SHA384" => Ok(&digest::SHA384),
