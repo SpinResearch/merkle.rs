@@ -1,9 +1,17 @@
 
 # Changelog
 
-## [Unreleased](https://github.com/SpinResearch/merkle.rs/compare/1.7.0...master)
+## [Unreleased](https://github.com/SpinResearch/merkle.rs/compare/1.8.0...master)
 
 > Nothing yet.
+
+## [1.8.0](https://github.com/SpinResearch/merkle.rs/compare/1.7.0...1.8.0) - 2018-07-07
+
+## Changed
+- Move `Proof::validate_lemma` to `Lemma::validate` ([@nvesely](https://github.com/nvesely))
+- Automatically build Protobuf schemas using `protoc-rust` ([@dingxiangfei2009](https://github.com/dingxiangfei2009))
+- Update `protobuf` to 2.0.2 ([@nvesely](https://github.com/nvesely))
+- Update `ring` to `0.13.0` ([@kpcyrd](https://github.com/kpcyrd))
 
 ## [1.7.0](https://github.com/SpinResearch/merkle.rs/compare/1.6.0...1.7.0) - 2018-05-15
 
