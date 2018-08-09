@@ -56,14 +56,14 @@ matrix:
             - libdw-dev
             - binutils-dev
             - libiberty-dev
-            - zlib1g-dev 
+            - zlib1g-dev
 
     - env: NAME='clippy'
       rust: nightly-2018-07-22
       before_script:
         - rustup component add clippy-preview
       script:
-        - cargo clippy --all --tests --all-features -- -D clippy
+        - cargo clippy --all --all-features -- -D clippy
 
 env:
   global:
