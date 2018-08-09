@@ -1,14 +1,16 @@
 
 # Changelog
 
-## [Unreleased](https://github.com/SpinResearch/merkle.rs/compare/1.9.0...master)
+## [Unreleased](https://github.com/SpinResearch/merkle.rs/compare/1.10.0...master)
 
 > Nothing yet.
 
-## [1.9.0](https://github.com/SpinResearch/merkle.rs/compare/1.8.0...1.9.0) - 2018-07-09
+## [1.10.0](https://github.com/SpinResearch/merkle.rs/compare/1.9.0...1.10.0) - 2018-07-09
 
 ## Added
 - Add `MerkleTree::gen_nth_proof` and `Proof::index` ([@afck](https://github.com/afck))
+
+## [1.9.0](https://github.com/SpinResearch/merkle.rs/compare/1.8.0...1.9.0) - 2018-07-09
 
 ## Fixed
 - Fix proof deserialization when deserializer does not own the slice ([@afck](https://github.com/afck))
