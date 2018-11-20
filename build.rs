@@ -15,7 +15,8 @@ fn has_right_protoc_version(version: &str) -> bool {
     let version_output = protoc.wait_with_output().unwrap();
     assert!(version_output.status.success());
 
-    String::from_utf8(version_output.stdout).unwrap().trim() == version.trim()
+    let full_version = String::from_utf8(version_output.stdout).unwrap();
+    full_version.trim() == format!("libprotoc {}", version.trim())
 }
 
 #[cfg(feature = "serialization-protobuf")]
@@ -26,7 +27,8 @@ fn build_protobuf(out_dir: &str, input: &[&str], includes: &[&str]) {
         input,
         includes,
         customize: Default::default(),
-    }).expect("protoc");
+    })
+    .expect("protoc");
 }
 
 #[cfg(feature = "serialization-protobuf")]
@@ -36,13 +38,14 @@ fn build_protobuf_schemata() {
     let mut version_string = String::new();
     let mut version_pin =
         File::open("PROTOC_VERSION").expect("protoc version pin `PROTOC_VERSION` file is missing");
+
     version_pin
         .read_to_string(&mut version_string)
         .expect("cannot read protoc pin file");
 
     if !has_right_protoc_version(&version_string) {
         eprintln!(
-            "Build failed because merkle.rs could not find: {}",
+            "Build failed because merkle.rs could not find protobuf version {}",
             version_string
         );
 

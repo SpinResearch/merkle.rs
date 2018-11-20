@@ -1,9 +1,15 @@
 language: rust
+
+# Need to cache the whole `.cargo` directory to keep .crates.toml for
+# cargo-update to work
 cache:
   directories:
-    - $HOME/.cargo
     - $HOME/protobuf
-    - $TRAVIS_BUILD_DIR/target
+    - $HOME/.cargo
+
+# But don't cache the cargo registry
+before_cache:
+  - rm -rf $HOME/.cargo/registry
 
 rust:
   - stable
@@ -21,23 +27,12 @@ matrix:
     - env: NAME='nightly'
       rust: nightly
 
-    - env:
-        - NAME='rustfmt'
-        - PROTOBUF_CODEGEN_VERSION=2.0.0
-        - PATH=$PATH:$HOME/.cargo/bin:$HOME/protobuf/bin
-      rust: nightly-2018-07-22
+    - env: NAME='clippy'
+      rust: stable
       before_script:
-        - rustup component add rustfmt-preview
-        # Protoc plugin needed to generate proof.rs from proof.proto
-        - cargo install protobuf-codegen --version $PROTOBUF_CODEGEN_VERSION || echo "protobuf-codegen already installed"
-        # TODO: see if we can avoid installing protobuf-codegen and generating
-        # proof.rs in this build by using rustfmt options (see
-        # https://github.com/SpinResearch/merkle.rs/pull/38#issuecomment-391336829,
-        # paragraph 2).
-        - protoc --version
-        - protoc --rust_out src/proto/ protobuf/proof.proto
+        - rustup component add clippy-preview
       script:
-        - cargo fmt --all -- --check
+        - cargo clippy --all-targets --all-features -- -D warnings
 
     - env: NAME='kcov'
       sudo: required # travis-ci/travis-ci#9061
@@ -58,13 +53,6 @@ matrix:
             - libiberty-dev
             - zlib1g-dev
 
-    - env: NAME='clippy'
-      rust: nightly-2018-07-22
-      before_script:
-        - rustup component add clippy-preview
-      script:
-        - cargo clippy --all --all-features -- -D clippy
-
 env:
   global:
   - RUSTFLAGS="-C link-dead-code"
@@ -78,4 +66,5 @@ script:
 before_install:
   - export PATH=$PATH:$HOME/protobuf/bin
   - export PROTOC_VERSION=$(cat PROTOC_VERSION)
-  - bash install_protobuf.sh
+  - bash ci/install_protobuf.sh
+
