@@ -75,11 +75,12 @@ mod algorithm_serde {
                     serde_json::ser::PrettyFormatter::new(),
                 );
 
-                serialize(alg, &mut serializer).expect(&format!("{:?}", alg));
+                serialize(alg, &mut serializer).unwrap_or_else(|_| panic!("{:?}", alg));
+
                 let alg_ = deserialize(&mut serde_json::Deserializer::from_slice(
                     &serializer.into_inner()[..],
                 ))
-                .expect(&format!("{:?}", alg));
+                .unwrap_or_else(|_| panic!("{:?}", alg));
 
                 assert_eq!(*alg, alg_);
             }
@@ -92,7 +93,7 @@ mod algorithm_serde {
             {
                 let alg_str = "\"BLAKE2b\"";
                 let mut deserializer = serde_json::Deserializer::from_str(alg_str);
-                let _ = deserialize(&mut deserializer).expect(&format!("{:?}", alg_str));
+                let _ = deserialize(&mut deserializer).unwrap_or_else(|_| panic!("{:?}", alg_str));
             }
         }
     }
