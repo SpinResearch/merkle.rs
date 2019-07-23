@@ -18,7 +18,7 @@ categories    = ["data-structures", "cryptography"]
 
 
 [dependencies]
-ring = "^0.13.0"
+ring = "^0.14.0"
 protobuf = { version = "^2.0.2", optional = true }
 serde = { version = "^1.0.55", optional = true }
 serde_derive = { version = "^1.0.55", optional = true }
