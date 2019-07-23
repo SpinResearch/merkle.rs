@@ -1,9 +1,17 @@
 
 # Changelog
 
-## [Unreleased](https://github.com/SpinResearch/merkle.rs/compare/1.10.0...master)
+## [Unreleased](https://github.com/SpinResearch/merkle.rs/compare/1.11.0...master)
 
 > Nothing yet.
+
+## [1.11.0](https://github.com/SpinResearch/merkle.rs/compare/1.10.0...1.11.0) - 2019-07-23
+
+## Changed
+- Update dependencies ([@romac](https://github.com/romac))
+
+## Added
+- Add `MerkleTree::gen_nth_proof` and `Proof::index` ([@afck](https://github.com/afck))
 
 ## [1.10.0](https://github.com/SpinResearch/merkle.rs/compare/1.9.0...1.10.0) - 2018-07-09
 
