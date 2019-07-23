@@ -93,7 +93,8 @@ mod algorithm_serde {
             {
                 let alg_str = "\"BLAKE2b\"";
                 let mut deserializer = serde_json::Deserializer::from_str(alg_str);
-                let _ = deserialize(&mut deserializer).unwrap_or_else(|_| panic!("{:?}", alg_str));
+                let _ = deserialize(&mut deserializer)
+                    .unwrap_or_else(|_| panic!("unknown hash algorithm {:?}", alg_str));
             }
         }
     }
