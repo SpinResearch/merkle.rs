@@ -5,9 +5,9 @@ extern crate serde_json;
 
 use ring::digest::{Algorithm, Context, SHA512};
 
-use hashutils::{HashUtils, Hashable};
-use merkletree::MerkleTree;
-use proof::Positioned;
+use crate::hashutils::{HashUtils, Hashable};
+use crate::merkletree::MerkleTree;
+use crate::proof::Positioned;
 
 #[allow(non_upper_case_globals)]
 static digest: &'static Algorithm = &SHA512;

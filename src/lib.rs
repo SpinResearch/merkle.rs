@@ -24,16 +24,16 @@ extern crate serde;
 extern crate serde_derive;
 
 mod merkletree;
-pub use merkletree::MerkleTree;
+pub use crate::merkletree::MerkleTree;
 
 mod proof;
-pub use proof::Proof;
+pub use crate::proof::Proof;
 
 mod hashutils;
-pub use hashutils::Hashable;
+pub use crate::hashutils::Hashable;
 
 mod tree;
-pub use tree::{LeavesIntoIterator, LeavesIterator};
+pub use crate::tree::{LeavesIntoIterator, LeavesIterator};
 
 #[cfg(feature = "serialization-protobuf")]
 #[allow(unused_qualifications)]

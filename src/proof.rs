@@ -3,8 +3,8 @@ use std::hash::{Hash, Hasher};
 
 use ring::digest::Algorithm;
 
-use hashutils::HashUtils;
-use tree::Tree;
+use crate::hashutils::HashUtils;
+use crate::tree::Tree;
 
 /// An inclusion proof represent the fact that a `value` is a member
 /// of a `MerkleTree` with root hash `root_hash`, and hash function `algorithm`.

@@ -3,10 +3,10 @@ use std::hash::{Hash, Hasher};
 
 use ring::digest::Algorithm;
 
-use hashutils::{HashUtils, Hashable};
-use tree::{LeavesIntoIterator, LeavesIterator, Tree};
+use crate::hashutils::{HashUtils, Hashable};
+use crate::tree::{LeavesIntoIterator, LeavesIterator, Tree};
 
-use proof::{Lemma, Proof};
+use crate::proof::{Lemma, Proof};
 
 /// A Merkle tree is a binary tree, with values of type `T` at the leafs,
 /// and where every internal node holds the hash of the concatenation of the hashes of its children nodes.
