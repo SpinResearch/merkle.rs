@@ -294,7 +294,7 @@ fn test_custom_hashable_impl() {
 #[test]
 fn test_serialize_proof_with_serde() {
     let values = (1..10).map(|x| vec![x]).collect::<Vec<_>>();
-    let tree = MerkleTree::from_vec(digest, values);
+    let tree = MerkleTree::from_vec(DIGEST, values);
     let proof = tree.gen_proof(vec![5]);
 
     let serialized = serde_json::to_string(&proof).expect("serialize proof");
