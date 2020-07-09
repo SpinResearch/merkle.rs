@@ -21,14 +21,12 @@ fn has_right_protoc_version(version: &str) -> bool {
 
 #[cfg(feature = "serialization-protobuf")]
 fn build_protobuf(out_dir: &str, input: &[&str], includes: &[&str]) {
-    use self::protoc_rust::{run, Args};
-    run(Args {
-        out_dir,
-        input,
-        includes,
-        customize: Default::default(),
-    })
-    .expect("protoc");
+    protoc_rust::Codegen::new()
+        .out_dir(out_dir)
+        .inputs(input)
+        .includes(includes)
+        .run()
+        .expect("Running protoc failed");
 }
 
 #[cfg(feature = "serialization-protobuf")]

@@ -12,7 +12,7 @@ use merkle::MerkleTree;
 use rand::RngCore;
 use ring::digest::{Algorithm, SHA512};
 
-static DIGEST: &'static Algorithm = &SHA512;
+static DIGEST: &Algorithm = &SHA512;
 
 fn bench_small_str_tree(c: &mut Criterion) {
     c.bench_function("MerkleTree::from_bec - small", |b| {
@@ -115,7 +115,7 @@ fn bench_big_rnd_iter(c: &mut Criterion) {
             rng.fill_bytes(&mut v);
         }
 
-        let tree = MerkleTree::from_vec(DIGEST, values.clone());
+        let tree = MerkleTree::from_vec(DIGEST, values);
         b.iter(|| {
             for value in &tree {
                 black_box(value);
