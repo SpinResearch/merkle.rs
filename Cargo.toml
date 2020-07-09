@@ -20,7 +20,6 @@ categories    = ["data-structures", "cryptography"]
 [package.metadata.release]
 sign-commit                 = true
 sign-tag                    = true
-enable-features             = [ "serialization-serde", "serialization-protobuf" ]
 pre-release-commit-message  = "Release version {{version}}."
 post-release-commit-message = "Start next development iteration {{version}}."
 tag-message                 = "Release version {{version}}."
