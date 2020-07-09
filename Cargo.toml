@@ -18,17 +18,16 @@ keywords      = ["merkle", "merkle-tree"]
 categories    = ["data-structures", "cryptography"]
 
 [package.metadata.release]
-sign-commit = true
-upload-doc = true
-doc-branch = "gh-pages"
-pre-release-commit-message = "Release version {{version}}."
-pro-release-commit-message = "Start next development iteration {{version}}."
-tag-message = "Release version {{version}}."
-doc-commit-message = "Update documentation."
-dev-version-ext = "pre"
+sign-commit                 = true
+sign-tag                    = true
+enable-features             = [ "serialization-serde", "serialization-protobuf" ]
+pre-release-commit-message  = "Release version {{version}}."
+post-release-commit-message = "Start next development iteration {{version}}."
+tag-message                 = "Release version {{version}}."
+dev-version-ext             = "pre"
 
 [[bench]]
-name = "proof"
+name    = "proof"
 harness = false
 
 [dependencies]
