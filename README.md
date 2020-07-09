@@ -9,7 +9,7 @@
 
 ## Documentation
 
-Documentation is [available](https://spinresearch.github.io/merkle.rs/merkle/index.html).
+Documentation is [available](https://docs.rs/merkle).
 
 ## Bug Reporting
 
