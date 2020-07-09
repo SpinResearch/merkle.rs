@@ -6,6 +6,7 @@
 ## Changed
 - Update to Rust 2018 ([@romac](https://github.com/romac))
 - Update criterion to v0.3.3 ([@romac](https://github.com/romac))
+- Update protobuf to v3.12.3 ([@romac](https://github.com/romac))
 
 ## [1.11.0](https://github.com/SpinResearch/merkle.rs/compare/1.10.0...1.11.0) - 2019-07-23
 

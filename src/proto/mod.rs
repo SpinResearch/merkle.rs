@@ -3,12 +3,13 @@ mod proof;
 
 use ring::digest::Algorithm;
 
-pub use self::proof::{LemmaProto, ProofProto};
-use proof::{Lemma, Positioned, Proof};
-
 use protobuf::error::ProtobufResult;
 use protobuf::parse_from_bytes;
-use protobuf::Message;
+
+use crate::proof::{Lemma, Positioned, Proof};
+use crate::protobuf::Message;
+
+pub use self::proof::{LemmaProto, ProofProto};
 
 impl<T> Proof<T> {
     /// Constructs a `Proof` struct from its Protobuf representation.
