@@ -30,18 +30,18 @@ name    = "proof"
 harness = false
 
 [dependencies]
-ring         = "0.16.15"
-protobuf     = { version = "2.16.2",  optional = true }
-serde        = { version = "1.0.114", optional = true }
-serde_derive = { version = "1.0.114", optional = true }
+ring         = "0.17.8"
+protobuf     = { version = "3.5.0",  optional = true }
+serde        = { version = "1.0.208", optional = true }
+serde_derive = { version = "1.0.208", optional = true }
 
 [build-dependencies]
-protoc-rust = { version = "2.16.2", optional = true }
+protoc-rust = { version = "2.28.0", optional = true }
 
 [dev-dependencies]
-serde_json = "1.0.56"
-criterion  = "0.3.3"
-rand       = "0.7.3"
+serde_json = "1.0.125"
+criterion  = "0.5.1"
+rand       = "0.8.5"
 
 [features]
 serialization-protobuf = [ "protobuf", "protoc-rust" ]
